@@ -11,13 +11,13 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    public function getAuthIdentifierName()
+    {
+        return 'phone_number';
+    }
+
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'phone_number',
     ];
 
     /**

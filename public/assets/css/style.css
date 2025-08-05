@@ -1,0 +1,71 @@
+body {
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+.bg-purple {
+    background-color: #3F2F96;
+}
+
+/* LOGIN */
+.btn-purple {
+    background-color: #3F2F96;
+    color: white;
+}
+
+.bullet {
+    width: 10px; 
+    height: 10px; 
+    background-color: #3F2F96; 
+    border-radius: 50%;
+}
+
+/* CIRCLE PUTIH DI HEADER */
+.circle {
+  position: absolute;
+  background-color: white;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.circle1 {
+  width: 100px;
+  height: 100px;
+  top: 200px;
+  left: -10px;
+}
+
+.circle2 {
+  width: 60px;
+  height: 60px;
+  top: 230px;
+  left: 74px;
+}
+
+.circle3 {
+  width: 20px;
+  height: 20px;
+  top: 210px;
+  left: 100px;
+}
+
+.circle4 {
+  width: 80px;
+  height: 80px;
+  top: 215px;
+  right: -10px;
+}
+
+.circle5 {
+  width: 40px;
+  height: 40px;
+  top: 250px;
+  right: 60px;
+}
+
+.circle6 {
+  width: 30px;
+  height: 30px;
+  top: 215px;
+  right: 70px;
+}
