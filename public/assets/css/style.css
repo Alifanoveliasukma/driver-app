@@ -20,7 +20,6 @@ body {
     border-radius: 50%;
 }
 
-/* CIRCLE PUTIH DI HEADER */
 .circle {
   position: absolute;
   background-color: white;
@@ -69,3 +68,87 @@ body {
   top: 215px;
   right: 70px;
 }
+
+.floating-box {
+  background-color: #2E8B57; 
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); 
+  position: absolute;
+  top: 100%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  width: 350px;
+  font-size: 12px;      
+  font-weight: bold;
+}
+
+.row-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.label {
+  color: #ffff;
+}
+
+.value {
+  text-align: right;
+  max-width: 65%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.alamat-box {
+  background-color: #f2f2f2;
+  border-radius: 10px;
+  padding: 15px;
+  width: 90%;
+  max-width: 350px;
+  margin: 60px auto 0 auto;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* css geser button */
+.slide-confirm-container {
+  padding: 20px;
+}
+
+.slide-track {
+  position: relative;
+  width: 300px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  overflow: hidden;
+}
+
+.slide-button {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background 0.3s;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.slide-label {
+  margin: 0 auto;
+  z-index: 1;
+  pointer-events: none;
+}
+
