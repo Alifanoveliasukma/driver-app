@@ -1,7 +1,10 @@
 body {
     background-color: #ffffff;
     min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
+
 
 .bg-purple {
     background-color: #3F2F96;
@@ -70,18 +73,21 @@ body {
 }
 
 .floating-box {
-  background-color: #2E8B57; 
+  background-color: #2E8B57; /* Hijau */
   color: white;
   padding: 15px;
-  border-radius: 5px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); 
-  position: absolute;
-  top: 100%; 
-  left: 50%; 
-  transform: translate(-50%, -50%); 
-  width: 350px;
-  font-size: 12px;      
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  font-size: 12px;
   font-weight: bold;
+
+  position: absolute;
+  bottom: -40px; /* Melayang ke bawah dari kotak ungu */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 400px;
+  z-index: 10;
 }
 
 .row-item {

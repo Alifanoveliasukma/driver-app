@@ -8,6 +8,11 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        return view('menu.utama');
+        return view('menu.utama.order');
+    }
+
+    public function tiba()
+    {
+        return view('menu.utama.tiba');
     }
 }
