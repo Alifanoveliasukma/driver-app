@@ -14,9 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="{{ asset('assets/js/script.js') }}"></script>
 
-   <body class="login-bg">
+    <body class="login-bg">
       @yield('content')
-  </body>
+    </body>
   <nav class="nav nav-pills nav-fill bg-light border-top position-fixed bottom-0 w-100" style="height: 60px; z-index: 999;">
     <a class="nav-link text-center" data-id="utama">
       <i class="bi bi-house-door-fill d-block" style="font-size: 18px; color: purple;"></i>

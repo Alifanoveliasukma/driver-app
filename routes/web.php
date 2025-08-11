@@ -16,7 +16,7 @@ use App\Http\Controllers\DashboardController;
 */
 
 Route::get('/', function () {
-    return view('menu.utama.tiba');
+    return view('menu.utama.no-order');
 });
 // routes/web.php
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
