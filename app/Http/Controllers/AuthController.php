@@ -22,7 +22,7 @@ class AuthController extends Controller
 
         if (Auth::attempt(['phone_number' => $credentials['phone_number'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/utama');
         }
 
         return back()->withErrors([
