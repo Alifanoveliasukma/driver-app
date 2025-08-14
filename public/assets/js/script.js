@@ -18,7 +18,7 @@ function onSlide(e) {
   btn.style.left = moveX + 'px';
 
   if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-    btn.style.background = '#198754'; // green
+    btn.style.background = '#198754';
     btn.innerHTML = '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
   } else {
     btn.style.background = '#ffffff';
@@ -30,9 +30,11 @@ function stopSlide(e) {
   isDragging = false;
   const btn = document.querySelector('.slide-button');
   const container = document.querySelector('.slide-track');
+  const targetUrl = container.dataset.redirect;
 
   if (parseInt(btn.style.left) >= container.clientWidth - btn.clientWidth - 5) {
     alert('✅ Konfirmasi Berangkat!');
+    window.location.href = targetUrl; 
   } else {
     btn.style.left = '0px';
     btn.style.background = '#ffffff';
