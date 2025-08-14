@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+
 use App\Http\Controllers\Menu\UtamaController;
 use App\Http\Controllers\Menu\HistoriController;
 use App\Http\Controllers\Menu\UjpController;
