@@ -3,7 +3,6 @@
 @section('content')
 <div class="profile-wrap">
 
-  <!-- Hero header -->
   <div class="profile-hero">
     <button class="btn-back" onclick="window.history.back()" aria-label="Kembali">
       <i class="bi bi-chevron-left"></i>
@@ -24,13 +23,11 @@
     </div>
   </div>
 
-  <!-- Alert perpanjang SIM -->
   <button type="button" class="btn-sim-alert w-100">
     <i class="bi bi-exclamation-triangle-fill me-1"></i>
     Segera Perpanjang SIM
   </button>
 
-  <!-- Order berjalan -->
   <div class="section-panel mt-3">
     <div class="section-title">Order Berjalan</div>
 
@@ -64,7 +61,6 @@
     </div>
   </div>
 
-  <!-- Asal + Lihat peta -->
   <div class="section-panel mt-3">
     <div class="muted mb-1">Asal</div>
     <div class="addr-row">

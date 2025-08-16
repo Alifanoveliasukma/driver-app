@@ -14,7 +14,6 @@
   </div>
 </div>
 
-<!-- Konten scroll -->
 <div class="scrollable-content px-3">
 
   <div class="alamat-box" style="width: 90%; max-width: 400px; margin-top: 50px; background-color: #f3f3f3; padding: 16px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
