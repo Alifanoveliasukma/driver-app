@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="position-relative bg-purple text-white" style="height: 100px;">
-  <!-- Parent ungu sebagai anchor -->
   <div class="floating-box">
     <div class="row-item">
       <span class="label">Surat Jalan</span>
@@ -80,6 +79,8 @@
         </div>
       </div>
     </div>
+
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   const input   = document.getElementById('foto-sopir');
@@ -118,5 +119,5 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 </script>
-
+@endpush
 @endsection

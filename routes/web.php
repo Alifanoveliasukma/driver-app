@@ -8,24 +8,17 @@ use App\Http\Controllers\Menu\HistoriController;
 use App\Http\Controllers\Menu\UjpController;
 use App\Http\Controllers\Menu\ProfilController;
 
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'handleLogin']);
 
-Route::get('/login/roleorg', [AuthController::class, 'showRoleOrg'])->name('login.roleorg');
-Route::post('/login/roleorg', [AuthController::class, 'handleRoleOrg']);
-
-Route::get('/login/authenticate', [AuthController::class, 'authenticate'])->name('login.authenticate');
-
+Route::match(['get','post'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-Route::get('/konfirmasi-tiba-muat', function () {
-    return view('menu.utama.konfirmasi-tiba-muat');
-})->name('utama.konfirmasi-tiba-muat');
 
 Route::get('/no-order', function () {
     return view('menu.utama.no-order');
 });
+Route::get('/konfirmasi-tiba-muat', function () {
+    return view('menu.utama.konfirmasi-tiba-muat');
+})->name('utama.konfirmasi-tiba-muat');
 
 Route::get('/konfirmasi-selesai-muat', function () {
     return view('menu.utama.konfirmasi-selesai-muat');

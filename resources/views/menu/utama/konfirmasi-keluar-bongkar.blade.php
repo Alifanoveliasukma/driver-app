@@ -152,6 +152,7 @@
     </div>
 <script>
 
+@push('scripts')
 (function(){
   const c = document.getElementById('signPad');
   if(!c) return;
@@ -252,5 +253,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
+@endpush
 
 @endsection

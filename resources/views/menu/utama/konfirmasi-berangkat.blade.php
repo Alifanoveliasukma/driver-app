@@ -2,6 +2,12 @@
 
 @section('content')
 <div class="position-relative bg-purple text-white" style="height: 100px;">
+  <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
+      @csrf
+      <button type="submit" class="btn btn-sm btn-light text-dark">
+          <i class="bi bi-box-arrow-right"></i> Logout
+      </button>
+  </form>
   <div class="floating-box">
     <div class="row-item">
       <span class="label">Surat Jalan</span>
