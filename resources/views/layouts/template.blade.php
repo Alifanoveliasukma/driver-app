@@ -28,12 +28,12 @@
     <small class="d-block">Utama</small>
   </a>
 
-  <a href="{{ route('menu.ujp') }}"
+  <!-- <a href="{{ route('menu.ujp') }}"
      class="nav-link text-center {{ request()->routeIs('menu.ujp') ? 'active' : '' }}"
      aria-current="{{ request()->routeIs('menu.ujp') ? 'page' : '' }}">
     <i class="bi bi-credit-card-2-front d-block"></i>
     <small class="d-block">UJP</small>
-  </a>
+  </a> -->
 
   <a href="{{ route('menu.histori') }}"
      class="nav-link text-center {{ request()->routeIs('menu.histori') ? 'active' : '' }}"
