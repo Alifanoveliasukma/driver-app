@@ -11,7 +11,7 @@
   <div class="floating-box">
     <div class="row-item">
       <span class="label">Surat Jalan</span>
-      <span class="value">PROJECT/22/10/08827</span>
+      <span class="value">{{ $order->value }}</span>
     </div>
     <div class="row-item">
       <span class="label">Pelanggan</span>
@@ -31,10 +31,10 @@
         <div style="font-weight: bold;">Jakarta Utara</div>
       </div>
       <div class="text-center">
-        <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center" style="width: 80px; height: 80px;">
+        <!-- <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center" style="width: 80px; height: 80px;">
           <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
           <small>Lihat Peta</small>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>

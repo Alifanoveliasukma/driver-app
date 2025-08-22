@@ -65,7 +65,7 @@ class AuthApi
             ->select('ur.ad_role_id as id', 'r.name')
             ->leftJoin('mzl.ad_role as r', 'r.ad_role_id', '=', 'ur.ad_role_id')
             ->where('ur.ad_user_id', $userId)
-            ->whereIn('r.name', ['OPS MRO', 'INVOICE ADMIN'])
+            ->whereIn('r.name', ['OPS MRO', 'INVOICE ADMIN', 'Driver'])
             ->get();
     }
 

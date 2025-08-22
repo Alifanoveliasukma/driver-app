@@ -172,13 +172,11 @@ class AuthController extends Controller
             'is_login' => true,
         ]);
         
-        if ((int)$roleid === 1000048) {
+        if ((int)$roleid === 1000049) {
             return redirect()->route('menu.konfirmasi-berangkat');
         }
-        if ((int)$roleid === 1000043) {
-            return redirect()->route('invoices');
-        }
-        return redirect()->route('menu.histori');
+        return redirect()->route('login')->with('error', 'Role tidak dikenali');
+        
     }
 
     public function logout()
