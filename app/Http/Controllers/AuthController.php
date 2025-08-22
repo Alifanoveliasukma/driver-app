@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\AuthApi; 
+use App\Services\AuthApi;
 
 class AuthController extends Controller
 {
@@ -26,7 +26,7 @@ class AuthController extends Controller
     {
         $this->isLoginRedirect();
 
-        $step = $request->query('step'); 
+        $step = $request->query('step');
 
         $data = [
             'title' => 'Log in',
@@ -46,8 +46,9 @@ class AuthController extends Controller
                     ->first();
 
                 if (!$user) {
-                    
-                    session()->flash('message',
+
+                    session()->flash(
+                        'message',
                         'Error logging in - no roles or user/pwd invalid for user sales'
                     );
                     return redirect()->route('login');
@@ -55,10 +56,10 @@ class AuthController extends Controller
 
                 $data['user']  = $user;
                 $data['roles'] = $api->getRoles($user->id);
-                $data['orgs']  = $api->getOrgs($user->id);  
+                $data['orgs']  = $api->getOrgs($user->id);
 
                 if (!$request->isMethod('post')) {
-                    return view('auth.role', $data); 
+                    return view('auth.role', $data);
                 }
 
                 $request->validate([
@@ -77,7 +78,7 @@ class AuthController extends Controller
                 return $this->_auth($api);
 
             default:
-               
+
                 session([
                     'username' => null,
                     'password' => null,
@@ -85,9 +86,9 @@ class AuthController extends Controller
                     'orgid'    => null,
                 ]);
 
-               
+
                 if (!$request->isMethod('post')) {
-                    return view('auth.login', $data); 
+                    return view('auth.login', $data);
                 }
 
                 $request->validate([
@@ -95,7 +96,7 @@ class AuthController extends Controller
                     'password' => 'required|string',
                 ]);
 
-               
+
                 session([
                     'username' => $request->input('username'),
                     'password' => $request->input('password'),
@@ -134,12 +135,12 @@ class AuthController extends Controller
             return redirect()->route('login');
         }
 
-        $dataset = $user['DataSet'] 
+        $dataset = $user['DataSet']
             ?? ($user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet'] ?? null);
 
-        $success = ($user['Success'] 
+        $success = ($user['Success']
             ?? ($user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['Success'] ?? null));
-        $successOk = in_array(strtolower((string)$success), ['true','y','1'], true) || $success === true;
+        $successOk = in_array(strtolower((string)$success), ['true', 'y', '1'], true) || $success === true;
         if (!$successOk) {
             session()->flash('message', 'Login gagal: Success=false.');
             return redirect()->route('login');
@@ -161,7 +162,7 @@ class AuthController extends Controller
         $name    = $fields[1]['@attributes']['lval'] ?? null;
         $value   = $fields[2]['@attributes']['lval'] ?? $username;
 
-        session()->forget(['username','password','roleid','orgid']);
+        session()->forget(['username', 'password', 'roleid', 'orgid']);
 
         session([
             'user_id'  => $user_id,
@@ -171,18 +172,17 @@ class AuthController extends Controller
             'orgid'    => (int) $orgid,
             'is_login' => true,
         ]);
-        
+
         if ((int)$roleid === 1000049) {
             return redirect()->route('menu.konfirmasi-berangkat');
         }
         return redirect()->route('login')->with('error', 'Role tidak dikenali');
-        
     }
 
     public function logout()
     {
 
-        session()->forget(['user_id','name','username','password','roleid','is_login']);
+        session()->forget(['user_id', 'name', 'username', 'password', 'roleid', 'is_login']);
         return redirect()->route('login');
     }
 }
