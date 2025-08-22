@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 use Mtownsend\XmlToArray\XmlToArray;
