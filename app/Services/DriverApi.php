@@ -6,8 +6,6 @@ namespace App\Services;
 
 class DriverApi extends BaseApi
 {
-
-
     public function getDriver($bpartnerId)
     {
         $request = '

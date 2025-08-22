@@ -3,9 +3,8 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
-use Mtownsend\XmlToArray\XmlToArray;
 
-class AuthApi
+class AuthApi extends BaseApi
 {
     public function authUser($username, $password, $roleid, $orgid, $whid)
     {
@@ -37,26 +36,7 @@ class AuthApi
             </soapenv:Body>
         </soapenv:Envelope>';
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, env('API_URL'));
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $request);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            "Content-Type: text/xml; charset=utf-8",
-            "Content-Length: " . strlen($request)
-        ]);
-        $response = curl_exec($ch);
-        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-
-        if ($httpcode != 200) {
-            return 'The service is temporarily unavailable. Please try again later.';
-        }
-        $responseArray = XmlToArray::convert($response);
-        return $responseArray;
+        return $this->sendRequest($request);
     }
 
     public function getRoles($userId)
