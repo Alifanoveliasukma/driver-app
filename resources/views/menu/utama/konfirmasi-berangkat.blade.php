@@ -11,11 +11,11 @@
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>
-                {{-- <span class="value">{{ $order->value }}</span> --}}
+                <span class="value">{{$mappedDetail['Value'] ?? '-'}}</span>
             </div>
             <div class="row-item">
                 <span class="label">Pelanggan</span>
-                <span class="value">PT. SEMEN INDONESIA</span>
+                <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
             </div>
         </div>
     </div>
@@ -29,7 +29,6 @@
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
                     <div style="font-weight: bold;">Gudang Jakarta</div>
-                    <div style="font-weight: bold;">Jakarta Utara</div>
                 </div>
                 <div class="text-center">
                     <!-- <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center" style="width: 80px; height: 80px;">
@@ -45,12 +44,13 @@
         </div>
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
-                <div style="font-weight: bold;">06 Oct 2022</div>
+                <div id="tanggalKeluar" style="font-weight: bold;">--</div>
             </div>
             <div class="bg-light rounded p-3 text-center flex-fill">
-                <div style="font-weight: bold;">20:26</div>
+                <div id="jamKeluar" style="font-weight: bold;">--</div>
             </div>
         </div>
+        <input type="hidden" name="OutLoadDate" id="OutLoadDate">
 
         <div class="d-flex align-items-center rounded px-3 py-2" style="width: 100%; max-width: 400px; margin: 0 auto;">
             <div class="text-muted" style="flex: 1;">KM Mobil</div>
@@ -72,18 +72,5 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script>
-            document.addEventListener('focusin', (e) => {
-                if (e.target.matches('input, textarea, select')) {
-                    setTimeout(() => {
-                        e.target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }, 100);
-                }
-            });
-        </script>
-    @endpush
+@endpush
 @endsection
