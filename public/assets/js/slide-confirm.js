@@ -40,23 +40,11 @@ function stopSlide(e) {
     const container = document.querySelector(".slide-track");
     const targetUrl = container.dataset.redirect;
 
+    const hiddenEl = document.getElementById("OutLoadDate");
+    let outLoadDate = hiddenEl ? hiddenEl.value : null;
     const orderId = container.dataset.orderid;
 
-    const now = new Date();
-    const formatted =
-        now.getFullYear() +
-        "-" +
-        String(now.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(now.getDate()).padStart(2, "0") +
-        " " +
-        String(now.getHours()).padStart(2, "0") +
-        ":" +
-        String(now.getMinutes()).padStart(2, "0") +
-        ":" +
-        String(now.getSeconds()).padStart(2, "0");
-
-    console.log(targetUrl, formatted, "TEST TES");
+    console.log(targetUrl, outLoadDate, "TEST TES");
     if (
         parseInt(btn.style.left) >=
         container.clientWidth - btn.clientWidth - 5
@@ -72,7 +60,7 @@ function stopSlide(e) {
                     .getAttribute("content"),
             },
             body: JSON.stringify({
-                OutLoadDate: formatted,
+                OutLoadDate: outLoadDate,
                 orderId: orderId,
             }),
         })
@@ -99,3 +87,56 @@ function stopSlide(e) {
     document.removeEventListener("touchmove", onSlide);
     document.removeEventListener("touchend", stopSlide);
 }
+
+function initRealtimeDateTime() {
+    function updateDateTime() {
+        let now = new Date();
+
+        const bulan = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ];
+        let tanggal =
+            String(now.getDate()).padStart(2, "0") +
+            " " +
+            bulan[now.getMonth()] +
+            " " +
+            now.getFullYear();
+        let jam =
+            String(now.getHours()).padStart(2, "0") +
+            ":" +
+            String(now.getMinutes()).padStart(2, "0");
+
+        let tanggalEl = document.getElementById("tanggalKeluar");
+        let jamEl = document.getElementById("jamKeluar");
+        let hiddenEl = document.getElementById("OutLoadDate");
+
+        if (tanggalEl) tanggalEl.innerText = tanggal;
+        if (jamEl) jamEl.innerText = jam;
+
+        let yyyy = now.getFullYear();
+        let mm = String(now.getMonth() + 1).padStart(2, "0");
+        let dd = String(now.getDate()).padStart(2, "0");
+        let HH = String(now.getHours()).padStart(2, "0");
+        let ii = String(now.getMinutes()).padStart(2, "0");
+        let ss = String(now.getSeconds()).padStart(2, "0");
+        let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
+
+        if (hiddenEl) hiddenEl.value = formatted;
+    }
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+}
+
+document.addEventListener("DOMContentLoaded", initRealtimeDateTime);

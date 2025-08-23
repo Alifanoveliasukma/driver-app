@@ -32,9 +32,9 @@
                 </div>
                 <div class="text-center">
                     <!-- <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                                                                                                                                                                                                                                      <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
-                                                                                                                                                                                                                                      <small>Lihat Peta</small>
-                                                                                                                                                                                                                                    </div> -->
+                                                                                                                                                                  <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
+                                                                                                                                                                  <small>Lihat Peta</small>
+                                                                                                                                                                </div> -->
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
                 <div id="jamKeluar" style="font-weight: bold;">--</div>
             </div>
         </div>
-
+        <input type="hidden" name="OutLoadDate" id="OutLoadDate">
 
         <div class="d-flex align-items-center rounded px-3 py-2" style="width: 100%; max-width: 400px; margin: 0 auto;">
             <div class="text-muted" style="flex: 1;">KM Mobil</div>
@@ -62,7 +62,7 @@
 
     <div class="slide-confirm-container px-3">
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-            style="max-width: 400px; margin: 0 auto;" data-orderid={{ $mappedDetail['XX_TransOrder_ID'] }}
+            style="max-width: 400px; margin: 0 auto;" data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}"
             data-redirect="{{ route('utama.konfirmasi-tiba-muat') }}">
             <div class="slide-button bg-white d-flex justify-content-center align-items-center"
                 onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
