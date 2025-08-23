@@ -21,14 +21,14 @@ class UtamaController extends Controller
         $this->orderUpdate = $orderupdate;
     }
 
-    public function index()
+    public function getOrder()
     {
-
         $c_bpartner_id = session('c_bpartner_id');
 
 
         $driver = $this->driver->getDriver($c_bpartner_id);
-        $fields = $driver['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet']['DataRow']['field'] ?? [];
+        $fields = data_get($driver, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
+        if (isset($fields['@attributes'])) $fields = [$fields];
 
         $mappedDriver = [];
         foreach ($fields as $f) {
@@ -37,45 +37,50 @@ class UtamaController extends Controller
                 $mappedDriver[$attr['column']] = $attr['lval'];
             }
         }
-
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
         $order = $this->order->getOrderList($driverId);
-
-        $rows = $order['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet']['DataRow'] ?? [];
+        $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        if (isset($rows['field'])) $rows = [$rows];
 
         $mappedOrders = [];
-
-
-        if (isset($rows['field'])) {
-            $rows = [$rows];
-        }
-
         foreach ($rows as $row) {
-            $fields = $row['field'] ?? [];
-            $mappedRow = [];
+            $fs = $row['field'] ?? [];
+            if (isset($fs['@attributes'])) $fs = [$fs];
 
-            foreach ($fields as $f) {
+            $tmp = [];
+            foreach ($fs as $f) {
                 $attr = $f['@attributes'] ?? [];
                 if (isset($attr['column'], $attr['lval'])) {
-                    $mappedRow[$attr['column']] = $attr['lval'];
+                    $tmp[$attr['column']] = $attr['lval'];
                 }
             }
-
-            if (!empty($mappedRow)) {
-                $mappedOrders[] = $mappedRow;
-            }
+            if (!empty($tmp)) $mappedOrders[] = $tmp;
         }
 
+       $orders = collect($mappedOrders)
+            ->filter(fn($r) => !isset($r['Status']) || $r['Status'] !== 'FINISHED')
+            ->sortBy(fn($r) => $r['ETD'] ?? '9999-12-31 23:59:59')
+            ->values()
+            ->take(6)
+            ->all();
+        // dd($orders);
 
-        $orderId = $mappedOrders[0]['XX_TransOrder_ID'] ?? null;
-        // dd($mappedOrders[0]);
+        return view('menu.utama.list-order', compact('orders'));
+    }
+    
+
+    public function detailOrder($orderId)
+    {
+        if (empty($orderId)) {
+            abort(404);
+        }
 
         $detailOrder = $this->order->getOrderDetail($orderId);
 
-        $row = $detailOrder['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet']['DataRow'] ?? [];
+        $row = data_get($detailOrder, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
 
-        $fields = $row['field'] ?? [];
+        $fields = data_get($row, 'field', []);
         if (isset($fields['@attributes'])) {
             $fields = [$fields];
         }
@@ -83,44 +88,107 @@ class UtamaController extends Controller
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'], $attr['lval'])) {
-                $mappedDetail[$attr['column']] = $attr['lval'];
+            if (isset($attr['column'])) {
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
             }
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
-        $customerName = null;
-        if ($customerId) {
-            $customerName = DB::table('mzl.c_bpartner')
-                ->where('c_bpartner_id', $customerId)
-                ->value('name');
-        }
-
-        $mappedDetail['Customer_Name'] = $customerName ?? '-';
+        $mappedDetail['Customer_Name'] = $customerId
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            : '-';
 
         // dd($mappedDetail);
+        return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
+    }
 
-        return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail'));
+    public function berangkat(Request $request)
+    {
+        $orderId = $request->input('orderId');
+
+        if (empty($orderId)) {
+            return redirect()
+                ->route('utama.berangkat.list') 
+                ->with('message', 'Order ID tidak ditemukan.');
+        }
+
+        $update = $this->orderUpdate->updateOrder($orderId, [
+            'Status'      => 'LOAD',
+            'OutLoadDate' => now()->format('Y-m-d H:i:s'),
+        ]);
+
+        if (is_array($update) && isset($update['Error'])) {
+        $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+        return redirect()
+            ->route('menu.detail-order', ['orderId' => $orderId])
+            ->with('message', 'Gagal update: '.$err);
+    }
+
+    return redirect()
+        ->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId])
+        ->with('success', 'Status diubah ke LOAD.');
+
+    }
+
+    public function tibaMuatPage($orderId)
+    {
+        if (empty($orderId)) {
+            return redirect()->route('utama.berangkat.list')
+                ->with('message', 'Order ID tidak ditemukan.');
+        }
+
+        $detail = $this->order->getOrderDetail($orderId);
+
+        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $fields = data_get($row, 'field', []);
+        if (isset($fields['@attributes'])) $fields = [$fields];
+
+        $mappedDetail = [];
+        foreach ($fields as $f) {
+            $attr = $f['@attributes'] ?? [];
+            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+        }
+
+        $customerId = $mappedDetail['Customer_ID'] ?? null;
+        $mappedDetail['Customer_Name'] = $customerId
+            ? \DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            : '-';
+        // dd($mappedDetail);
+        return view('menu.utama.konfirmasi-tiba-muat', [
+            'mappedDetail' => $mappedDetail,
+            'orderId'      => $orderId,
+        ]);
+    
     }
 
     public function tibaMuat(Request $request)
     {
-        $outLoadDate = $request->input('OutLoadDate');
-        $orderId     = $request->input('orderId');
+         $data = $request->validate([
+        'orderId'     => 'required|integer',
+        'OutUnLoadDate' => 'required|date_format:Y-m-d H:i:s',
+    ]);
 
-        $status = "LOAD";
+    $update = $this->orderUpdate->updateOrder($data['orderId'], [
+        'Status'      => 'UNLOAD',
+        'OutUnLoadDate' => $data['OutUnLoadDate'],
+    ]);
 
-
-        $updateResult = $this->orderUpdate->updateOrder($orderId, [
-            'OutLoadDate' => $outLoadDate,
-            'Status' => $status
-        ]);
-
-
-
-        return response()->json([
-            'success' => true,
-            'data' => $updateResult
-        ]);
+    if (is_array($update) && isset($update['Error'])) {
+        $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+        return response()->json(['success' => false, 'message' => 'Gagal update: '.$err], 422);
     }
+
+    return response()->json([
+        'success'  => true,
+        'next_url' => route('utama.konfirmasi-selesai-muat', ['orderId' => $data['orderId']]),
+    ]);
+    }
+
+
+    public function selesaiMuatPage($orderId)
+    {
+        dd('berhasil diubah');
+    
+    }
+
 }

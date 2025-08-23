@@ -2,6 +2,12 @@
 
 @section('content')
     <div class="position-relative bg-purple text-white" style="height: 100px;">
+        @if(session('message'))
+        <div class="alert alert-danger">{{ session('message') }}</div>
+        @endif
+        @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
         <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
             @csrf
             <button type="submit" class="btn btn-sm btn-light text-dark">
@@ -31,10 +37,7 @@
                     <div style="font-weight: bold;">Gudang Jakarta</div>
                 </div>
                 <div class="text-center">
-                    <!-- <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                                                                                                                                                                  <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
-                                                                                                                                                                  <small>Lihat Peta</small>
-                                                                                                                                                                </div> -->
+                   
                 </div>
             </div>
         </div>
@@ -62,14 +65,16 @@
 
     <div class="slide-confirm-container px-3">
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-            style="max-width: 400px; margin: 0 auto;" data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}"
-            data-redirect="{{ route('utama.konfirmasi-tiba-muat') }}">
-            <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
-                <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                    style="width:30px;height:30px;filter:brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
-            </div>
-            <span class="slide-label text-primary fw-semibold">Konfirmasi Berangkat</span>
+        style="max-width: 400px; margin: 0 auto;"
+
+        data-action="{{ route('utama.konfirmasi-berangkat') }}"
+        data-redirect="{{ route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
+        data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
+        <div class="slide-button bg-white d-flex justify-content-center align-items-center"
+            onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
+            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow" style="width:30px;height:30px;">
         </div>
+        <span class="slide-label text-primary fw-semibold">Konfirmasi Berangkat</span>
+    </div>
     </div>
 @endsection

@@ -18,7 +18,7 @@ class AuthController extends Controller
     private function isLoginRedirect()
     {
         if (session('is_login') === true) {
-            return redirect()->route('menu.konfirmasi-berangkat')->send();
+            return redirect()->route('menu.list-order')->send();
         }
     }
 
@@ -176,7 +176,7 @@ class AuthController extends Controller
         ]);
 
         if ((int)$roleid === 1000049) {
-            return redirect()->route('menu.konfirmasi-berangkat');
+            return redirect()->route('menu.list-order');
         }
         return redirect()->route('login')->with('error', 'Role tidak dikenali');
     }
