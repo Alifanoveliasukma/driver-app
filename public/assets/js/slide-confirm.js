@@ -35,69 +35,74 @@ function onSlide(e) {
 }
 
 function stopSlide(e) {
-  isDragging = false;
+    isDragging = false;
 
-  const btn       = document.querySelector(".slide-button");
-  const container = document.querySelector(".slide-track");
+    const btn = document.querySelector(".slide-button");
+    const container = document.querySelector(".slide-track");
 
-  const postUrl   = container.dataset.action;   // endpoint POST /utama/berangkat
-  const nextUrl   = container.dataset.redirect; // halaman tiba muat
-  const orderId   = container.dataset.orderid;
+    const postUrl = container.dataset.action; // endpoint POST /utama/berangkat
+    const nextUrl = container.dataset.redirect; // halaman tiba muat
 
-  const hiddenEl   = document.getElementById("OutLoadDate");
-  const outLoadDate = hiddenEl ? hiddenEl.value : null;
+    const payload = container.dataset.payload
+        ? JSON.parse(container.dataset.payload)
+        : {};
 
-  const left = parseInt(btn.style.left || "0", 10);
-  const threshold = container.clientWidth - btn.clientWidth - 5;
+    const left = parseInt(btn.style.left || "0", 10);
+    const threshold = container.clientWidth - btn.clientWidth - 5;
 
-  if (left >= threshold) {
-    // optional: cegah double submit
-    btn.style.pointerEvents = "none";
+    if (left >= threshold) {
+        // optional: cegah double submit
+        btn.style.pointerEvents = "none";
 
-    fetch(postUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-        "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-      },
-      body: JSON.stringify({ orderId, OutLoadDate: outLoadDate }),
-    })
-      .then(async (res) => {
-        const ct = res.headers.get("content-type") || "";
-        const data = ct.includes("application/json") ? await res.json() : {};
-        if (res.ok && (data.success ?? true)) {
-          window.location.href = nextUrl; // pindah ke halaman tiba muat
-        } else {
-          alert(data.message || "Gagal konfirmasi.");
-          resetSlider();
-        }
-      })
-      .catch(() => {
-        alert("Kesalahan jaringan.");
+        fetch(postUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: JSON.stringify(payload),
+        })
+            .then(async (res) => {
+                const ct = res.headers.get("content-type") || "";
+                const data = ct.includes("application/json")
+                    ? await res.json()
+                    : {};
+
+                console.log("DATA : ", data);
+                if (res.ok && (data.success ?? true)) {
+                    window.location.href = nextUrl; // pindah ke halaman tiba muat
+                } else {
+                    alert(data.message || "Gagal konfirmasi.");
+                    resetSlider();
+                }
+            })
+            .catch(() => {
+                alert("Kesalahan jaringan.");
+                resetSlider();
+            })
+            .finally(() => {
+                btn.style.pointerEvents = "";
+            });
+    } else {
         resetSlider();
-      })
-      .finally(() => {
-        btn.style.pointerEvents = "";
-      });
-  } else {
-    resetSlider();
-  }
+    }
 
-  document.removeEventListener("mousemove", onSlide);
-  document.removeEventListener("mouseup", stopSlide);
-  document.removeEventListener("touchmove", onSlide);
-  document.removeEventListener("touchend", stopSlide);
+    document.removeEventListener("mousemove", onSlide);
+    document.removeEventListener("mouseup", stopSlide);
+    document.removeEventListener("touchmove", onSlide);
+    document.removeEventListener("touchend", stopSlide);
 
-  function resetSlider() {
-    btn.style.left = "0px";
-    btn.style.background = "#ffffff";
-    btn.innerHTML =
-      '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
-  }
+    function resetSlider() {
+        btn.style.left = "0px";
+        btn.style.background = "#ffffff";
+        btn.innerHTML =
+            '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+    }
 }
-
 
 function startSlidetiba(e) {
     isDragging = true;
@@ -133,113 +138,134 @@ function onSlidetiba(e) {
 }
 
 function stopSlidetiba(e) {
-  isDragging = false;
+    isDragging = false;
 
-  const btn       = document.querySelector(".slide-button");
-  const container = document.querySelector(".slide-track");
+    const btn = document.querySelector(".slide-button");
+    const container = document.querySelector(".slide-track");
 
-  const postUrl   = container.dataset.action;   
-  const nextUrl   = container.dataset.redirect; 
-  const orderId   = container.dataset.orderid;
+    const postUrl = container.dataset.action;
+    const nextUrl = container.dataset.redirect;
+    const orderId = container.dataset.orderid;
 
-  const hiddenEl   = document.getElementById("OutUnLoadDate");
-  const outUnLoadDate = hiddenEl ? hiddenEl.value : null;
+    const hiddenEl = document.getElementById("OutUnLoadDate");
+    const outUnLoadDate = hiddenEl ? hiddenEl.value : null;
 
-  const left = parseInt(btn.style.left || "0", 10);
-  const threshold = container.clientWidth - btn.clientWidth - 5;
+    const left = parseInt(btn.style.left || "0", 10);
+    const threshold = container.clientWidth - btn.clientWidth - 5;
 
-  if (left >= threshold) {
-    // optional: cegah double submit
-    btn.style.pointerEvents = "none";
+    if (left >= threshold) {
+        // optional: cegah double submit
+        btn.style.pointerEvents = "none";
 
-    fetch(postUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-        "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest",
-      },
-      body: JSON.stringify({ orderId, OutUnLoadDate: outUnLoadDate }),
-    })
-      .then(async (res) => {
-        const ct = res.headers.get("content-type") || "";
-        const data = ct.includes("application/json") ? await res.json() : {};
-        if (res.ok && (data.success ?? true)) {
-          window.location.href = nextUrl; // pindah ke halaman tiba muat
-        } else {
-          alert(data.message || "Gagal konfirmasi.");
-          resetSlider();
-        }
-      })
-      .catch(() => {
-        alert("Kesalahan jaringan.");
+        fetch(postUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document
+                    .querySelector('meta[name="csrf-token"]')
+                    .getAttribute("content"),
+                Accept: "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            },
+            body: JSON.stringify({ orderId, OutUnLoadDate: outUnLoadDate }),
+        })
+            .then(async (res) => {
+                const ct = res.headers.get("content-type") || "";
+                const data = ct.includes("application/json")
+                    ? await res.json()
+                    : {};
+                if (res.ok && (data.success ?? true)) {
+                    window.location.href = nextUrl; // pindah ke halaman tiba muat
+                } else {
+                    alert(data.message || "Gagal konfirmasi.");
+                    resetSlider();
+                }
+            })
+            .catch(() => {
+                alert("Kesalahan jaringan.");
+                resetSlider();
+            })
+            .finally(() => {
+                btn.style.pointerEvents = "";
+            });
+    } else {
         resetSlider();
-      })
-      .finally(() => {
-        btn.style.pointerEvents = "";
-      });
-  } else {
-    resetSlider();
-  }
+    }
 
-  document.removeEventListener("mousemove", onSlide);
-  document.removeEventListener("mouseup", stopSlide);
-  document.removeEventListener("touchmove", onSlide);
-  document.removeEventListener("touchend", stopSlide);
+    document.removeEventListener("mousemove", onSlide);
+    document.removeEventListener("mouseup", stopSlide);
+    document.removeEventListener("touchmove", onSlide);
+    document.removeEventListener("touchend", stopSlide);
 
-  function resetSlider() {
-    btn.style.left = "0px";
-    btn.style.background = "#ffffff";
-    btn.innerHTML =
-      '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
-  }
+    function resetSlider() {
+        btn.style.left = "0px";
+        btn.style.background = "#ffffff";
+        btn.innerHTML =
+            '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+    }
 }
-
-
 
 function initRealtimeDateTime() {
-  function updateDateTime() {
-    let now = new Date();
+    function updateDateTime() {
+        let now = new Date();
 
-    const bulan = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    let tanggal = String(now.getDate()).padStart(2,"0") + " " + bulan[now.getMonth()] + " " + now.getFullYear();
-    let jam     = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
+        const bulan = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+        ];
+        let tanggal =
+            String(now.getDate()).padStart(2, "0") +
+            " " +
+            bulan[now.getMonth()] +
+            " " +
+            now.getFullYear();
+        let jam =
+            String(now.getHours()).padStart(2, "0") +
+            ":" +
+            String(now.getMinutes()).padStart(2, "0");
 
-    // LOAD
-    let tanggalElLoad = document.getElementById("tanggalKeluar");
-    let jamElLoad     = document.getElementById("jamKeluar");
-    let hiddenElLoad  = document.getElementById("OutLoadDate");
+        // LOAD
+        let tanggalElLoad = document.getElementById("tanggalKeluar");
+        let jamElLoad = document.getElementById("jamKeluar");
+        let hiddenElLoad = document.getElementById("OutLoadDate");
 
-    if (tanggalElLoad) tanggalElLoad.innerText = tanggal;
-    if (jamElLoad)     jamElLoad.innerText     = jam;
+        if (tanggalElLoad) tanggalElLoad.innerText = tanggal;
+        if (jamElLoad) jamElLoad.innerText = jam;
 
-    // UNLOAD
-    let tanggalElUnload = document.getElementById("tanggalKeluarUnload");
-    let jamElUnload     = document.getElementById("jamKeluarUnload");
-    let hiddenElUnload  = document.getElementById("OutUnloadDate");
+        // UNLOAD
+        let tanggalElUnload = document.getElementById("tanggalKeluarUnload");
+        let jamElUnload = document.getElementById("jamKeluarUnload");
+        let hiddenElUnload = document.getElementById("OutUnloadDate");
 
-    if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
-    if (jamElUnload)     jamElUnload.innerText     = jam;
+        if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
+        if (jamElUnload) jamElUnload.innerText = jam;
 
-    // format SQL datetime
-    let yyyy = now.getFullYear();
-    let mm   = String(now.getMonth() + 1).padStart(2, "0");
-    let dd   = String(now.getDate()).padStart(2, "0");
-    let HH   = String(now.getHours()).padStart(2, "0");
-    let ii   = String(now.getMinutes()).padStart(2, "0");
-    let ss   = String(now.getSeconds()).padStart(2, "0");
-    let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
+        // format SQL datetime
+        let yyyy = now.getFullYear();
+        let mm = String(now.getMonth() + 1).padStart(2, "0");
+        let dd = String(now.getDate()).padStart(2, "0");
+        let HH = String(now.getHours()).padStart(2, "0");
+        let ii = String(now.getMinutes()).padStart(2, "0");
+        let ss = String(now.getSeconds()).padStart(2, "0");
+        let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
 
-    if (hiddenElLoad)   hiddenElLoad.value   = formatted;
-    if (hiddenElUnload) hiddenElUnload.value = formatted;
-  }
+        if (hiddenElLoad) hiddenElLoad.value = formatted;
+        if (hiddenElUnload) hiddenElUnload.value = formatted;
+    }
 
-  setInterval(updateDateTime, 1000);
-  updateDateTime();
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
 }
-
-
 
 // function initRealtimeDateTime() {
 //     function updateDateTime() {

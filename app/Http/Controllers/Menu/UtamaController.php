@@ -58,7 +58,7 @@ class UtamaController extends Controller
             if (!empty($tmp)) $mappedOrders[] = $tmp;
         }
 
-       $orders = collect($mappedOrders)
+        $orders = collect($mappedOrders)
             ->filter(fn($r) => !isset($r['Status']) || $r['Status'] !== 'FINISHED')
             ->sortBy(fn($r) => $r['ETD'] ?? '9999-12-31 23:59:59')
             ->values()
@@ -68,7 +68,7 @@ class UtamaController extends Controller
 
         return view('menu.utama.list-order', compact('orders'));
     }
-    
+
 
     public function detailOrder($orderId)
     {
@@ -108,7 +108,7 @@ class UtamaController extends Controller
 
         if (empty($orderId)) {
             return redirect()
-                ->route('utama.berangkat.list') 
+                ->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
         }
 
@@ -118,16 +118,15 @@ class UtamaController extends Controller
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
-        $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+            $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+            return redirect()
+                ->route('menu.detail-order', ['orderId' => $orderId])
+                ->with('message', 'Gagal update: ' . $err);
+        }
+
         return redirect()
-            ->route('menu.detail-order', ['orderId' => $orderId])
-            ->with('message', 'Gagal update: '.$err);
-    }
-
-    return redirect()
-        ->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId])
-        ->with('success', 'Status diubah ke LOAD.');
-
+            ->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId])
+            ->with('success', 'Status diubah ke LOAD.');
     }
 
     public function tibaMuatPage($orderId)
@@ -151,44 +150,41 @@ class UtamaController extends Controller
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
-            ? \DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-muat', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
         ]);
-    
     }
 
     public function tibaMuat(Request $request)
     {
-         $data = $request->validate([
-        'orderId'     => 'required|integer',
-        'OutUnLoadDate' => 'required|date_format:Y-m-d H:i:s',
-    ]);
+        $data = $request->validate([
+            'orderId'     => 'required|integer',
+            'OutUnLoadDate' => 'required|date_format:Y-m-d H:i:s',
+        ]);
 
-    $update = $this->orderUpdate->updateOrder($data['orderId'], [
-        'Status'      => 'UNLOAD',
-        'OutUnLoadDate' => $data['OutUnLoadDate'],
-    ]);
+        $update = $this->orderUpdate->updateOrder($data['orderId'], [
+            'Status'      => 'UNLOAD',
+            'OutUnLoadDate' => $data['OutUnLoadDate'],
+        ]);
 
-    if (is_array($update) && isset($update['Error'])) {
-        $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
-        return response()->json(['success' => false, 'message' => 'Gagal update: '.$err], 422);
-    }
+        if (is_array($update) && isset($update['Error'])) {
+            $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+            return response()->json(['success' => false, 'message' => 'Gagal update: ' . $err], 422);
+        }
 
-    return response()->json([
-        'success'  => true,
-        'next_url' => route('utama.konfirmasi-selesai-muat', ['orderId' => $data['orderId']]),
-    ]);
+        return response()->json([
+            'success'  => true,
+            'next_url' => route('utama.konfirmasi-selesai-muat', ['orderId' => $data['orderId']]),
+        ]);
     }
 
 
     public function selesaiMuatPage($orderId)
     {
         dd('berhasil diubah');
-    
     }
-
 }

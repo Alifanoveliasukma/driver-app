@@ -2,11 +2,11 @@
 
 @section('content')
     <div class="position-relative bg-purple text-white" style="height: 100px;">
-        @if(session('message'))
-        <div class="alert alert-danger">{{ session('message') }}</div>
+        @if (session('message'))
+            <div class="alert alert-danger">{{ session('message') }}</div>
         @endif
-        @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
             @csrf
@@ -37,7 +37,7 @@
                     <div style="font-weight: bold;">Gudang Jakarta</div>
                 </div>
                 <div class="text-center">
-                   
+
                 </div>
             </div>
         </div>
@@ -65,16 +65,17 @@
 
     <div class="slide-confirm-container px-3">
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-        style="max-width: 400px; margin: 0 auto;"
-
-        data-action="{{ route('utama.konfirmasi-berangkat') }}"
-        data-redirect="{{ route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
-        data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
-        <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-            onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
-            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow" style="width:30px;height:30px;">
+            data-payload='@json([
+                'orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '',
+                'OutLoadDate' => now()->format('Y-m-d H:i:s'),
+            ])' style="max-width: 400px; margin: 0 auto;"
+            data-action="{{ route('utama.konfirmasi-berangkat') }}"
+            data-redirect="{{ route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}">
+            <div class="slide-button bg-white d-flex justify-content-center align-items-center"
+                onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
+                <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow" style="width:30px;height:30px;">
+            </div>
+            <span class="slide-label text-primary fw-semibold">Konfirmasi Berangkat</span>
         </div>
-        <span class="slide-label text-primary fw-semibold">Konfirmasi Berangkat</span>
-    </div>
     </div>
 @endsection
