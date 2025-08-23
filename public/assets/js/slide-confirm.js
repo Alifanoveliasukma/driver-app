@@ -1,6 +1,7 @@
 let isDragging = false;
 let offsetX = 0;
 
+// berangkat
 function startSlide(e) {
     isDragging = true;
     offsetX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -86,7 +87,7 @@ function stopSlide(e) {
     .finally(() => {
     btn.style.pointerEvents = "";
     });
-    
+
   } else {
     resetSlider();
   }
@@ -104,6 +105,7 @@ function stopSlide(e) {
   }
 }
 
+// tiba muat
 
 function startSlidetiba(e) {
     isDragging = true;
@@ -202,6 +204,104 @@ function stopSlidetiba(e) {
   }
 }
 
+// selesai muat
+function startSlideSelesaiMuat(e) {
+    isDragging = true;
+    offsetX = e.clientX || (e.touches && e.touches[0].clientX);
+    document.addEventListener("mousemove", onSlide);
+    document.addEventListener("mouseup", stopSlide);
+    document.addEventListener("touchmove", onSlide);
+    document.addEventListener("touchend", stopSlide);
+}
+
+function onSlideSelesaiMuat(e) {
+    if (!isDragging) return;
+
+    const btn = document.querySelector(".slide-button");
+    const container = document.querySelector(".slide-track");
+    let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    let moveX = clientX - offsetX;
+    moveX = Math.max(
+        0,
+        Math.min(moveX, container.clientWidth - btn.clientWidth)
+    );
+    btn.style.left = moveX + "px";
+
+    if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+        btn.style.background = "#198754";
+        btn.innerHTML =
+            '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
+    } else {
+        btn.style.background = "#ffffff";
+        btn.innerHTML =
+            '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+    }
+}
+
+function stopSlideSelesaiMuat(e) {
+  isDragging = false;
+
+  const btn       = document.querySelector(".slide-button");
+  const container = document.querySelector(".slide-track");
+
+  const postUrl   = container.dataset.action;   
+  const nextUrl   = container.dataset.redirect; 
+  const orderId   = container.dataset.orderid;
+
+  const hiddenEl   = document.getElementById("LoadDate");
+  const loadDate = hiddenEl ? hiddenEl.value : null;
+
+  const left = parseInt(btn.style.left || "0", 10);
+  const threshold = container.clientWidth - btn.clientWidth - 5;
+
+  if (left >= threshold) {
+    // optional: cegah double submit
+    btn.style.pointerEvents = "none";
+
+    fetch(postUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify({ orderId, LoadDate: loadDate }),
+    })
+      .then(async (res) => {
+        const ct = res.headers.get("content-type") || "";
+        const data = ct.includes("application/json") ? await res.json() : {};
+        if (res.ok && (data.success ?? true)) {
+          window.location.href = nextUrl; // pindah ke halaman tiba muat
+        } else {
+          alert(data.message || "Gagal konfirmasi.");
+          resetSlider();
+        }
+      })
+      .catch(() => {
+        alert("Kesalahan jaringan.");
+        resetSlider();
+      })
+      .finally(() => {
+        btn.style.pointerEvents = "";
+      });
+  } else {
+    resetSlider();
+  }
+
+  document.removeEventListener("mousemove", onSlide);
+  document.removeEventListener("mouseup", stopSlide);
+  document.removeEventListener("touchmove", onSlide);
+  document.removeEventListener("touchend", stopSlide);
+
+  function resetSlider() {
+    btn.style.left = "0px";
+    btn.style.background = "#ffffff";
+    btn.innerHTML =
+      '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+  }
+}
+
 
 
 function initRealtimeDateTime() {
@@ -228,6 +328,15 @@ function initRealtimeDateTime() {
     if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
     if (jamElUnload)     jamElUnload.innerText     = jam;
 
+
+    // WAIT FOR LOAD
+    let tanggalSelesaiMuat = document.getElementById("tanggalSelesaiMuat");
+    let jamSelesaiMuat     = document.getElementById("jamSelesaiMuat");
+    let hiddenSelesaiMuat  = document.getElementById("LoadDate");
+
+    if (tanggalSelesaiMuat) tanggalSelesaiMuat.innerText = tanggal;
+    if (jamSelesaiMuat)     jamSelesaiMuat.innerText     = jam;
+
     // format SQL datetime
     let yyyy = now.getFullYear();
     let mm   = String(now.getMonth() + 1).padStart(2, "0");
@@ -238,7 +347,7 @@ function initRealtimeDateTime() {
     let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
 
     if (hiddenElLoad)   hiddenElLoad.value   = formatted;
-    if (hiddenElUnload) hiddenElUnload.value = formatted;
+    if (hiddenSelesaiMuat) hiddenSelesaiMuat.value = formatted;
   }
 
   setInterval(updateDateTime, 1000);
