@@ -37,23 +37,33 @@
   </div>
   <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
     <div class="bg-light rounded p-3 text-center flex-fill">
-      <div style="font-weight: bold;">06 Oct 2022</div>
+      <div id="tanggalSelesaiMuat" style="font-weight: bold;">--</div>
     </div>
     <div class="bg-light rounded p-3 text-center flex-fill">
-      <div style="font-weight: bold;">20:25</div>
+      <div id="jamSelesaiMuat" style="font-weight: bold;">--</div>
     </div>
   </div>
-
+  <input type="hidden" name="LoadDate" id="LoadDate">
 </div>
 
 <!-- Tombol fixed -->
-<div class="slide-confirm-container px-3">
-  <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2" style="max-width: 400px; margin: 0 auto;">
-    <div class="slide-button bg-white d-flex justify-content-center align-items-center" onmousedown="startSlide(event)" style="width: 48px; height: 48px; border-radius: 0;">
-      <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow" style="width: 30px; height: 30px; filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
+<div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
+  <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;" >
+        <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2" style="max-width: 400px; margin: 0 auto;" 
+
+        data-action="{{ route('utama.konfirmasi-selesai-muat.submit') }}"
+        data-redirect="{{ route('utama.konfirmasi-keluar-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
+        data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
+
+            <div class="slide-button bg-white d-flex justify-content-center align-items-center" 
+            onmousedown="startSlideSelesaiMuat(event)"
+            style="width: 48px; height: 48px; border-radius: 0;">
+            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow" style="width: 30px; height: 30px; filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
+            </div>
+           
+            <span class="slide-label text-primary fw-semibold">Konfirmasi Selesai Muat</span>
+        </div>
     </div>
-    <span class="slide-label text-primary fw-semibold">Konfirmasi Selesai Muat</span>
-  </div>
 </div>
 
 @push('scripts')
