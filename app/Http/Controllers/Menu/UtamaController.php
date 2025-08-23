@@ -7,11 +7,12 @@ use App\Services\DriverApi;
 use App\Services\OrderApi;
 use App\Services\OrderUpdateApi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UtamaController extends Controller
 {
 
-    protected $order, $driver, $c_bpartner_id;
+    protected $order, $driver, $c_bpartner_id, $orderUpdate;
 
     public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderupdate)
     {
@@ -66,11 +67,12 @@ class UtamaController extends Controller
             }
         }
 
+
         $orderId = $mappedOrders[0]['XX_TransOrder_ID'] ?? null;
-        // dd($orderId);
+        // dd($mappedOrders[0]);
 
         $detailOrder = $this->order->getOrderDetail($orderId);
-        
+
         $row = $detailOrder['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet']['DataRow'] ?? [];
 
         $fields = $row['field'] ?? [];
@@ -89,29 +91,36 @@ class UtamaController extends Controller
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $customerName = null;
         if ($customerId) {
-            $customerName = \DB::table('mzl.c_bpartner')
+            $customerName = DB::table('mzl.c_bpartner')
                 ->where('c_bpartner_id', $customerId)
-                ->value('name'); 
+                ->value('name');
         }
 
         $mappedDetail['Customer_Name'] = $customerName ?? '-';
+
+        // dd($mappedDetail);
 
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail'));
     }
 
     public function tibaMuat(Request $request)
     {
-        $outLoadDate = $request->input('OutLoadDate'); 
-        $orderId     = $request->input('orderId'); 
+        $outLoadDate = $request->input('OutLoadDate');
+        $orderId     = $request->input('orderId');
 
-        $updateResult = $this->orderUpdateApi->updateOrder($orderId, [
+        $status = "LOAD";
+
+
+        $updateResult = $this->orderUpdate->updateOrder($orderId, [
             'OutLoadDate' => $outLoadDate,
+            'Status' => $status
         ]);
+
+
 
         return response()->json([
             'success' => true,
             'data' => $updateResult
         ]);
-        
     }
 }

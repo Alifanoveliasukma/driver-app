@@ -35,16 +35,16 @@ class OrderUpdateApi extends BaseApi
                        <adin:RecordID>' . $orderId . '</adin:RecordID>
                        <adin:Action>Update</adin:Action>
                        <adin:DataRow>';
-                        foreach ($fields as $column => $value) {
-                            $request .= '
+        foreach ($fields as $column => $value) {
+            $request .= '
                                         <adin:field column="' . $column . '">
                                             <adin:val>' . $value . '</adin:val>
                                             <adin:lookup>
                                                 <adin:lv val="?" key="?"/>
                                             </adin:lookup>
                                         </adin:field>';
-                        }
-                        $request .= '
+        }
+        $request .= '
                        </adin:DataRow>
                     </adin:ModelCRUD>
                     <adin:ADLoginRequest>
@@ -56,7 +56,7 @@ class OrderUpdateApi extends BaseApi
                        <adin:OrgID>' . env('ERP_ORG') . '</adin:OrgID>
                        <adin:WarehouseID>' . env('ERP_WH') . '</adin:WarehouseID>
                     </adin:ADLoginRequest>
-                    
+
                  </adin:ModelCRUDRequest>
               </adin:updateData>
            </soapenv:Body>

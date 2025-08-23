@@ -9,13 +9,13 @@ use App\Http\Controllers\Menu\UjpController;
 use App\Http\Controllers\Menu\ProfilController;
 
 
-Route::match(['get','post'], '/login', [AuthController::class, 'login'])->name('login');
+Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 Route::patch('/utama/tiba-muat', [App\Http\Controllers\Menu\UtamaController::class, 'tibaMuat'])
     ->name('utama.konfirmasi-tiba-muat');
-    
+
 Route::get('/no-order', function () {
     return view('menu.utama.no-order');
 });
@@ -42,6 +42,8 @@ Route::get('/konfirmasi-keluar-bongkar', function () {
 
 
 Route::get('/konfirmasi-berangkat', [UtamaController::class, 'index'])->name('menu.konfirmasi-berangkat');
+Route::post('/utama/tiba-muat', [UtamaController::class, 'tibaMuat'])->name('utama.konfirmasi-tiba-muat');
+
 Route::get('/ujp', [UjpController::class, 'ujp'])->name('menu.ujp');
 Route::get('/histori', [HistoriController::class, 'histori'])->name('menu.histori');
 Route::get('/profil', [ProfilController::class, 'profil'])->name('menu.profil');
