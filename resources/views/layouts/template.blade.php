@@ -25,9 +25,9 @@
 </body>
 <nav class="bottom-nav nav nav-pills nav-fill bg-light border-top position-fixed bottom-0 w-100"
     style="height:60px; z-index:999;">
-    <a href="{{ route('menu.konfirmasi-berangkat') }}"
-        class="nav-link text-center {{ request()->routeIs('menu.konfirmasi-berangkat') ? 'active' : '' }}"
-        aria-current="{{ request()->routeIs('menu.konfirmasi-berangkat') ? 'page' : '' }}">
+    <a href="{{ route('menu.list-order') }}"
+        class="nav-link text-center {{ request()->routeIs('menu.list-order') ? 'active' : '' }}"
+        aria-current="{{ request()->routeIs('menu.list-order') ? 'page' : '' }}">
         <i class="bi bi-house-door-fill d-block"></i>
         <small class="d-block">Utama</small>
     </a>

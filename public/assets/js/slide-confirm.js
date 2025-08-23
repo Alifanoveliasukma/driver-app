@@ -35,108 +35,261 @@ function onSlide(e) {
 }
 
 function stopSlide(e) {
-    isDragging = false;
+  isDragging = false;
+
+  const btn       = document.querySelector(".slide-button");
+  const container = document.querySelector(".slide-track");
+
+  const postUrl   = container.dataset.action;   // endpoint POST /utama/berangkat
+  const nextUrl   = container.dataset.redirect; // halaman tiba muat
+  const orderId   = container.dataset.orderid;
+
+  const hiddenEl   = document.getElementById("OutLoadDate");
+  const outLoadDate = hiddenEl ? hiddenEl.value : null;
+
+  const left = parseInt(btn.style.left || "0", 10);
+  const threshold = container.clientWidth - btn.clientWidth - 5;
+
+  if (left >= threshold) {
+    // optional: cegah double submit
+    btn.style.pointerEvents = "none";
+
+    fetch(postUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify({ orderId, OutLoadDate: outLoadDate }),
+    })
+      .then(async (res) => {
+        const ct = res.headers.get("content-type") || "";
+        const data = ct.includes("application/json") ? await res.json() : {};
+        if (res.ok && (data.success ?? true)) {
+          window.location.href = nextUrl; // pindah ke halaman tiba muat
+        } else {
+          alert(data.message || "Gagal konfirmasi.");
+          resetSlider();
+        }
+      })
+      .catch(() => {
+        alert("Kesalahan jaringan.");
+        resetSlider();
+      })
+      .finally(() => {
+        btn.style.pointerEvents = "";
+      });
+  } else {
+    resetSlider();
+  }
+
+  document.removeEventListener("mousemove", onSlide);
+  document.removeEventListener("mouseup", stopSlide);
+  document.removeEventListener("touchmove", onSlide);
+  document.removeEventListener("touchend", stopSlide);
+
+  function resetSlider() {
+    btn.style.left = "0px";
+    btn.style.background = "#ffffff";
+    btn.innerHTML =
+      '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+  }
+}
+
+
+function startSlidetiba(e) {
+    isDragging = true;
+    offsetX = e.clientX || (e.touches && e.touches[0].clientX);
+    document.addEventListener("mousemove", onSlide);
+    document.addEventListener("mouseup", stopSlide);
+    document.addEventListener("touchmove", onSlide);
+    document.addEventListener("touchend", stopSlide);
+}
+
+function onSlidetiba(e) {
+    if (!isDragging) return;
+
     const btn = document.querySelector(".slide-button");
     const container = document.querySelector(".slide-track");
-    const targetUrl = container.dataset.redirect;
+    let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    let moveX = clientX - offsetX;
+    moveX = Math.max(
+        0,
+        Math.min(moveX, container.clientWidth - btn.clientWidth)
+    );
+    btn.style.left = moveX + "px";
 
-    const hiddenEl = document.getElementById("OutLoadDate");
-    let outLoadDate = hiddenEl ? hiddenEl.value : null;
-    const orderId = container.dataset.orderid;
-
-    console.log(targetUrl, outLoadDate, "TEST TES");
-    if (
-        parseInt(btn.style.left) >=
-        container.clientWidth - btn.clientWidth - 5
-    ) {
-        alert("✅ Konfirmasi Berangkat!");
-
-        fetch(targetUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute("content"),
-            },
-            body: JSON.stringify({
-                OutLoadDate: outLoadDate,
-                orderId: orderId,
-            }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log("Update sukses:", data);
-                if (data.success) {
-                    alert("Sukses Konfirmasi");
-                    // window.location.href = "{{ route('utama.konfirmasi-tiba-muat') }}";
-                } else {
-                    alert("Gagal konfirmasi!");
-                }
-            })
-            .catch((err) => console.error(err));
+    if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+        btn.style.background = "#198754";
+        btn.innerHTML =
+            '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
     } else {
-        btn.style.left = "0px";
         btn.style.background = "#ffffff";
         btn.innerHTML =
             '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
     }
-
-    document.removeEventListener("mousemove", onSlide);
-    document.removeEventListener("mouseup", stopSlide);
-    document.removeEventListener("touchmove", onSlide);
-    document.removeEventListener("touchend", stopSlide);
 }
+
+function stopSlidetiba(e) {
+  isDragging = false;
+
+  const btn       = document.querySelector(".slide-button");
+  const container = document.querySelector(".slide-track");
+
+  const postUrl   = container.dataset.action;   
+  const nextUrl   = container.dataset.redirect; 
+  const orderId   = container.dataset.orderid;
+
+  const hiddenEl   = document.getElementById("OutUnLoadDate");
+  const outUnLoadDate = hiddenEl ? hiddenEl.value : null;
+
+  const left = parseInt(btn.style.left || "0", 10);
+  const threshold = container.clientWidth - btn.clientWidth - 5;
+
+  if (left >= threshold) {
+    // optional: cegah double submit
+    btn.style.pointerEvents = "none";
+
+    fetch(postUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        "Accept": "application/json",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+      body: JSON.stringify({ orderId, OutUnLoadDate: outUnLoadDate }),
+    })
+      .then(async (res) => {
+        const ct = res.headers.get("content-type") || "";
+        const data = ct.includes("application/json") ? await res.json() : {};
+        if (res.ok && (data.success ?? true)) {
+          window.location.href = nextUrl; // pindah ke halaman tiba muat
+        } else {
+          alert(data.message || "Gagal konfirmasi.");
+          resetSlider();
+        }
+      })
+      .catch(() => {
+        alert("Kesalahan jaringan.");
+        resetSlider();
+      })
+      .finally(() => {
+        btn.style.pointerEvents = "";
+      });
+  } else {
+    resetSlider();
+  }
+
+  document.removeEventListener("mousemove", onSlide);
+  document.removeEventListener("mouseup", stopSlide);
+  document.removeEventListener("touchmove", onSlide);
+  document.removeEventListener("touchend", stopSlide);
+
+  function resetSlider() {
+    btn.style.left = "0px";
+    btn.style.background = "#ffffff";
+    btn.innerHTML =
+      '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+  }
+}
+
+
 
 function initRealtimeDateTime() {
-    function updateDateTime() {
-        let now = new Date();
+  function updateDateTime() {
+    let now = new Date();
 
-        const bulan = [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-        ];
-        let tanggal =
-            String(now.getDate()).padStart(2, "0") +
-            " " +
-            bulan[now.getMonth()] +
-            " " +
-            now.getFullYear();
-        let jam =
-            String(now.getHours()).padStart(2, "0") +
-            ":" +
-            String(now.getMinutes()).padStart(2, "0");
+    const bulan = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    let tanggal = String(now.getDate()).padStart(2,"0") + " " + bulan[now.getMonth()] + " " + now.getFullYear();
+    let jam     = String(now.getHours()).padStart(2,"0") + ":" + String(now.getMinutes()).padStart(2,"0");
 
-        let tanggalEl = document.getElementById("tanggalKeluar");
-        let jamEl = document.getElementById("jamKeluar");
-        let hiddenEl = document.getElementById("OutLoadDate");
+    // LOAD
+    let tanggalElLoad = document.getElementById("tanggalKeluar");
+    let jamElLoad     = document.getElementById("jamKeluar");
+    let hiddenElLoad  = document.getElementById("OutLoadDate");
 
-        if (tanggalEl) tanggalEl.innerText = tanggal;
-        if (jamEl) jamEl.innerText = jam;
+    if (tanggalElLoad) tanggalElLoad.innerText = tanggal;
+    if (jamElLoad)     jamElLoad.innerText     = jam;
 
-        let yyyy = now.getFullYear();
-        let mm = String(now.getMonth() + 1).padStart(2, "0");
-        let dd = String(now.getDate()).padStart(2, "0");
-        let HH = String(now.getHours()).padStart(2, "0");
-        let ii = String(now.getMinutes()).padStart(2, "0");
-        let ss = String(now.getSeconds()).padStart(2, "0");
-        let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
+    // UNLOAD
+    let tanggalElUnload = document.getElementById("tanggalKeluarUnload");
+    let jamElUnload     = document.getElementById("jamKeluarUnload");
+    let hiddenElUnload  = document.getElementById("OutUnloadDate");
 
-        if (hiddenEl) hiddenEl.value = formatted;
-    }
+    if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
+    if (jamElUnload)     jamElUnload.innerText     = jam;
 
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
+    // format SQL datetime
+    let yyyy = now.getFullYear();
+    let mm   = String(now.getMonth() + 1).padStart(2, "0");
+    let dd   = String(now.getDate()).padStart(2, "0");
+    let HH   = String(now.getHours()).padStart(2, "0");
+    let ii   = String(now.getMinutes()).padStart(2, "0");
+    let ss   = String(now.getSeconds()).padStart(2, "0");
+    let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
+
+    if (hiddenElLoad)   hiddenElLoad.value   = formatted;
+    if (hiddenElUnload) hiddenElUnload.value = formatted;
+  }
+
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
 }
+
+
+
+// function initRealtimeDateTime() {
+//     function updateDateTime() {
+//         let now = new Date();
+
+//         const bulan = [
+//             "Jan",
+//             "Feb",
+//             "Mar",
+//             "Apr",
+//             "May",
+//             "Jun",
+//             "Jul",
+//             "Aug",
+//             "Sep",
+//             "Oct",
+//             "Nov",
+//             "Dec",
+//         ];
+//         let tanggal =
+//             String(now.getDate()).padStart(2, "0") +
+//             " " +
+//             bulan[now.getMonth()] +
+//             " " +
+//             now.getFullYear();
+//         let jam =
+//             String(now.getHours()).padStart(2, "0") +
+//             ":" +
+//             String(now.getMinutes()).padStart(2, "0");
+
+//         let tanggalEl = document.getElementById("tanggalKeluar");
+//         let jamEl = document.getElementById("jamKeluar");
+//         let hiddenEl = document.getElementById("OutLoadDate");
+
+//         if (tanggalEl) tanggalEl.innerText = tanggal;
+//         if (jamEl) jamEl.innerText = jam;
+
+//         let yyyy = now.getFullYear();
+//         let mm = String(now.getMonth() + 1).padStart(2, "0");
+//         let dd = String(now.getDate()).padStart(2, "0");
+//         let HH = String(now.getHours()).padStart(2, "0");
+//         let ii = String(now.getMinutes()).padStart(2, "0");
+//         let ss = String(now.getSeconds()).padStart(2, "0");
+//         let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
+
+//         if (hiddenEl) hiddenEl.value = formatted;
+//     }
+
+//     setInterval(updateDateTime, 1000);
+//     updateDateTime();
+// }
 
 document.addEventListener("DOMContentLoaded", initRealtimeDateTime);
