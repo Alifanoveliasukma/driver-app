@@ -43,7 +43,6 @@
             <div style="font-weight: bold;">15:51</div>
         </div>
     </div>
-     <input type="hidden" id="OutUnloadDate">
 
     <div class="text-center mt-3 mb-2">
         <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Berangkat Tiba Lokasi Muat</span>
@@ -56,7 +55,7 @@
             <div  id="jamKeluarUnload"style="font-weight: bold;">--</div>
         </div>
     </div>
-    <input type="hidden" name="OutUnloadDate" id="OutUnloadDate">
+    <input type="hidden" name="LoadDateStart" id="LoadDateStart">
 </div>
 
 <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">

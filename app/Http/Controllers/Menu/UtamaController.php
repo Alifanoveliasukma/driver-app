@@ -103,32 +103,71 @@ class UtamaController extends Controller
     }
 
     public function berangkat(Request $request)
-    {
-        $orderId = $request->input('orderId');
+{
+    $orderId = $request->input('orderId');
 
-        if (empty($orderId)) {
-            return redirect()
-                ->route('utama.berangkat.list') 
-                ->with('message', 'Order ID tidak ditemukan.');
+    if (empty($orderId)) {
+        if ($request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => 'Order ID tidak ditemukan.'], 422);
         }
+        return redirect()->route('utama.berangkat.list')->with('message', 'Order ID tidak ditemukan.');
+    }
 
-        $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'      => 'LOAD',
-            'OutLoadDate' => now()->format('Y-m-d H:i:s'),
-        ]);
+    $update = $this->orderUpdate->updateOrder($orderId, [
+        'Status'      => 'LOAD',
+        'OutLoadDate' => now()->format('Y-m-d H:i:s'),
+    ]);
 
-        if (is_array($update) && isset($update['Error'])) {
+    if (is_array($update) && isset($update['Error'])) {
         $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
-        return redirect()
-            ->route('menu.detail-order', ['orderId' => $orderId])
-            ->with('message', 'Gagal update: '.$err);
+        if ($request->wantsJson()) {
+            return response()->json(['success' => false, 'message' => 'Gagal update: '.$err], 400);
+        }
+        return redirect()->route('menu.detail-order', ['orderId' => $orderId])
+                         ->with('message', 'Gagal update: '.$err);
     }
 
-    return redirect()
-        ->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId])
-        ->with('success', 'Status diubah ke LOAD.');
+    $nextUrl = route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId]);
 
+    if ($request->wantsJson()) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Status diubah ke LOAD.',
+            'nextUrl' => $nextUrl,
+        ]);
     }
+
+    return redirect()->to($nextUrl)->with('success', 'Status diubah ke LOAD.');
+}
+
+
+    // public function berangkat(Request $request)
+    // {
+    //     $orderId = $request->input('orderId');
+
+    //     if (empty($orderId)) {
+    //         return redirect()
+    //             ->route('utama.berangkat.list') 
+    //             ->with('message', 'Order ID tidak ditemukan.');
+    //     }
+
+    //     $update = $this->orderUpdate->updateOrder($orderId, [
+    //         'Status'      => 'LOAD',
+    //         'OutLoadDate' => now()->format('Y-m-d H:i:s'),
+    //     ]);
+
+    //     if (is_array($update) && isset($update['Error'])) {
+    //     $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+    //     return redirect()
+    //         ->route('menu.detail-order', ['orderId' => $orderId])
+    //         ->with('message', 'Gagal update: '.$err);
+    // }
+
+    // return redirect()
+    //     ->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId])
+    //     ->with('success', 'Status diubah ke LOAD.');
+
+    // }
 
     public function tibaMuatPage($orderId)
     {
@@ -153,7 +192,7 @@ class UtamaController extends Controller
         $mappedDetail['Customer_Name'] = $customerId
             ? \DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
-        // dd($mappedDetail);
+
         return view('menu.utama.konfirmasi-tiba-muat', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
@@ -162,32 +201,65 @@ class UtamaController extends Controller
     }
 
     public function tibaMuat(Request $request)
-    {
-         $data = $request->validate([
-        'orderId'     => 'required|integer',
-        'OutUnLoadDate' => 'required|date_format:Y-m-d H:i:s',
-    ]);
+{
+    $orderId = $request->input('orderId');
 
-    $update = $this->orderUpdate->updateOrder($data['orderId'], [
-        'Status'      => 'UNLOAD',
-        'OutUnLoadDate' => $data['OutUnLoadDate'],
+    if (empty($orderId)) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Order ID tidak ditemukan.'
+        ], 422);
+    }
+
+    $update = $this->orderUpdate->updateOrder($orderId, [
+        'Status'        => 'UNLOAD',
+        'LoadDateStart' => now()->format('Y-m-d H:i:s'),
     ]);
 
     if (is_array($update) && isset($update['Error'])) {
         $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
-        return response()->json(['success' => false, 'message' => 'Gagal update: '.$err], 422);
+        return response()->json([
+            'success' => false,
+            'message' => 'Gagal update: '.$err,
+        ], 400);
     }
 
     return response()->json([
-        'success'  => true,
-        'next_url' => route('utama.konfirmasi-selesai-muat', ['orderId' => $data['orderId']]),
+        'success' => true,
+        'message' => 'Status diubah ke UNLOAD.',
+        'nextUrl' => route('utama.konfirmasi-selesai-muat', ['orderId' => $orderId]),
     ]);
-    }
+}
 
 
     public function selesaiMuatPage($orderId)
     {
-        dd('berhasil diubah');
+        if (empty($orderId)) {
+            return redirect()->route('utama.berangkat.list')
+                ->with('message', 'Order ID tidak ditemukan.');
+        }
+
+        $detail = $this->order->getOrderDetail($orderId);
+
+        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $fields = data_get($row, 'field', []);
+        if (isset($fields['@attributes'])) $fields = [$fields];
+
+        $mappedDetail = [];
+        foreach ($fields as $f) {
+            $attr = $f['@attributes'] ?? [];
+            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+        }
+
+        $customerId = $mappedDetail['Customer_ID'] ?? null;
+        $mappedDetail['Customer_Name'] = $customerId
+            ? \DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            : '-';
+
+        return view('menu.utama.konfirmasi-selesai-muat', [
+            'mappedDetail' => $mappedDetail,
+            'orderId'      => $orderId,
+        ]);
     
     }
 
