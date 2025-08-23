@@ -5,11 +5,11 @@
   <div class="floating-box">
     <div class="row-item">
       <span class="label">Surat Jalan</span>
-      <span class="value">PROJECT/22/10/08827</span>
+      <span class="value">{{$mappedDetail['Value'] ?? '-'}}</span>
     </div>
     <div class="row-item">
       <span class="label">Pelanggan</span>
-      <span class="value">PT. SEMEN INDONESIA</span>
+      <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
     </div>
   </div>
 </div>

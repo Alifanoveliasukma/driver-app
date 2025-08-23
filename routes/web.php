@@ -13,32 +13,32 @@ Route::match(['get','post'], '/login', [AuthController::class, 'login'])->name('
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
+Route::patch('/utama/tiba-muat', [App\Http\Controllers\Menu\UtamaController::class, 'tibaMuat'])
+    ->name('utama.konfirmasi-tiba-muat');
+    
 Route::get('/no-order', function () {
     return view('menu.utama.no-order');
 });
-Route::get('/konfirmasi-tiba-muat', function () {
-    return view('menu.utama.konfirmasi-tiba-muat');
-})->name('utama.konfirmasi-tiba-muat');
 
 Route::get('/konfirmasi-selesai-muat', function () {
     return view('menu.utama.konfirmasi-selesai-muat');
-})->name('utama.konfirmasi-selesai-muat');
+});
 
 Route::get('/konfirmasi-keluar-muat', function () {
     return view('menu.utama.konfirmasi-keluar-muat');
-})->name('utama.konfirmasi-keluar-muat');
+});
 
 Route::get('/konfirmasi-tiba-tujuan', function () {
     return view('menu.utama.konfirmasi-tiba-tujuan');
-})->name('utama.konfirmasi-tiba-tujuan');
+});
 
 Route::get('/konfirmasi-mulai-bongkar', function () {
     return view('menu.utama.konfirmasi-mulai-bongkar');
-})->name('utama.konfirmasi-mulai-bongkar');
+});
 
 Route::get('/konfirmasi-keluar-bongkar', function () {
     return view('menu.utama.konfirmasi-keluar-bongkar');
-})->name('utama.konfirmasi-keluar-bongkar');
+});
 
 
 Route::get('/konfirmasi-berangkat', [UtamaController::class, 'index'])->name('menu.konfirmasi-berangkat');

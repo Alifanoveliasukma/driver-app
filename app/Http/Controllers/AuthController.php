@@ -112,13 +112,11 @@ class AuthController extends Controller
         $password = session('password');
         $roleid   = (int) session('roleid');
         $orgid    = (int) session('orgid');
-
         $whid = DB::table('mzl.m_warehouse')
             ->where(['isactive' => 'Y', 'ad_org_id' => $orgid])
             ->value('m_warehouse_id');
 
         $user = $this->auth->authUser($username, $password, $roleid, $orgid, $whid);
-
         if (isset($user['Error'])) {
             session()->flash('message', is_array($user['Error']) ? json_encode($user['Error']) : $user['Error']);
             return redirect()->route('login');
@@ -139,7 +137,6 @@ class AuthController extends Controller
 
         $dataset = $user['DataSet']
             ?? ($user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet'] ?? null);
-
         $success = ($user['Success']
             ?? ($user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['Success'] ?? null));
         $successOk = in_array(strtolower((string)$success), ['true', 'y', '1'], true) || $success === true;
@@ -159,7 +156,7 @@ class AuthController extends Controller
         if (isset($fields['@attributes'])) {
             $fields = [$fields];
         }
-
+        
         $user_id = $fields[0]['@attributes']['lval'] ?? null;
         $name    = $fields[1]['@attributes']['lval'] ?? null;
         $c_bpartner_id   = $fields[2]['@attributes']['lval'] ?? null;
