@@ -123,6 +123,8 @@ class AuthController extends Controller
             session()->flash('message', is_array($user['Error']) ? json_encode($user['Error']) : $user['Error']);
             return redirect()->route('login');
         }
+
+
         $hasDataSet = isset($user['DataSet']) || isset($user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['DataSet']);
 
         if (!$hasDataSet) {
@@ -160,14 +162,17 @@ class AuthController extends Controller
 
         $user_id = $fields[0]['@attributes']['lval'] ?? null;
         $name    = $fields[1]['@attributes']['lval'] ?? null;
-        $value   = $fields[2]['@attributes']['lval'] ?? $username;
+        $c_bpartner_id   = $fields[2]['@attributes']['lval'] ?? null;
+        $value   = $fields[3]['@attributes']['lval'] ?? $username;
 
-        session()->forget(['username', 'password', 'roleid', 'orgid']);
+
+        session()->forget(['username', 'password', 'roleid', 'orgid', 'c_bpartner_id']);
 
         session([
             'user_id'  => $user_id,
             'name'     => $name,
             'username' => $value,
+            'c_bpartner_id' => $c_bpartner_id,
             'roleid'   => (int) $roleid,
             'orgid'    => (int) $orgid,
             'is_login' => true,
