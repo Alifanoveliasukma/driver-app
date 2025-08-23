@@ -32,9 +32,9 @@
                 </div>
                 <div class="text-center">
                     <!-- <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                                                                          <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
-                                                                          <small>Lihat Peta</small>
-                                                                        </div> -->
+                                                                                                                                                                                                                                      <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
+                                                                                                                                                                                                                                      <small>Lihat Peta</small>
+                                                                                                                                                                                                                                    </div> -->
                 </div>
             </div>
         </div>
@@ -50,7 +50,7 @@
                 <div id="jamKeluar" style="font-weight: bold;">--</div>
             </div>
         </div>
-        <input type="hidden" name="OutLoadDate" id="OutLoadDate">
+
 
         <div class="d-flex align-items-center rounded px-3 py-2" style="width: 100%; max-width: 400px; margin: 0 auto;">
             <div class="text-muted" style="flex: 1;">KM Mobil</div>
@@ -62,7 +62,8 @@
 
     <div class="slide-confirm-container px-3">
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-            style="max-width: 400px; margin: 0 auto;" data-redirect="{{ route('utama.konfirmasi-tiba-muat') }}">
+            style="max-width: 400px; margin: 0 auto;" data-orderid={{ $mappedDetail['XX_TransOrder_ID'] }}
+            data-redirect="{{ route('utama.konfirmasi-tiba-muat') }}">
             <div class="slide-button bg-white d-flex justify-content-center align-items-center"
                 onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
                 <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
@@ -71,97 +72,4 @@
             <span class="slide-label text-primary fw-semibold">Konfirmasi Berangkat</span>
         </div>
     </div>
-    <script>
-        let isSliding = false;
-        let startX = 0;
-        let button = null;
-        let track = null;
-
-        function startSlide(e) {
-            e.preventDefault();
-            button = e.target.closest('.slide-button');
-            track = button.closest('.slide-track');
-            isSliding = true;
-            startX = e.clientX || e.touches?.[0].clientX;
-
-            document.addEventListener('mousemove', slideMove);
-            document.addEventListener('mouseup', endSlide);
-            document.addEventListener('touchmove', slideMove);
-            document.addEventListener('touchend', endSlide);
-        }
-
-        function slideMove(e) {
-            if (!isSliding) return;
-
-            let currentX = e.clientX || e.touches?.[0].clientX;
-            let deltaX = currentX - startX;
-
-            let maxSlide = track.offsetWidth - button.offsetWidth - 10; // sedikit jarak
-            if (deltaX < 0) deltaX = 0;
-            if (deltaX > maxSlide) deltaX = maxSlide;
-
-            button.style.transform = `translateX(${deltaX}px)`;
-
-            // Jika sudah sampai ujung
-            if (deltaX >= maxSlide) {
-                endSlide();
-                triggerConfirm();
-            }
-        }
-
-        function endSlide() {
-            if (!isSliding) return;
-            isSliding = false;
-
-            document.removeEventListener('mousemove', slideMove);
-            document.removeEventListener('mouseup', endSlide);
-            document.removeEventListener('touchmove', slideMove);
-            document.removeEventListener('touchend', endSlide);
-
-            // reset posisi kalau belum sampai ujung
-            button.style.transform = 'translateX(0px)';
-        }
-
-        function triggerConfirm() {
-
-            const now = new Date();
-            const formatted = now.getFullYear() + '-' +
-                String(now.getMonth() + 1).padStart(2, '0') + '-' +
-                String(now.getDate()).padStart(2, '0') + ' ' +
-                String(now.getHours()).padStart(2, '0') + ':' +
-                String(now.getMinutes()).padStart(2, '0') + ':' +
-                String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('OutLoadDate').value = formatted;
-
-
-            const url = track.dataset.redirect;
-
-
-            const orderId = "{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}";
-
-            fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        OutLoadDate: formatted,
-                        orderId: orderId
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-
-                    console.log(data, "TEST ITNG")
-                    if (data.success) {
-                        alert('Berhasil konfirmasi berangkat');
-
-                    } else {
-                        alert('Gagal konfirmasi!');
-                    }
-                })
-                .catch(err => console.error(err));
-        }
-    </script>
 @endsection
