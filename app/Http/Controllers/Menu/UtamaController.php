@@ -325,6 +325,37 @@ class UtamaController extends Controller
     
     }
 
+    public function keluarMuat(Request $request)
+    {
+        $orderId = $request->input('orderId');
+
+        if (empty($orderId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order ID tidak ditemukan.'
+            ], 422);
+        }
+
+        $update = $this->orderUpdate->updateOrder($orderId, [
+            'Status'        => 'SHIPMENT',
+            'LoadDate' => now()->format('Y-m-d H:i:s'),
+        ]);
+
+        if (is_array($update) && isset($update['Error'])) {
+            $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal update: '.$err,
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status diubah ke WAIT FOR LOAD.',
+            'nextUrl' => route('utama.konfirmasi-keluar-muat', ['orderId' => $orderId]),
+        ]);
+    }
+
     public function tibaTujuanPage($orderId)
     {
         if (empty($orderId)) {
