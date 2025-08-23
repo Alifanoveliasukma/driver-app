@@ -55,32 +55,38 @@ function stopSlide(e) {
     btn.style.pointerEvents = "none";
 
     fetch(postUrl, {
-      method: "POST",
-      headers: {
+    method: "POST",
+    headers: {
         "Content-Type": "application/json",
-        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest",
-      },
-      body: JSON.stringify({ orderId, OutLoadDate: outLoadDate }),
+        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+    },
+    body: JSON.stringify({ orderId, OutLoadDate: outLoadDate }),
     })
-      .then(async (res) => {
-        const ct = res.headers.get("content-type") || "";
-        const data = ct.includes("application/json") ? await res.json() : {};
-        if (res.ok && (data.success ?? true)) {
-          window.location.href = nextUrl; // pindah ke halaman tiba muat
-        } else {
-          alert(data.message || "Gagal konfirmasi.");
-          resetSlider();
-        }
-      })
-      .catch(() => {
-        alert("Kesalahan jaringan.");
+    .then(async (res) => {
+    const ct = res.headers.get("content-type") || "";
+    const isJson = ct.includes("application/json");
+    const data = isJson ? await res.json() : null;
+
+    if (res.ok && isJson && data?.success) {
+        window.location.href = data.nextUrl;        // pindah ke halaman tiba muat
+    } else if (res.status === 419) {
+        alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
         resetSlider();
-      })
-      .finally(() => {
-        btn.style.pointerEvents = "";
-      });
+    } else {
+        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+        resetSlider();
+    }
+    })
+    .catch(() => {
+    alert("Kesalahan jaringan.");
+    resetSlider();
+    })
+    .finally(() => {
+    btn.style.pointerEvents = "";
+    });
+    
   } else {
     resetSlider();
   }
@@ -142,8 +148,8 @@ function stopSlidetiba(e) {
   const nextUrl   = container.dataset.redirect; 
   const orderId   = container.dataset.orderid;
 
-  const hiddenEl   = document.getElementById("OutUnLoadDate");
-  const outUnLoadDate = hiddenEl ? hiddenEl.value : null;
+  const hiddenEl   = document.getElementById("LoadDateStart");
+  const loadDateStart = hiddenEl ? hiddenEl.value : null;
 
   const left = parseInt(btn.style.left || "0", 10);
   const threshold = container.clientWidth - btn.clientWidth - 5;
@@ -160,7 +166,7 @@ function stopSlidetiba(e) {
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: JSON.stringify({ orderId, OutUnLoadDate: outUnLoadDate }),
+      body: JSON.stringify({ orderId, LoadDateStart: loadDateStart }),
     })
       .then(async (res) => {
         const ct = res.headers.get("content-type") || "";
@@ -217,7 +223,7 @@ function initRealtimeDateTime() {
     // UNLOAD
     let tanggalElUnload = document.getElementById("tanggalKeluarUnload");
     let jamElUnload     = document.getElementById("jamKeluarUnload");
-    let hiddenElUnload  = document.getElementById("OutUnloadDate");
+    let hiddenElUnload  = document.getElementById("LoadDateStart");
 
     if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
     if (jamElUnload)     jamElUnload.innerText     = jam;
