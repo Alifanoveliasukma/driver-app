@@ -135,6 +135,7 @@ class UtamaController extends Controller
     public function berangkat(Request $request)
     {
         $orderId = $request->input('orderId');
+        $kmTake = $request->input('kmTake');
 
         if (empty($orderId)) {
             if ($request->wantsJson()) {
@@ -143,9 +144,12 @@ class UtamaController extends Controller
             return redirect()->route('utama.berangkat.list')->with('message', 'Order ID tidak ditemukan.');
         }
 
-        $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'      => 'LOAD',
-            'OutLoadDate' => now()->format('Y-m-d H:i:s'),
+        $update = $this->TrackingUpdate->UpdateTracking($orderId, [
+            'Status'    => 'LOADOTW',
+            'Note'      => 'driver confirmation',
+            'Reference' => 'TMS',
+            'KMTake'    => $kmTake,
+            'DateDoc'   => now()->format('Y-m-d H:i:s'),
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
@@ -162,7 +166,7 @@ class UtamaController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => true,
-                'message' => 'Status diubah ke LOAD.',
+                'message' => 'Status diubah ke LOADOTW.',
                 'nextUrl' => $nextUrl,
             ]);
         }
