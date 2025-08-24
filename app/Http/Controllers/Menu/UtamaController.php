@@ -8,17 +8,19 @@ use App\Services\OrderApi;
 use App\Services\OrderUpdateApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\OrderNew;
 
 class UtamaController extends Controller
 {
 
-    protected $order, $driver, $c_bpartner_id, $orderUpdate;
+    protected $order, $driver, $c_bpartner_id, $orderUpdate, $orderNew;
 
-    public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderupdate)
+    public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderupdate, OrderNew $orderNew)
     {
         $this->order = $order;
         $this->driver = $driver;
         $this->orderUpdate = $orderupdate;
+        $this->orderNew = $orderNew;
     }
 
     public function getOrder()
@@ -57,7 +59,6 @@ class UtamaController extends Controller
             if (!empty($tmp)) $mappedOrders[] = $tmp;
         }
 
-
         $customerIds = collect($mappedOrders)->pluck('Customer_ID')->filter()->unique();
         $transOrderIds = collect($mappedOrders)->pluck('XX_TransOrder_ID')->filter()->unique();
 
@@ -76,7 +77,7 @@ class UtamaController extends Controller
             ->filter(fn($r) => !isset($r['Status']) || $r['Status'] !== 'FINISHED')
             ->sortBy(fn($r) => $r['ETD'] ?? '9999-12-31 23:59:59')
             ->values()
-            ->take(6)
+            ->take(7)
             ->map(function ($r) use ($customers, $routes) {
                 $r['Customer_Name'] = $customers[$r['Customer_ID']] ?? '-';
                 $route = $routes[$r['XX_TransOrder_ID']] ?? null;
@@ -92,9 +93,10 @@ class UtamaController extends Controller
 
     public function detailOrder($orderId)
     {
-        if (empty($orderId)) {
-            abort(404);
-        }
+        // if (empty($orderId)) {
+        //     abort(404);
+        // }
+        $orderId='1138894';
 
         $detailOrder = $this->order->getOrderDetail($orderId);
 
@@ -126,7 +128,7 @@ class UtamaController extends Controller
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
         $mappedDetail['route'] = $detailTransOrder->route;
 
-        dd($mappedDetail);
+        // dd($mappedDetail);
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
 
@@ -471,7 +473,7 @@ class UtamaController extends Controller
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
-        dd($mappedDetail);
+        // dd($mappedDetail);
         return view('menu.utama.konfirmasi-mulai-bongkar', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
@@ -490,8 +492,8 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'UNLOAD',
-            'UnloadDate' => now()->format('Y-m-d H:i:s'),
+            'Status'        => 'DONE',
+            'UnloadStd' => now()->format('Y-m-d H:i:s'),
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
@@ -558,7 +560,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'EXECUTED',
+            'Status'        => 'FINISHED',
             'UnloadStd' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -571,9 +573,83 @@ class UtamaController extends Controller
         }
 
         return response()->json([
+            'data' => $update,
             'success' => true,
             'message' => 'Status diubah ke EXECUTED',
-            'nextUrl' => route('utama.konfirmasi-mulai-bongkar', ['orderId' => $orderId]),
+            'nextUrl' => route('menu.list-order'),
+        ]);
+    }
+
+    public function cek_status()
+    {
+        $orderId = '1138894';
+        if (empty($orderId)) {
+            return redirect()->route('utama.berangkat.list')
+                ->with('message', 'Order ID tidak ditemukan.');
+        }
+
+        $detail = $this->order->getOrderDetail($orderId);
+
+        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $fields = data_get($row, 'field', []);
+        if (isset($fields['@attributes'])) $fields = [$fields];
+
+        $mappedDetail = [];
+        foreach ($fields as $f) {
+            $attr = $f['@attributes'] ?? [];
+            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+        }
+
+        $customerId = $mappedDetail['Customer_ID'] ?? null;
+        $mappedDetail['Customer_Name'] = $customerId
+            ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            : '-';
+
+        $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
+
+
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+
+        dd($mappedDetail);
+        // return view('menu.utama.konfirmasi-keluar-bongkar', [
+        //     'mappedDetail' => $mappedDetail,
+        //     'orderId'      => $orderId,
+        // ]);
+    }
+
+
+    public function getOrderList(Request $request)
+    {
+        // ambil driverId dari parameter request (query/body)
+        $driverId = $request->input('driverId',1001145); // default dummy
+
+        // panggil service
+        $response = $this->orderNew->OrderNew($driverId);
+        dd($response);
+
+        // return response mentah atau decode XML ke JSON
+        return response()->json([
+            'success' => true,
+            'driverId' => $driverId,
+            'data' => $response
+        ]);
+    }
+
+    public function getOrderDetail(Request $request)
+    {
+        // ambil driverId dari parameter request (query/body)
+        $orderId = '1138894';
+
+        // panggil service
+        $detailOrder = $this->order->getOrderDetail($orderId);
+        dd($detailOrder);
+
+        // return response mentah atau decode XML ke JSON
+        return response()->json([
+            'success' => true,
+            'driverId' => $driverId,
+            'data' => $response
         ]);
     }
 }
