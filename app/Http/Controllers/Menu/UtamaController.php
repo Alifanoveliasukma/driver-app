@@ -26,8 +26,8 @@ class UtamaController extends Controller
     public function getOrder()
     {
         $c_bpartner_id = session('c_bpartner_id');
-
         $driver = $this->driver->getDriver($c_bpartner_id);
+
         $fields = data_get($driver, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
         if (isset($fields['@attributes'])) $fields = [$fields];
 
@@ -42,6 +42,7 @@ class UtamaController extends Controller
 
         $order = $this->order->getOrderList($driverId);
         $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+
         if (isset($rows['field'])) $rows = [$rows];
 
         $mappedOrders = [];
@@ -93,10 +94,10 @@ class UtamaController extends Controller
 
     public function detailOrder($orderId)
     {
-        // if (empty($orderId)) {
-        //     abort(404);
-        // }
-        $orderId='1138894';
+        if (empty($orderId)) {
+            abort(404);
+        }
+        // $orderId='1138894';
 
         $detailOrder = $this->order->getOrderDetail($orderId);
 
@@ -620,40 +621,5 @@ class UtamaController extends Controller
         //     'mappedDetail' => $mappedDetail,
         //     'orderId'      => $orderId,
         // ]);
-    }
-
-
-    public function getOrderList(Request $request)
-    {
-        // ambil driverId dari parameter request (query/body)
-        $driverId = $request->input('driverId',1001145); // default dummy
-
-        // panggil service
-        $response = $this->orderNew->OrderNew($driverId);
-        dd($response);
-
-        // return response mentah atau decode XML ke JSON
-        return response()->json([
-            'success' => true,
-            'driverId' => $driverId,
-            'data' => $response
-        ]);
-    }
-
-    public function getOrderDetail(Request $request)
-    {
-        // ambil driverId dari parameter request (query/body)
-        $orderId = '1138894';
-
-        // panggil service
-        $detailOrder = $this->order->getOrderDetail($orderId);
-        dd($detailOrder);
-
-        // return response mentah atau decode XML ke JSON
-        return response()->json([
-            'success' => true,
-            'driverId' => $driverId,
-            'data' => $response
-        ]);
     }
 }
