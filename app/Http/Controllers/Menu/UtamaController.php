@@ -29,7 +29,8 @@ class UtamaController extends Controller
 
         $driver = $this->driver->getDriver($c_bpartner_id);
         $fields = data_get($driver, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDriver = [];
         foreach ($fields as $f) {
@@ -42,12 +43,14 @@ class UtamaController extends Controller
 
         $order = $this->order->getOrderList($driverId);
         $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
-        if (isset($rows['field'])) $rows = [$rows];
+        if (isset($rows['field']))
+            $rows = [$rows];
 
         $mappedOrders = [];
         foreach ($rows as $row) {
             $fs = $row['field'] ?? [];
-            if (isset($fs['@attributes'])) $fs = [$fs];
+            if (isset($fs['@attributes']))
+                $fs = [$fs];
 
             $tmp = [];
             foreach ($fs as $f) {
@@ -56,7 +59,8 @@ class UtamaController extends Controller
                     $tmp[$attr['column']] = $attr['lval'];
                 }
             }
-            if (!empty($tmp)) $mappedOrders[] = $tmp;
+            if (!empty($tmp))
+                $mappedOrders[] = $tmp;
         }
 
         $customerIds = collect($mappedOrders)->pluck('Customer_ID')->filter()->unique();
@@ -74,8 +78,12 @@ class UtamaController extends Controller
             ->keyBy('xx_transorder_id');
 
         $orders = collect($mappedOrders)
-            ->filter(fn($r) => !isset($r['Status']) || $r['Status'] !== 'FINISHED')
-            ->sortBy(fn($r) => $r['ETD'] ?? '9999-12-31 23:59:59')
+            ->filter(function ($r) {
+                return !isset($r['Status']) || $r['Status'] !== 'FINISHED';
+            })
+            ->sortBy(function ($r) {
+                return $r['ETD'] ?? '9999-12-31 23:59:59';
+            })
             ->values()
             ->take(7)
             ->map(function ($r) use ($customers, $routes) {
@@ -96,7 +104,7 @@ class UtamaController extends Controller
         // if (empty($orderId)) {
         //     abort(404);
         // }
-        $orderId='1138894';
+        $orderId = '1138894';
 
         $detailOrder = $this->order->getOrderDetail($orderId);
 
@@ -145,11 +153,11 @@ class UtamaController extends Controller
         }
 
         $update = $this->TrackingUpdate->UpdateTracking($orderId, [
-            'Status'    => 'LOADOTW',
-            'Note'      => 'driver confirmation',
+            'Status' => 'LOADOTW',
+            'Note' => 'driver confirmation',
             'Reference' => 'TMS',
-            'KMTake'    => $kmTake,
-            'DateDoc'   => now()->format('Y-m-d H:i:s'),
+            'KMTake' => $kmTake,
+            'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
@@ -183,14 +191,16 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
@@ -207,7 +217,7 @@ class UtamaController extends Controller
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-muat', [
             'mappedDetail' => $mappedDetail,
-            'orderId'      => $orderId,
+            'orderId' => $orderId,
         ]);
     }
 
@@ -223,7 +233,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'UNLOAD',
+            'Status' => 'UNLOAD',
             'LoadDateStart' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -252,14 +262,16 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
@@ -276,7 +288,7 @@ class UtamaController extends Controller
 
         return view('menu.utama.konfirmasi-selesai-muat', [
             'mappedDetail' => $mappedDetail,
-            'orderId'      => $orderId,
+            'orderId' => $orderId,
         ]);
     }
 
@@ -292,7 +304,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'SHIPMENT',
+            'Status' => 'SHIPMENT',
             'LoadDate' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -320,19 +332,21 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
-            ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
@@ -343,7 +357,7 @@ class UtamaController extends Controller
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-keluar-muat', [
             'mappedDetail' => $mappedDetail,
-            'orderId'      => $orderId,
+            'orderId' => $orderId,
         ]);
     }
 
@@ -359,7 +373,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'UNLOAD',
+            'Status' => 'UNLOAD',
             'UnloadDateStart' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -388,19 +402,21 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
-            ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
@@ -412,7 +428,7 @@ class UtamaController extends Controller
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-tujuan', [
             'mappedDetail' => $mappedDetail,
-            'orderId'      => $orderId,
+            'orderId' => $orderId,
         ]);
     }
 
@@ -428,7 +444,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'FINISHED',
+            'Status' => 'FINISHED',
             'OutUnloadDate' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -456,19 +472,21 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
-            ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
@@ -480,7 +498,7 @@ class UtamaController extends Controller
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-mulai-bongkar', [
             'mappedDetail' => $mappedDetail,
-            'orderId'      => $orderId,
+            'orderId' => $orderId,
         ]);
     }
 
@@ -496,7 +514,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'DONE',
+            'Status' => 'DONE',
             'UnloadStd' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -524,19 +542,21 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
-            ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
@@ -548,7 +568,7 @@ class UtamaController extends Controller
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-keluar-bongkar', [
             'mappedDetail' => $mappedDetail,
-            'orderId'      => $orderId,
+            'orderId' => $orderId,
         ]);
     }
 
@@ -564,7 +584,7 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'FINISHED',
+            'Status' => 'FINISHED',
             'UnloadStd' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -594,19 +614,21 @@ class UtamaController extends Controller
 
         $detail = $this->order->getOrderDetail($orderId);
 
-        $row    = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+        $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
-        if (isset($fields['@attributes'])) $fields = [$fields];
+        if (isset($fields['@attributes']))
+            $fields = [$fields];
 
         $mappedDetail = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
-            if (isset($attr['column'])) $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+            if (isset($attr['column']))
+                $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
-            ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
+            ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
@@ -622,38 +644,4 @@ class UtamaController extends Controller
         // ]);
     }
 
-
-    public function getOrderList(Request $request)
-    {
-        // ambil driverId dari parameter request (query/body)
-        $driverId = $request->input('driverId',1001145); // default dummy
-
-        // panggil service
-        $response = $this->orderNew->OrderNew($driverId);
-        dd($response);
-
-        // return response mentah atau decode XML ke JSON
-        return response()->json([
-            'success' => true,
-            'driverId' => $driverId,
-            'data' => $response
-        ]);
-    }
-
-    public function getOrderDetail(Request $request)
-    {
-        // ambil driverId dari parameter request (query/body)
-        $orderId = '1138894';
-
-        // panggil service
-        $detailOrder = $this->order->getOrderDetail($orderId);
-        dd($detailOrder);
-
-        // return response mentah atau decode XML ke JSON
-        return response()->json([
-            'success' => true,
-            'driverId' => $driverId,
-            'data' => $response
-        ]);
-    }
 }
