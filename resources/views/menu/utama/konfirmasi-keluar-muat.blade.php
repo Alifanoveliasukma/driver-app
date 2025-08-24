@@ -80,7 +80,7 @@
                     data-action="{{ route('utama.konfirmasi-keluar-muat.submit') }}"
                     data-redirect="{{ route('utama.konfirmasi-tiba-tujuan', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}">
                     <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                        onmousedown="startSlide(event)" style="width: 48px; height: 48px; border-radius: 0;">
+                        onmousedown="startSlideKeluarMuat(event)" style="width: 48px; height: 48px; border-radius: 0;">
                         <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
                             style="width: 30px; height: 30px; filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
                     </div>
