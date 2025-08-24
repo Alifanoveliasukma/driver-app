@@ -6,21 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Services\DriverApi;
 use App\Services\OrderApi;
 use App\Services\OrderUpdateApi;
+use App\Services\TrackingUpdate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Services\OrderNew;
+
 
 class UtamaController extends Controller
 {
 
-    protected $order, $driver, $c_bpartner_id, $orderUpdate, $orderNew;
+    protected $order, $driver, $c_bpartner_id, $orderUpdate, $tracking;
 
-    public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderupdate, OrderNew $orderNew)
+    public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderupdate, TrackingUpdate $tracking)
     {
         $this->order = $order;
         $this->driver = $driver;
-        $this->orderUpdate = $orderupdate;
-        $this->orderNew = $orderNew;
+        $this->tracking = $tracking;
     }
 
     public function getOrder()
@@ -145,7 +145,7 @@ class UtamaController extends Controller
             return redirect()->route('utama.berangkat.list')->with('message', 'Order ID tidak ditemukan.');
         }
 
-        $update = $this->TrackingUpdate->UpdateTracking($orderId, [
+        $update = $this->tracking->UpdateTracking($orderId, [
             'Status'    => 'LOADOTW',
             'Note'      => 'driver confirmation',
             'Reference' => 'TMS',
