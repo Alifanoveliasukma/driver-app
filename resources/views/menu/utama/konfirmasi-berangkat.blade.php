@@ -53,7 +53,6 @@
                 <div id="jamKeluar" style="font-weight: bold;">--</div>
             </div>
         </div>
-        <input type="hidden" name="" id="">
 
         <div class="d-flex align-items-center rounded px-3 py-2" style="width: 100%; max-width: 400px; margin: 0 auto;">
             <div class="text-muted" style="flex: 1;">KM Mobil</div>
@@ -122,6 +121,7 @@
             const postUrl = @json(route('utama.konfirmasi-berangkat'));
             const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
             const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+            const status = @json($mappedDetail['status'] ?? '');
 
 
             const kmTake = document.getElementById("kmTake").value || 0;
@@ -144,7 +144,8 @@
                         },
                         body: JSON.stringify({
                             orderId,
-                            kmTake: kmTake
+                            kmTake: kmTake,
+                            status,
                         }),
                     })
                     .then(async (res) => {
@@ -153,7 +154,7 @@
                         const data = isJson ? await res.json() : null;
                         console.log(data, "TEST TEST")
                         if (res.ok && isJson && data?.success) {
-                            window.location.href = data.nextUrl; // pindah ke halaman tiba muat
+                            // window.location.href = data.nextUrl; // pindah ke halaman tiba muat
                         } else if (res.status === 419) {
                             alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
                             resetSlider();
@@ -216,7 +217,7 @@
                 let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
 
                 if (hiddenElLoad) hiddenElLoad.value = formatted;
-                if (hiddenSelesaiMuat) hiddenSelesaiMuat.value = formatted;
+                // if (hiddenSelesaiMuat) hiddenSelesaiMuat.value = formatted;
             }
 
             setInterval(updateDateTime, 1000);
