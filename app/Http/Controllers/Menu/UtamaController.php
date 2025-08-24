@@ -95,7 +95,7 @@ class UtamaController extends Controller
                 return $r;
             })
             ->all();
-        dd($orders);
+        // dd($orders);
 
         return view('menu.utama.list-order', compact('orders'));
     }
@@ -126,7 +126,7 @@ class UtamaController extends Controller
         $status = $mappedDetail['Status'] ?? null;
         // dd($status);
 
-        if ($status !== ''){
+        if ($status !== '') {
             return redirect()->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId]);
         }
 
@@ -142,7 +142,7 @@ class UtamaController extends Controller
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
         $mappedDetail['route'] = $detailTransOrder->route;
 
-       
+
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
 
@@ -211,7 +211,7 @@ class UtamaController extends Controller
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
         $status = $mappedDetail['Status'] ?? null;
-        if ($status !== 'LOADOTW'){
+        if ($status !== 'LOADOTW') {
             return redirect()->route('utama.konfirmasi-mulai-muat', ['orderId' => $orderId]);
         }
 
