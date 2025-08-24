@@ -70,8 +70,6 @@ Route::get('/utama/tiba-tujuan/{orderId}', [UtamaController::class, 'tibaTujuanP
 
 
 
-
-
 // // Route::get('/konfirmasi-berangkat', [UtamaController::class, 'getOrder'])->name('menu.konfirmasi-berangkat');
 // Route::post('/utama/tiba-muat', [UtamaController::class, 'tibaMuat'])->name('utama.konfirmasi-tiba-muat');
 

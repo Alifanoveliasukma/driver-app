@@ -39,13 +39,13 @@
         </div>
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
-                <div id="tanggalSelesaiMuat" style="font-weight: bold;">--</div>
+                <div id="tanggalKeluarMuat" style="font-weight: bold;">--</div>
             </div>
             <div class="bg-light rounded p-3 text-center flex-fill">
-                <div id="jamSelesaiMuat" style="font-weight: bold;">--</div>
+                <div id="jamKeluarMuat" style="font-weight: bold;">--</div>
             </div>
         </div>
-        <input type="hidden" name="LoadDate" id="LoadDate">
+        <input type="hidden" name="UnloadDateStart" id="UnloadDateStart">
 
         <div class="text-center total-muat-container ">
             <label class="total-muat-label">Total Muat</label>
@@ -75,7 +75,8 @@
         <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
             <div class="slide-confirm-container start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">
                 <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-                    style="max-width: 400px; margin: 0 auto;" data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}"
+                    style="max-width: 400px; margin: 0 auto;" 
+                    data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}"
                     data-action="{{ route('utama.konfirmasi-keluar-muat.submit') }}"
                     data-redirect="{{ route('utama.konfirmasi-tiba-tujuan', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}">
                     <div class="slide-button bg-white d-flex justify-content-center align-items-center"

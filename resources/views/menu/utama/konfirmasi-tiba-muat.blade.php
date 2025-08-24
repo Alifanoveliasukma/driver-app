@@ -71,7 +71,8 @@
     <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
         <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">
             <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-                style="max-width: 400px; margin: 0 auto;" data-action="{{ route('utama.konfirmasi-tiba-muat.submit') }}"
+                style="max-width: 400px; margin: 0 auto;" 
+                data-action="{{ route('utama.konfirmasi-tiba-muat.submit') }}"
                 data-redirect="{{ route('utama.konfirmasi-selesai-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
                 data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
 
