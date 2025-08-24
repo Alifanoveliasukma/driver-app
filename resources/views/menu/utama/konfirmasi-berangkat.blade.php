@@ -33,8 +33,8 @@
             style=" max-width: 400px; background-color: #f3f3f3; margin:50px auto 0; padding: 16px; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
-                    <div style="font-weight: bold;">{{ $mappedDetail['delivery_address'] ?? '-' }}</div>
+                    <div class="text-muted mb-1" style="font-size: 14px;">Rute</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail['route'] ?? '-' }}</div>
                 </div>
                 <div class="text-center">
 

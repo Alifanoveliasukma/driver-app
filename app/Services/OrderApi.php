@@ -87,6 +87,7 @@ class OrderApi extends BaseApi
             ->select(
                 't.xx_transorder_id',
                 't.value',
+                't.route',
                 'bp.name as customer_name',
                 'loc.address1 as customer_address',
                 'loc.city',

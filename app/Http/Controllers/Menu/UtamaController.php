@@ -25,7 +25,6 @@ class UtamaController extends Controller
     {
         $c_bpartner_id = session('c_bpartner_id');
 
-
         $driver = $this->driver->getDriver($c_bpartner_id);
         $fields = data_get($driver, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
         if (isset($fields['@attributes'])) $fields = [$fields];
@@ -58,13 +57,34 @@ class UtamaController extends Controller
             if (!empty($tmp)) $mappedOrders[] = $tmp;
         }
 
+
+        $customerIds = collect($mappedOrders)->pluck('Customer_ID')->filter()->unique();
+        $transOrderIds = collect($mappedOrders)->pluck('XX_TransOrder_ID')->filter()->unique();
+
+
+        $customers = DB::table('mzl.c_bpartner')
+            ->whereIn('c_bpartner_id', $customerIds)
+            ->pluck('name', 'c_bpartner_id');
+
+        $routes = DB::table('mzl.xx_transorder as t')
+            ->select('t.xx_transorder_id', 't.route')
+            ->whereIn('t.xx_transorder_id', $transOrderIds)
+            ->get()
+            ->keyBy('xx_transorder_id');
+
         $orders = collect($mappedOrders)
             ->filter(fn($r) => !isset($r['Status']) || $r['Status'] !== 'FINISHED')
             ->sortBy(fn($r) => $r['ETD'] ?? '9999-12-31 23:59:59')
             ->values()
             ->take(6)
+            ->map(function ($r) use ($customers, $routes) {
+                $r['Customer_Name'] = $customers[$r['Customer_ID']] ?? '-';
+                $route = $routes[$r['XX_TransOrder_ID']] ?? null;
+
+                $r['route'] = $route->route ?? '-';
+                return $r;
+            })
             ->all();
-        // dd($orders);
 
         return view('menu.utama.list-order', compact('orders'));
     }
@@ -93,6 +113,8 @@ class UtamaController extends Controller
             }
         }
 
+
+
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
@@ -104,6 +126,7 @@ class UtamaController extends Controller
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail['route'] = $detailTransOrder->route;
 
 
 
