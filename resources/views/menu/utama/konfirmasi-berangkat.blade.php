@@ -43,7 +43,7 @@
         </div>
 
         <div class="text-center mt-3 mb-2">
-            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Keluar Tempat Muat</span>
+            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Berangkat</span>
         </div>
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
@@ -53,7 +53,7 @@
                 <div id="jamKeluar" style="font-weight: bold;">--</div>
             </div>
         </div>
-        <input type="hidden" name="OutLoadDate" id="OutLoadDate">
+        <input type="hidden" name="" id="">
 
         <div class="d-flex align-items-center rounded px-3 py-2" style="width: 100%; max-width: 400px; margin: 0 auto;">
             <div class="text-muted" style="flex: 1;">KM Mobil</div>

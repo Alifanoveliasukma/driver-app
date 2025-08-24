@@ -43,14 +43,14 @@
             <div id="jamMulaiBongkar"style="font-weight: bold;">--</div>
         </div>
     </div>
-    <input type="hidden" name="UnloadStd" id="UnloadStd">
+    <input type="hidden" name="UnloadDateStart" id="UnloadDateStart">
 
         <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
         <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">
             <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
                 style="max-width: 400px; margin: 0 auto;" 
                 data-action="{{ route('utama.konfirmasi-mulai-bongkar.submit') }}"
-                data-redirect="{{ route('utama.konfirmasi-keluar-bongkar', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
+                data-redirect="{{ route('utama.konfirmasi-selesai-bongkar', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
                 data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
 
                 <div class="slide-button bg-white d-flex justify-content-center align-items-center"

@@ -52,6 +52,12 @@ Route::get('/utama/tiba-muat/{orderId}', [UtamaController::class, 'tibaMuatPage'
 Route::post('/utama/tiba-muat', [UtamaController::class, 'tibaMuat'])
     ->name('utama.konfirmasi-tiba-muat.submit');
 
+Route::get('/utama/mulai-muat/{orderId}', [UtamaController::class, 'mulaiMuatPage'])
+    ->name('utama.konfirmasi-mulai-muat');
+
+Route::post('/utama/mulai-muat', [UtamaController::class, 'mulaiMuat'])
+    ->name('utama.konfirmasi-mulai-muat.submit');
+
 Route::get('/utama/selesai-muat/{orderId}', [UtamaController::class, 'selesaiMuatPage'])
     ->name('utama.konfirmasi-selesai-muat');
 

@@ -45,7 +45,7 @@
                 <div id="jamKeluarMuat" style="font-weight: bold;">--</div>
             </div>
         </div>
-        <input type="hidden" name="UnloadDateStart" id="UnloadDateStart">
+        <input type="hidden" name="" id="">
 
         <div class="text-center total-muat-container ">
             <label class="total-muat-label">Total Muat</label>
