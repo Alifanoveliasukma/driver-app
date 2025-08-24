@@ -113,8 +113,6 @@ class UtamaController extends Controller
             }
         }
 
-
-
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
@@ -128,8 +126,7 @@ class UtamaController extends Controller
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
         $mappedDetail['route'] = $detailTransOrder->route;
 
-
-
+        dd($mappedDetail);
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
 
@@ -474,7 +471,7 @@ class UtamaController extends Controller
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
-        // dd($mappedDetail);
+        dd($mappedDetail);
         return view('menu.utama.konfirmasi-mulai-bongkar', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
@@ -542,8 +539,8 @@ class UtamaController extends Controller
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
-        dd($mappedDetail);
-        return view('menu.utama.konfirmasi-tiba-tujuan', [
+        // dd($mappedDetail);
+        return view('menu.utama.konfirmasi-keluar-bongkar', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
         ]);
@@ -561,8 +558,8 @@ class UtamaController extends Controller
         }
 
         $update = $this->orderUpdate->updateOrder($orderId, [
-            'Status'        => 'WAIT UNLOAD',
-            'UnloadDate' => now()->format('Y-m-d H:i:s'),
+            'Status'        => 'EXECUTED',
+            'UnloadStd' => now()->format('Y-m-d H:i:s'),
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
@@ -575,8 +572,8 @@ class UtamaController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Status diubah ke WAIT UNLOAD',
-            'nextUrl' => route('utama.konfirmasi-selesai-bongkar', ['orderId' => $orderId]),
+            'message' => 'Status diubah ke EXECUTED',
+            'nextUrl' => route('utama.konfirmasi-mulai-bongkar', ['orderId' => $orderId]),
         ]);
     }
 }
