@@ -43,7 +43,7 @@
             <div id="jamMulaiBongkar"style="font-weight: bold;">--</div>
         </div>
     </div>
-    <input type="hidden" name="UnloadDate" id="UnloadDate">
+    <input type="hidden" name="UnloadStd" id="UnloadStd">
 
         <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
         <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">

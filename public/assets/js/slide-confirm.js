@@ -542,8 +542,8 @@ function stopSlideMulaiBongkar(e) {
   const nextUrl   = container.dataset.redirect; 
   const orderId   = container.dataset.orderid;
 
-  const hiddenEl   = document.getElementById("UnloadDate");
-  const unloadDate = hiddenEl ? hiddenEl.value : null;
+  const hiddenEl   = document.getElementById("UnloadStd");
+  const unloadStd = hiddenEl ? hiddenEl.value : null;
 
   const left = parseInt(btn.style.left || "0", 10);
   const threshold = container.clientWidth - btn.clientWidth - 5;
@@ -560,7 +560,7 @@ function stopSlideMulaiBongkar(e) {
         "Accept": "application/json",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: JSON.stringify({ orderId, UnloadDate: unloadDate }),
+      body: JSON.stringify({ orderId, UnloadStd: unloadStd }),
     })
       .then(async (res) => {
         const ct = res.headers.get("content-type") || "";
