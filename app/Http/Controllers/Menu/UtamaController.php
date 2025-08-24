@@ -98,7 +98,20 @@ class UtamaController extends Controller
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
-        // dd($mappedDetail);
+
+        $route = $this->order->getTransOrderWithCustomerAddress($orderId)->route;
+
+        $parts = explode('-', $route);
+
+
+        $alamat_pengiriman = trim($parts[0] ?? '');
+        $alamat_pengambilan = trim($parts[1] ?? '');
+
+        $mappedDetail["alamat_pengiriman"] = $alamat_pengiriman;
+        $mappedDetail["alamat_pengambilan"] = $alamat_pengambilan;
+
+
+
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
 
@@ -193,6 +206,19 @@ class UtamaController extends Controller
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
+
+
+        $route = $this->order->getTransOrderWithCustomerAddress($orderId)->route;
+
+        $parts = explode('-', $route);
+
+
+        $alamat_pengiriman = trim($parts[0] ?? '');
+        $alamat_pengambilan = trim($parts[1] ?? '');
+
+        $mappedDetail["alamat_pengiriman"] = $alamat_pengiriman;
+        $mappedDetail["alamat_pengambilan"] = $alamat_pengambilan;
+        // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-muat', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,

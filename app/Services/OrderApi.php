@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\DB;
 
 class OrderApi extends BaseApi
 {
@@ -78,5 +79,30 @@ class OrderApi extends BaseApi
         </soapenv:Envelope>';
 
         return $this->sendRequest($request);
+    }
+
+    public function getTransOrderWithCustomerAddress($transOrderId)
+    {
+        return DB::table('mzl.xx_transorder as t')
+            ->select(
+                't.xx_transorder_id',
+                't.value',
+                'bp.name as customer_name',
+                'loc.address1 as customer_address',
+                'loc.city',
+                'loc.postal',
+                't.route',
+                DB::raw("to_char(t.loaddate, 'DD Mon YYYY HH24:MI') as pickup_time"),
+                DB::raw("to_char(t.loaddatestart, 'DD Mon YYYY HH24:MI') as pickup_start"),
+                DB::raw("to_char(t.unloaddate, 'DD Mon YYYY HH24:MI') as unload_time"),
+                DB::raw("to_char(t.unloaddatestart, 'DD Mon YYYY HH24:MI') as unload_start"),
+                't.drivername',
+                't.vendorcar'
+            )
+            ->join('mzl.c_bpartner as bp', 'bp.c_bpartner_id', '=', 't.customer_id')
+            ->leftJoin('mzl.c_bpartner_location as bpl', 'bpl.c_bpartner_id', '=', 'bp.c_bpartner_id')
+            ->leftJoin('mzl.c_location as loc', 'loc.c_location_id', '=', 'bpl.c_location_id')
+            ->where('t.xx_transorder_id', $transOrderId)
+            ->first();
     }
 }
