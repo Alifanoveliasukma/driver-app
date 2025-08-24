@@ -23,7 +23,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengambilan</div>
-                    <div style="font-weight: bold;">{{ $mappedDetail['alamat_pengambilan'] ?? '-' }}</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail['pickup_address'] ?? '-' }}</div>
                     {{-- <div style="font-weight: bold;">Jl Veteran</div> --}}
                 </div>
                 <div class="text-center">

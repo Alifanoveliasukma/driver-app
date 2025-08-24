@@ -91,7 +91,8 @@ class OrderApi extends BaseApi
                 'loc.address1 as customer_address',
                 'loc.city',
                 'loc.postal',
-                't.route',
+                'from_point.name as pickup_address',
+                'to_point.name as delivery_address',
                 DB::raw("to_char(t.loaddate, 'DD Mon YYYY HH24:MI') as pickup_time"),
                 DB::raw("to_char(t.loaddatestart, 'DD Mon YYYY HH24:MI') as pickup_start"),
                 DB::raw("to_char(t.unloaddate, 'DD Mon YYYY HH24:MI') as unload_time"),
@@ -102,6 +103,9 @@ class OrderApi extends BaseApi
             ->join('mzl.c_bpartner as bp', 'bp.c_bpartner_id', '=', 't.customer_id')
             ->leftJoin('mzl.c_bpartner_location as bpl', 'bpl.c_bpartner_id', '=', 'bp.c_bpartner_id')
             ->leftJoin('mzl.c_location as loc', 'loc.c_location_id', '=', 'bpl.c_location_id')
+            ->leftJoin('mzl.xx_transroute as tr', 'tr.xx_transorder_id', '=', 't.xx_transorder_id') // perbaikan di sini
+            ->leftJoin('mzl.xm_point as from_point', 'from_point.xm_point_id', '=', 'tr.from_id')   // perbaikan di sini
+            ->leftJoin('mzl.xm_point as to_point', 'to_point.xm_point_id', '=', 'tr.to_id')         // perbaikan di sini
             ->where('t.xx_transorder_id', $transOrderId)
             ->first();
     }

@@ -22,8 +22,8 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
-                    <div style="font-weight: bold;">Gudang Jakarta</div>
-                    <div style="font-weight: bold;">Jakarta Utara</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail['delivery_address'] ?? '-' }}</div>
+                    {{-- <div style="font-weight: bold;">Jakarta Utara</div> --}}
                 </div>
                 <div class="text-center">
                     <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center"
@@ -88,47 +88,48 @@
             </div>
         </div>
 
-        @push('scripts')
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const input = document.getElementById('foto-sopir');
-                    const box = document.getElementById('fotoBox');
-                    const preview = document.getElementById('fotoPreview');
-                    const nameEl = document.getElementById('fotoName');
-                    const clear = document.getElementById('clearFoto');
 
-                    function resetFoto() {
-                        input.value = '';
-                        preview.src = '';
-                        nameEl.textContent = '';
-                        box.classList.remove('has-file');
-                        if (clear) clear.style.display = 'none';
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const input = document.getElementById('foto-sopir');
+                const box = document.getElementById('fotoBox');
+                const preview = document.getElementById('fotoPreview');
+                const nameEl = document.getElementById('fotoName');
+                const clear = document.getElementById('clearFoto');
+
+                function resetFoto() {
+                    input.value = '';
+                    preview.src = '';
+                    nameEl.textContent = '';
+                    box.classList.remove('has-file');
+                    if (clear) clear.style.display = 'none';
+                }
+
+                input.addEventListener('change', () => {
+                    const file = input.files && input.files[0];
+
+                    if (!file) {
+                        resetFoto();
+                        return;
                     }
 
-                    input.addEventListener('change', () => {
-                        const file = input.files && input.files[0];
-                        if (!file) {
-                            resetFoto();
-                            return;
-                        }
+                    nameEl.textContent = file.name;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
 
-                        nameEl.textContent = file.name;
-                        const reader = new FileReader();
-                        reader.onload = (e) => {
-                            preview.src = e.target.result;
-                            box.classList.add('has-file');
-                            if (clear) clear.style.display = 'inline-block';
-                        };
-                        reader.readAsDataURL(file);
-                    });
-
-                    if (clear) {
-                        clear.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            resetFoto();
-                        });
-                    }
+                        preview.src = e.target.result;
+                        box.classList.add('has-file');
+                        if (clear) clear.style.display = 'inline-block';
+                    };
+                    reader.readAsDataURL(file);
                 });
-            </script>
-        @endpush
+
+                if (clear) {
+                    clear.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        resetFoto();
+                    });
+                }
+            });
+        </script>
     @endsection

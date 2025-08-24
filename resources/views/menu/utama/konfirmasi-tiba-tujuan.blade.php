@@ -23,8 +23,8 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
-                    <div style="font-weight: bold;">Gudang Jakarta</div>
-                    <div style="font-weight: bold;">Jakarta Utara</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail['delivery_address'] ?? '-' }}</div>
+                    {{-- <div style="font-weight: bold;">Jakarta Utara</div> --}}
                 </div>
                 <div class="text-center">
                     <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center"

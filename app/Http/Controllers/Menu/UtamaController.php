@@ -99,16 +99,11 @@ class UtamaController extends Controller
             : '-';
 
 
-        $route = $this->order->getTransOrderWithCustomerAddress($orderId)->route;
-
-        $parts = explode('-', $route);
+        $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $alamat_pengiriman = trim($parts[0] ?? '');
-        $alamat_pengambilan = trim($parts[1] ?? '');
-
-        $mappedDetail["alamat_pengiriman"] = $alamat_pengiriman;
-        $mappedDetail["alamat_pengambilan"] = $alamat_pengambilan;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
 
 
@@ -208,16 +203,12 @@ class UtamaController extends Controller
 
 
 
-        $route = $this->order->getTransOrderWithCustomerAddress($orderId)->route;
-
-        $parts = explode('-', $route);
+        $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $alamat_pengiriman = trim($parts[0] ?? '');
-        $alamat_pengambilan = trim($parts[1] ?? '');
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
-        $mappedDetail["alamat_pengiriman"] = $alamat_pengiriman;
-        $mappedDetail["alamat_pengambilan"] = $alamat_pengambilan;
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-muat', [
             'mappedDetail' => $mappedDetail,
@@ -281,6 +272,13 @@ class UtamaController extends Controller
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
+
+        $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
+
+
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+
         return view('menu.utama.konfirmasi-selesai-muat', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
@@ -341,7 +339,11 @@ class UtamaController extends Controller
         $mappedDetail['Customer_Name'] = $customerId
             ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
-        // dd($mappedDetail);
+        $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
+
+
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
         return view('menu.utama.konfirmasi-keluar-muat', [
             'mappedDetail' => $mappedDetail,
             'orderId'      => $orderId,
@@ -405,7 +407,11 @@ class UtamaController extends Controller
             ?  DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
             : '-';
 
-        // dd($mappedDetail);
+        $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
+
+
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
         return view('menu.utama.konfirmasi-tiba-tujuan', [
             'mappedDetail' => $mappedDetail,
