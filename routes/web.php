@@ -11,6 +11,9 @@ use App\Http\Controllers\Menu\ProfilController;
 Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Route::get('/', function () {
+//     return redirect('/login');
+// });
 
 Route::get('/no-order', function () {
     return view('menu.utama.no-order');
@@ -38,13 +41,13 @@ Route::get('/konfirmasi-keluar-bongkar', function () {
 
 
 Route::get('/utama/order', [UtamaController::class, 'getOrder'])
-->name('menu.list-order');
+    ->name('menu.list-order');
 
 Route::get('/utama/detail-order/{orderId}', [UtamaController::class, 'detailOrder'])
-->name('menu.detail-order');
+    ->name('menu.detail-order');
 
 Route::post('/utama/berangkat', [UtamaController::class, 'berangkat'])
-->name('utama.konfirmasi-berangkat');
+    ->name('utama.konfirmasi-berangkat');
 
 Route::get('/utama/tiba-muat/{orderId}', [UtamaController::class, 'tibaMuatPage'])
     ->name('utama.konfirmasi-tiba-muat');
