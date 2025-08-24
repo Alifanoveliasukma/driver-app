@@ -52,13 +52,10 @@
     <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
         <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">
             <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-                style="max-width: 400px; margin: 0 auto;" 
-                data-action="{{ route('utama.konfirmasi-selesai-muat.submit') }}"
-                data-redirect="{{ route('utama.konfirmasi-keluar-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
-                data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
+                style="max-width: 400px; margin: 0 auto;">
 
                 <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                    onmousedown="startSlideSelesaiMuat(event)" style="width: 48px; height: 48px; border-radius: 0;">
+                    onmousedown="startSlide(event)" style="width: 48px; height: 48px; border-radius: 0;">
                     <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
                         style="width: 30px; height: 30px; filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
                 </div>
@@ -82,4 +79,157 @@
             });
         </script>
     @endpush
+
+    <script>
+        let isDragging = false;
+        let offsetX = 0;
+
+        // berangkat
+        function startSlide(e) {
+            isDragging = true;
+            offsetX = e.clientX || (e.touches && e.touches[0].clientX);
+            document.addEventListener("mousemove", onSlide);
+            document.addEventListener("mouseup", stopSlide);
+            document.addEventListener("touchmove", onSlide);
+            document.addEventListener("touchend", stopSlide);
+        }
+
+        function onSlide(e) {
+            if (!isDragging) return;
+
+            const btn = document.querySelector(".slide-button");
+            const container = document.querySelector(".slide-track");
+            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            let moveX = clientX - offsetX;
+            moveX = Math.max(
+                0,
+                Math.min(moveX, container.clientWidth - btn.clientWidth)
+            );
+            btn.style.left = moveX + "px";
+
+            if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+                btn.style.background = "#198754";
+                btn.innerHTML =
+                    '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
+            } else {
+                btn.style.background = "#ffffff";
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+            }
+        }
+
+        function stopSlide(e) {
+            isDragging = false;
+
+            const btn = document.querySelector(".slide-button");
+            const container = document.querySelector(".slide-track");
+
+            const postUrl = @json(route('utama.konfirmasi-selesai-muat.submit'));
+            const nextUrl = @json(route('utama.konfirmasi-tiba-tujuan', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
+            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+
+
+
+
+            const left = parseInt(btn.style.left || "0", 10);
+            const threshold = container.clientWidth - btn.clientWidth - 5;
+
+            if (left >= threshold) {
+                // optional: cegah double submit
+                btn.style.pointerEvents = "none";
+
+                fetch(postUrl, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Accept": "application/json",
+                            "X-Requested-With": "XMLHttpRequest",
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                        },
+                        body: JSON.stringify({
+                            orderId
+                        }),
+                    })
+                    .then(async (res) => {
+                        const ct = res.headers.get("content-type") || "";
+                        const isJson = ct.includes("application/json");
+                        const data = isJson ? await res.json() : null;
+
+                        if (res.ok && isJson && data?.success) {
+                            window.location.href = data.nextUrl; // pindah ke halaman tiba muat
+                        } else if (res.status === 419) {
+                            alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
+                            resetSlider();
+                        } else {
+                            alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+                            resetSlider();
+                        }
+                    })
+                    .catch(() => {
+                        alert("Kesalahan jaringan.");
+                        resetSlider();
+                    })
+                    .finally(() => {
+                        btn.style.pointerEvents = "";
+                    });
+
+            } else {
+                resetSlider();
+            }
+
+            document.removeEventListener("mousemove", onSlide);
+            document.removeEventListener("mouseup", stopSlide);
+            document.removeEventListener("touchmove", onSlide);
+            document.removeEventListener("touchend", stopSlide);
+
+            function resetSlider() {
+                btn.style.left = "0px";
+                btn.style.background = "#ffffff";
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+            }
+        }
+
+
+        function initRealtimeDateTime() {
+            function updateDateTime() {
+                let now = new Date();
+
+                const bulan = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                let tanggal = String(now.getDate()).padStart(2, "0") + " " + bulan[now.getMonth()] + " " + now
+                    .getFullYear();
+                let jam = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+
+
+                // UNLOAD
+                let tanggalElUnload = document.getElementById("tanggalSelesaiMuat");
+                let jamElUnload = document.getElementById("jamSelesaiMuat");
+                let hiddenElLoad = document.getElementById("LoadDate");
+
+                if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
+                if (jamElUnload) jamElUnload.innerText = jam;
+
+
+
+
+                // format SQL datetime
+                let yyyy = now.getFullYear();
+                let mm = String(now.getMonth() + 1).padStart(2, "0");
+                let dd = String(now.getDate()).padStart(2, "0");
+                let HH = String(now.getHours()).padStart(2, "0");
+                let ii = String(now.getMinutes()).padStart(2, "0");
+                let ss = String(now.getSeconds()).padStart(2, "0");
+                let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
+
+                if (hiddenElLoad) hiddenElLoad.value = formatted;
+                // if (hiddenSelesaiMuat) hiddenSelesaiMuat.value = formatted;
+            }
+
+            setInterval(updateDateTime, 1000);
+            updateDateTime();
+        }
+
+
+        document.addEventListener("DOMContentLoaded", initRealtimeDateTime);
+    </script>
 @endsection

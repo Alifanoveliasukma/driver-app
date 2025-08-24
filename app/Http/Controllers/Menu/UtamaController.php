@@ -14,13 +14,14 @@ use Illuminate\Support\Facades\DB;
 class UtamaController extends Controller
 {
 
-    protected $order, $driver, $c_bpartner_id, $orderUpdate, $tracking;
+    protected $order, $driver, $c_bpartner_id, $orderUpdate, $TrackingUpdate;
 
-    public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderupdate, TrackingUpdate $tracking)
+    public function __construct(OrderApi $order, DriverApi $driver, OrderUpdateApi $orderUpdate, TrackingUpdate $TrackingUpdate)
     {
         $this->order = $order;
         $this->driver = $driver;
-        $this->tracking = $tracking;
+        $this->orderUpdate = $orderUpdate;
+        $this->TrackingUpdate = $TrackingUpdate;
     }
 
     public function getOrder()
@@ -151,13 +152,16 @@ class UtamaController extends Controller
             return redirect()->route('utama.berangkat.list')->with('message', 'Order ID tidak ditemukan.');
         }
 
-        $update = $this->tracking->UpdateTracking($orderId, [
+        $update = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOADOTW',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
             'KMTake' => $kmTake,
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
+
+
+
 
         if (is_array($update) && isset($update['Error'])) {
             $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
@@ -244,7 +248,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOADWAIT',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -322,7 +326,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOAD',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -397,7 +401,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOADWAIT',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -417,6 +421,7 @@ class UtamaController extends Controller
             return redirect()->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
         }
+        $detail = $this->order->getOrderDetail($orderId);
 
         $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
@@ -470,7 +475,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'SHIPMENT',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -548,7 +553,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'UNLOADWAIT',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -625,7 +630,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOAD',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -702,7 +707,7 @@ class UtamaController extends Controller
             ], 400);
         }
 
-        $updateTracking = $this->tracking->UpdateTracking($orderId, [
+        $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'UNLOADWAIT',
             'Note' => 'driver confirmation',
             'Reference' => 'TMS',
@@ -825,5 +830,4 @@ class UtamaController extends Controller
         //     'orderId'      => $orderId,
         // ]);
     }
-
 }

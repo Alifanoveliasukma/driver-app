@@ -57,7 +57,8 @@
 
         <div class="d-flex align-items-center rounded px-3 py-2" style="width: 100%; max-width: 400px; margin: 0 auto;">
             <div class="text-muted" style="flex: 1;">KM Mobil</div>
-            <input type="number" class="form-control border-0 text-center mx-2" value="100" style="max-width: 80px;">
+            <input type="number" id="kmTake" class="form-control border-0 text-center mx-2" value="100"
+                style="max-width: 80px;">
             <div class="fw-bold">KM</div>
         </div>
 
@@ -65,9 +66,7 @@
 
     <div class="slide-confirm-container px-3">
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-            style="max-width: 400px; margin: 0 auto;" data-action="{{ route('utama.konfirmasi-berangkat') }}"
-            data-redirect="{{ route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
-            data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
+            style="max-width: 400px; margin: 0 auto;">
             <div class="slide-button bg-white d-flex justify-content-center align-items-center"
                 onmousedown="startSlide(event)" style="width:48px;height:48px;border-radius:0;">
                 <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow" style="width:30px;height:30px;">
@@ -124,8 +123,9 @@
             const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
             const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
 
-            const hiddenEl = document.getElementById("OutLoadDate");
-            const outLoadDate = hiddenEl ? hiddenEl.value : null;
+
+            const kmTake = document.getElementById("kmTake").value || 0;
+
 
             const left = parseInt(btn.style.left || "0", 10);
             const threshold = container.clientWidth - btn.clientWidth - 5;
@@ -144,14 +144,14 @@
                         },
                         body: JSON.stringify({
                             orderId,
-                            OutLoadDate: outLoadDate
+                            kmTake: kmTake
                         }),
                     })
                     .then(async (res) => {
                         const ct = res.headers.get("content-type") || "";
                         const isJson = ct.includes("application/json");
                         const data = isJson ? await res.json() : null;
-
+                        console.log(data, "TEST TEST")
                         if (res.ok && isJson && data?.success) {
                             window.location.href = data.nextUrl; // pindah ke halaman tiba muat
                         } else if (res.status === 419) {
@@ -205,54 +205,6 @@
                 if (tanggalElLoad) tanggalElLoad.innerText = tanggal;
                 if (jamElLoad) jamElLoad.innerText = jam;
 
-                // UNLOAD
-                let tanggalElUnload = document.getElementById("tanggalKeluarUnload");
-                let jamElUnload = document.getElementById("jamKeluarUnload");
-                let hiddenElUnload = document.getElementById("LoadDateStart");
-
-                if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
-                if (jamElUnload) jamElUnload.innerText = jam;
-
-
-                // WAIT FOR LOAD
-                let tanggalSelesaiMuat = document.getElementById("tanggalSelesaiMuat");
-                let jamSelesaiMuat = document.getElementById("jamSelesaiMuat");
-                let hiddenSelesaiMuat = document.getElementById("LoadDate");
-
-                if (tanggalSelesaiMuat) tanggalSelesaiMuat.innerText = tanggal;
-                if (jamSelesaiMuat) jamSelesaiMuat.innerText = jam;
-
-                // WAIT UNLOAD
-                let tanggalKeluarMuat = document.getElementById("tanggalKeluarMuat");
-                let jamKeluarMuat = document.getElementById("jamKeluarMuat");
-                let hiddenKeluarMuat = document.getElementById("UnloadDateStart");
-
-                if (tanggalKeluarMuat) tanggalKeluarMuat.innerText = tanggal;
-                if (jamKeluarMuat) jamKeluarMuat.innerText = jam;
-
-                // FINISHED
-                let tanggalTibaTujuan = document.getElementById("tanggalTibaTujuan");
-                let jamTibaTujuan = document.getElementById("jamTibaTujuan");
-                let hiddenTibaTujuan = document.getElementById("UnloadDateStart");
-
-                if (tanggalTibaTujuan) tanggalTibaTujuan.innerText = tanggal;
-                if (jamTibaTujuan) jamTibaTujuan.innerText = jam;
-
-                // WAIT UNLOAD
-                let tanggalMulaiBongkar = document.getElementById("tanggalMulaiBongkar");
-                let jamMulaiBongkar = document.getElementById("jamMulaiBongkar");
-                let hiddenMulaiBongkar = document.getElementById("UnloadDate");
-
-                if (tanggalMulaiBongkar) tanggalMulaiBongkar.innerText = tanggal;
-                if (jamMulaiBongkar) jamMulaiBongkar.innerText = jam;
-
-                // EXECUTED
-                let tanggalKeluarBongkar = document.getElementById("tanggalKeluarBongkar");
-                let jamKeluarBongkar = document.getElementById("jamKeluarBongkar");
-                let hiddenKeluarBongkar = document.getElementById("UnloadStd");
-
-                if (tanggalKeluarBongkar) tanggalKeluarBongkar.innerText = tanggal;
-                if (jamKeluarBongkar) jamKeluarBongkar.innerText = jam;
 
                 // format SQL datetime
                 let yyyy = now.getFullYear();
