@@ -34,7 +34,8 @@
         <i class="fas fa-truck" style="font-size: 32px; color: white; background-color: #3F2F96; padding: 12px; border-radius: 50%;"></i>
     </div>
 
-    <div class="container d-flex justify-content-center align-items-start mt-n5" style="min-height: 60vh;">
+    <!-- <div class="container d-flex justify-content-center align-items-start mt-n5" style="min-height: 60vh;"> -->
+        <div class="container-fluid d-flex justify-content-center align-items-start mt-n5" style="min-height: 60vh;">
         <div class="w-100" style="max-width: 400px;">
 
             {{-- Tampilkan pesan dari session --}}
