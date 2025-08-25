@@ -154,7 +154,7 @@
                         const data = isJson ? await res.json() : null;
                         console.log(data, "TEST TEST")
                         if (res.ok && isJson && data?.success) {
-                            // window.location.href = data.nextUrl; // pindah ke halaman tiba muat
+                          window.location.href = data.nextUrl; // pindah ke halaman tiba muat
                         } else if (res.status === 419) {
                             alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
                             resetSlider();

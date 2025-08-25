@@ -96,6 +96,7 @@
             <div class="sign-box">
                 <canvas id="signPad" width="360" height="150"></canvas>
             </div>
+            <button id="uploadSign">Upload Sign</button>
             <button type="button" id="clearSign" class="btn btn-sm btn-outline-danger mt-2">
                 Hapus Tanda Tangan
             </button>
@@ -160,141 +161,189 @@
                 </div>
             </div>
         </div>
-
         <script>
-            (function() {
-                const c = document.getElementById('signPad');
-                if (!c) return;
-                const ctx = c.getContext('2d');
-                let drawing = false,
-                    last = null;
-
-                const pos = (e) => {
-                    const r = c.getBoundingClientRect();
-                    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-                    const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-                    return {
-                        x,
-                        y
-                    };
-                };
-
-                const start = (e) => {
-                    drawing = true;
-                    last = pos(e);
-                    e.preventDefault();
-                };
-                const move = (e) => {
-                    if (!drawing) return;
-                    const p = pos(e);
-                    ctx.lineWidth = 2;
-                    ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#000';
-                    ctx.beginPath();
-                    ctx.moveTo(last.x, last.y);
-                    ctx.lineTo(p.x, p.y);
-                    ctx.stroke();
-                    last = p;
-                    e.preventDefault();
-                };
-                const end = () => {
-                    drawing = false;
-                };
-
-                c.addEventListener('mousedown', start);
-                c.addEventListener('mousemove', move);
-                window.addEventListener('mouseup', end);
-
-                c.addEventListener('touchstart', start, {
-                    passive: false
-                });
-                c.addEventListener('touchmove', move, {
-                    passive: false
-                });
-                c.addEventListener('touchend', end);
-            })();
-
-            (function() {
-                const input = document.getElementById('docFile');
-                const preview = document.getElementById('docPreview');
-                const placeholder = document.getElementById('docPh');
-                const removeBtn = document.getElementById('removeDoc');
-
-                if (!input) return;
-
-                input.addEventListener('change', () => {
-                    const f = input.files && input.files[0];
-                    if (!f) {
-                        reset();
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = e => {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                        placeholder.style.display = 'none';
-                        removeBtn.style.display = 'inline-flex';
-                    };
-                    reader.readAsDataURL(f);
-                });
-
-                function reset() {
-                    input.value = '';
-                    preview.src = '';
-                    preview.style.display = 'none';
-                    placeholder.style.display = 'flex';
-                    removeBtn.style.display = 'none';
-                }
-                document.getElementById('removeDoc')?.addEventListener('click', reset);
-            })();
-
-            (function() {
-                const input = document.getElementById('fotoSopir');
-                const box = document.getElementById('fotoBox');
-                const preview = document.getElementById('fotoPreview');
-                const nameEl = document.getElementById('fotoName');
-                const clear = document.getElementById('clearFoto');
-                if (!input) return;
-
-                function reset() {
-                    input.value = '';
-                    preview.src = '';
-                    nameEl.textContent = '';
-                    box.classList.remove('has-file');
-                    clear.style.display = 'none';
-                }
-                input.addEventListener('change', () => {
-                    const f = input.files && input.files[0];
-                    if (!f) {
-                        reset();
-                        return;
-                    }
-                    nameEl.textContent = f.name;
-                    const r = new FileReader();
-                    r.onload = e => {
-                        preview.src = e.target.result;
-                        box.classList.add('has-file');
-                        clear.style.display = 'inline-flex';
-                    };
-                    r.readAsDataURL(f);
-                });
-                clear.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    reset();
-                });
-            })();
-
             document.addEventListener('DOMContentLoaded', function() {
-                const c = document.getElementById('signPad');
-                const ctx = c.getContext('2d');
-                const clearBtn = document.getElementById('clearSign');
+                // === SIGN PAD ===
+                (function() {
+                    const c = document.getElementById('signPad');
+                    if (!c) return;
+                    const ctx = c.getContext('2d');
+                    let drawing = false,
+                        last = null;
 
-                clearBtn.addEventListener('click', function() {
-                    ctx.clearRect(0, 0, c.width, c.height);
+                    const pos = (e) => {
+                        const r = c.getBoundingClientRect();
+                        const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+                        const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+                        return {
+                            x,
+                            y
+                        };
+                    };
+                    const start = (e) => {
+                        drawing = true;
+                        last = pos(e);
+                        e.preventDefault();
+                    };
+                    const move = (e) => {
+                        if (!drawing) return;
+                        const p = pos(e);
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.strokeStyle = '#000';
+                        ctx.beginPath();
+                        ctx.moveTo(last.x, last.y);
+                        ctx.lineTo(p.x, p.y);
+                        ctx.stroke();
+                        last = p;
+                        e.preventDefault();
+                    };
+                    const end = () => {
+                        drawing = false;
+                    };
+
+                    c.addEventListener('mousedown', start);
+                    c.addEventListener('mousemove', move);
+                    window.addEventListener('mouseup', end);
+                    c.addEventListener('touchstart', start, {
+                        passive: false
+                    });
+                    c.addEventListener('touchmove', move, {
+                        passive: false
+                    });
+                    c.addEventListener('touchend', end);
+
+                    const clearBtn = document.getElementById('clearSign');
+                    if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
+
+                    // === Tombol upload/sign submit ===
+                    const uploadBtn = document.getElementById('uploadSign');
+                    if (uploadBtn) {
+                        uploadBtn.addEventListener('click', async () => {
+                            // ambil isi canvas sebagai data URL
+                            const dataURL = c.toDataURL('image/png');
+                            // konversi ke blob agar bisa diupload layaknya file
+                            const blob = await (await fetch(dataURL)).blob();
+                            const formData = new FormData();
+                            formData.append('foto', blob, 'signature.png');
+                            formData.append('folder', 'signature');
+
+                            try {
+                                const res = await fetch('/api/upload-foto', {
+                                    method: 'POST',
+                                    body: formData,
+                                    headers: {
+                                        'X-CSRF-TOKEN': document.querySelector(
+                                                'meta[name="csrf-token"]')
+                                            .getAttribute('content')
+                                    }
+                                });
+
+                                if (!res.ok) throw new Error('Gagal upload tanda tangan');
+                                const data = await res.json();
+                                console.log('Upload tanda tangan sukses:', data);
+
+                            } catch (err) {
+                                console.error(err);
+                                alert('Upload tanda tangan gagal', err);
+                            }
+                        });
+                    }
+                })();
+
+                // === GENERIC FILE UPLOAD PREVIEW + UPLOAD ===
+                function setupFilePreview(opts) {
+                    const input = document.getElementById(opts.inputId);
+                    const preview = document.getElementById(opts.previewId);
+                    const placeholder = opts.placeholderId ? document.getElementById(opts.placeholderId) : null;
+                    const removeBtn = opts.removeBtnId ? document.getElementById(opts.removeBtnId) : null;
+                    const nameEl = opts.nameElId ? document.getElementById(opts.nameElId) : null;
+                    const box = opts.boxId ? document.getElementById(opts.boxId) : null;
+                    if (!input) return;
+
+                    function reset() {
+                        input.value = '';
+                        if (preview) {
+                            preview.src = '';
+                            preview.style.display = 'none';
+                        }
+                        if (placeholder) placeholder.style.display = 'flex';
+                        if (removeBtn) removeBtn.style.display = 'none';
+                        if (nameEl) nameEl.textContent = '';
+                        if (box) box.classList.remove('has-file');
+                    }
+
+                    async function uploadFile(file, folderName = 'default') {
+                        const formData = new FormData();
+                        formData.append('foto', file);
+                        formData.append('folder', folderName);
+                        try {
+                            const res = await fetch('/api/upload-foto', {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        .getAttribute('content')
+                                }
+                            });
+                            if (!res.ok) throw new Error('Upload gagal: ' + res.status);
+                            const data = await res.json();
+                            console.log('Upload sukses:', data);
+                        } catch (err) {
+                            console.error(err);
+                            alert('Gagal upload file');
+                        }
+                    }
+
+
+                    input.addEventListener('change', () => {
+                        const f = input.files && input.files[0];
+                        if (!f) {
+                            reset();
+                            return;
+                        }
+                        if (nameEl) nameEl.textContent = f.name;
+                        const r = new FileReader();
+                        r.onload = e => {
+                            if (preview) {
+                                preview.src = e.target.result;
+                                preview.style.display = 'block';
+                            }
+                            if (placeholder) placeholder.style.display = 'none';
+                            if (removeBtn) removeBtn.style.display = 'inline-flex';
+                            if (box) box.classList.add('has-file');
+                            uploadFile(f, opts.folder || 'default');
+
+                        };
+                        r.readAsDataURL(f);
+                    });
+                    if (removeBtn) removeBtn.addEventListener('click', e => {
+                        e.preventDefault();
+                        reset();
+                    });
+                }
+
+
+                setupFilePreview({
+                    inputId: 'docFile',
+                    previewId: 'docPreview',
+                    placeholderId: 'docPh',
+                    removeBtnId: 'removeDoc',
+                    folder: 'document'
                 });
+
+
+                setupFilePreview({
+                    inputId: 'fotoSopir',
+                    previewId: 'fotoPreview',
+                    nameElId: 'fotoName',
+                    boxId: 'fotoBox',
+                    removeBtnId: 'clearFoto',
+                    folder: 'foto-sopir'
+                });
+
             });
         </script>
-
 
 
         <script>

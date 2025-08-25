@@ -103,7 +103,7 @@
                     if (clear) clear.style.display = 'none';
                 }
 
-                input.addEventListener('change', () => {
+                input.addEventListener('change', async () => {
                     const file = input.files && input.files[0];
 
                     if (!file) {
@@ -114,12 +114,36 @@
                     nameEl.textContent = file.name;
                     const reader = new FileReader();
                     reader.onload = (e) => {
-
                         preview.src = e.target.result;
                         box.classList.add('has-file');
                         if (clear) clear.style.display = 'inline-block';
                     };
                     reader.readAsDataURL(file);
+
+
+                    try {
+                        const formData = new FormData();
+                        formData.append('foto', file);
+
+                        const res = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                // kalau pakai Laravel CSRF
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            }
+                        });
+
+                        const data = await res.json();
+                        console.log('Upload sukses:', data);
+
+                        // document.getElementById('fotoPath').value = data.path;
+                    } catch (err) {
+                        console.error('Upload gagal', err);
+                        alert('Gagal upload foto');
+                        resetFoto();
+                    }
                 });
 
                 if (clear) {
