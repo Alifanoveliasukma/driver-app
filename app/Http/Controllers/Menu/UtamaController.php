@@ -88,7 +88,7 @@ class UtamaController extends Controller
             })
 
             ->values()
-            ->take(20)
+            // ->take(7)
             ->map(function ($r) use ($customers, $routes) {
                 $r['Customer_Name'] = $customers[$r['Customer_ID']] ?? '-';
                 $route = $routes[$r['XX_TransOrder_ID']] ?? null;
@@ -125,9 +125,8 @@ class UtamaController extends Controller
             }
         }
 
-
         $status = $mappedDetail['Status'] ?? null;
-        // dd($status);
+        // dd($mappedDetail);
 
         if ($status !== '' && $status !== 'EXECUTE') {
             return redirect()->route('utama.konfirmasi-tiba-muat', [
@@ -141,6 +140,7 @@ class UtamaController extends Controller
             : '-';
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
+
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
@@ -315,6 +315,7 @@ class UtamaController extends Controller
 
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
+
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
@@ -817,7 +818,7 @@ class UtamaController extends Controller
 
     public function cek_status()
     {
-        $orderId = '1450012';
+        $orderId = '1138674';
         if (empty($orderId)) {
             return redirect()->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
