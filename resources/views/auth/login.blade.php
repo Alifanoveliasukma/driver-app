@@ -58,7 +58,6 @@
                         <div class="fw-bold text-dark">Masuk</div>
                         <div class="mx-auto mt-1 bullet"></div>
                     </div>
-                    <!-- <a href="#" class="text-decoration-none text-dark align-self-end small">Lupa Kata Sandi</a> -->
                 </div>
 
                 {{-- Username --}}
@@ -77,6 +76,9 @@
             </form>
         </div>
     </div>
+    <div class="text-center pb-5">
+             <img src="{{ asset('assets/img/logo.jpg') }}" alt="Logo" style="max-height: 150px;">
+        </div>
 
 </body>
     <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
