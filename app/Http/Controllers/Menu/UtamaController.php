@@ -82,9 +82,10 @@ class UtamaController extends Controller
             ->filter(function ($r) {
                 return !isset($r['Status']) || $r['Status'] !== 'FINISHED';
             })
-            ->sortBy(function ($r) {
+            ->sortByDesc(function ($r) {
                 return $r['ETD'] ?? '9999-12-31 23:59:59';
             })
+
             ->values()
             ->take(7)
             ->map(function ($r) use ($customers, $routes) {
@@ -123,11 +124,14 @@ class UtamaController extends Controller
             }
         }
 
+
         $status = $mappedDetail['Status'] ?? null;
         // dd($status);
 
-        if ($status !== '') {
-            return redirect()->route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId]);
+        if ($status !== '' && $status !== 'EXECUTE') {
+            return redirect()->route('utama.konfirmasi-tiba-muat', [
+                'orderId' =>  $orderId,
+            ]);
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
@@ -136,7 +140,6 @@ class UtamaController extends Controller
             : '-';
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
-
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
@@ -300,7 +303,6 @@ class UtamaController extends Controller
 
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
-
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
@@ -802,7 +804,7 @@ class UtamaController extends Controller
 
     public function cek_status()
     {
-        $orderId = '1138674';
+        $orderId = '1450012';
         if (empty($orderId)) {
             return redirect()->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
