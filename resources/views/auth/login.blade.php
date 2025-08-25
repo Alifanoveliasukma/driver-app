@@ -18,7 +18,7 @@
 <body>
     <div class="position-relative bg-purple text-white" style="height: 280px;">
         <div class="text-center pt-5">
-             <img src="{{ asset('assets/img/logo-perusahaan.jpg') }}" alt="Logo" style="max-height: 40px;">
+             <img src="{{ asset('assets/img/logo-perusahaan.jpg') }}" alt="Logo" style="max-height: 150px;">
             <p>Sopir</p>
         </div>
 
@@ -58,7 +58,7 @@
                         <div class="fw-bold text-dark">Masuk</div>
                         <div class="mx-auto mt-1 bullet"></div>
                     </div>
-                    <a href="#" class="text-decoration-none text-dark align-self-end small">Lupa Kata Sandi</a>
+                    <!-- <a href="#" class="text-decoration-none text-dark align-self-end small">Lupa Kata Sandi</a> -->
                 </div>
 
                 {{-- Username --}}

@@ -23,7 +23,6 @@ class ProfilController extends Controller
         $fields = data_get($driver, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
         if (isset($fields['@attributes']))
             $fields = [$fields];
-
         $mappedDriver = [];
         foreach ($fields as $f) {
             $attr = $f['@attributes'] ?? [];
@@ -31,6 +30,7 @@ class ProfilController extends Controller
                 $mappedDriver[$attr['column']] = $attr['lval'];
             }
         }
+        
         // $krani = $this->driver->getDriver($c_bpartner_id);
         // $fields = data_get($krani, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
         // if (isset($fields['@attributes']))

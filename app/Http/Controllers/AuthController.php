@@ -164,7 +164,6 @@ class AuthController extends Controller
 
 
         session()->forget(['username', 'password', 'roleid', 'orgid', 'c_bpartner_id']);
-
         session([
             'user_id'  => $user_id,
             'name'     => $name,
@@ -183,7 +182,6 @@ class AuthController extends Controller
 
     public function logout()
     {
-
         session()->forget(['user_id', 'name', 'username', 'password', 'roleid', 'is_login']);
         return redirect()->route('login');
     }

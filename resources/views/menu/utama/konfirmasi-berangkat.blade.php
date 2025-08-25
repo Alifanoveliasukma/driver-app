@@ -1,4 +1,8 @@
 @extends('layouts.template')
+<head>
+    <meta charset="UTF-8">
+    <title>@yield('title', 'Konfirmasi Berangkat')</title>
+</head>
 
 @section('content')
     <div class="position-relative bg-purple text-white" style="height: 100px;">

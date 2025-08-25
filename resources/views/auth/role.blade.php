@@ -15,7 +15,7 @@
   {{-- HEADER UNGU + GELEMBUNG (sama seperti login) --}}
   <div class="position-relative bg-purple text-white" style="height: 280px;">
     <div class="text-center pt-5">
-      <img src="{{ asset('assets/img/logo-perusahaan.jpg') }}" alt="Logo" style="max-height: 40px;">
+      <img src="{{ asset('assets/img/logo-perusahaan.jpg') }}" alt="Logo" style="max-height: 150px;">
       <p class="mt-2">Pilih Role & Organisasi</p>
       <div class="small">
         User: <strong>{{ $user->name ?? $user->value ?? session('username') }}</strong>

@@ -40,6 +40,7 @@ class UtamaController extends Controller
                 $mappedDriver[$attr['column']] = $attr['lval'];
             }
         }
+        
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
         $order = $this->order->getOrderList($driverId);

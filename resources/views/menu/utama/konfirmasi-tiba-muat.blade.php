@@ -1,4 +1,8 @@
 @extends('layouts.template')
+<head>
+    <meta charset="UTF-8">
+    <title>@yield('title', 'Konfirmasi Tiba Muat')</title>
+</head>
 
 @section('content')
     <div class="position-relative bg-purple text-white" style="height: 100px;">
@@ -27,11 +31,7 @@
                     {{-- <div style="font-weight: bold;">Jl Veteran</div> --}}
                 </div>
                 <div class="text-center">
-                    <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center"
-                        style="width: 80px; height: 80px;">
-                        <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
-                        <small>Lihat Peta</small>
-                    </div>
+                    
                 </div>
             </div>
         </div>

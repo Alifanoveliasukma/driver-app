@@ -19,27 +19,6 @@ Route::get('/no-order', function () {
     return view('menu.utama.no-order');
 });
 
-Route::get('/konfirmasi-selesai-muat', function () {
-    return view('menu.utama.konfirmasi-selesai-muat');
-});
-
-Route::get('/konfirmasi-keluar-muat', function () {
-    return view('menu.utama.konfirmasi-keluar-muat');
-});
-
-Route::get('/konfirmasi-tiba-tujuan', function () {
-    return view('menu.utama.konfirmasi-tiba-tujuan');
-});
-
-Route::get('/konfirmasi-mulai-bongkar', function () {
-    return view('menu.utama.konfirmasi-mulai-bongkar');
-});
-
-Route::get('/konfirmasi-keluar-bongkar', function () {
-    return view('menu.utama.konfirmasi-keluar-bongkar');
-});
-
-
 Route::get('/utama/order', [UtamaController::class, 'getOrder'])
     ->name('menu.list-order');
 

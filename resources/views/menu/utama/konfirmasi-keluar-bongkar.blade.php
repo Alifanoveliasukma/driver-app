@@ -1,4 +1,8 @@
 @extends('layouts.template')
+<head>
+    <meta charset="UTF-8">
+    <title>@yield('title', 'Konfirmasi Keluar Bongkar')</title>
+</head>
 
 @section('content')
     <div class="position-relative bg-purple text-white" style="height: 100px;">
@@ -27,11 +31,7 @@
                     <div style="font-weight: bold;">Jakarta Utara</div>
                 </div>
                 <div class="text-center">
-                    <div class="bg-primary text-white rounded p-2 d-flex flex-column align-items-center justify-content-center"
-                        style="width: 80px; height: 80px;">
-                        <i class="bi bi-geo-alt-fill" style="font-size: 24px;"></i>
-                        <small>Lihat Peta</small>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -131,10 +131,10 @@
                 </button>
             </div>
 
-            <div class="inline-input mt-3">
+            <!-- <div class="inline-input mt-3">
                 <label for="noDo">NO DO-SPJ Order</label>
                 <input id="noDo" type="text" class="form-control">
-            </div>
+            </div> -->
         </div>
         <div class="mt-3" style="max-width:400px;margin:0 auto;">
             <button type="button" class="btn-next-order w-100">

@@ -28,7 +28,7 @@ html, body { min-height: 100dvh; }
 }
 
 .bg-purple {
-    background: linear-gradient(180deg,#2f57d0 0%, #3f6be6 100%);
+    background: #0a32ad 0%;
 }
 
 .bottom-nav .nav-link {
