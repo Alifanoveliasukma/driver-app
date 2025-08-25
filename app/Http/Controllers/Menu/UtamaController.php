@@ -40,7 +40,7 @@ class UtamaController extends Controller
                 $mappedDriver[$attr['column']] = $attr['lval'];
             }
         }
-        
+
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
         $order = $this->order->getOrderList($driverId);
@@ -88,7 +88,7 @@ class UtamaController extends Controller
             })
 
             ->values()
-            ->take(7)
+            ->take(20)
             ->map(function ($r) use ($customers, $routes) {
                 $r['Customer_Name'] = $customers[$r['Customer_ID']] ?? '-';
                 $route = $routes[$r['XX_TransOrder_ID']] ?? null;
@@ -131,7 +131,7 @@ class UtamaController extends Controller
 
         if ($status !== '' && $status !== 'EXECUTE') {
             return redirect()->route('utama.konfirmasi-tiba-muat', [
-                'orderId' =>  $orderId,
+                'orderId' => $orderId,
             ]);
         }
 
@@ -178,6 +178,17 @@ class UtamaController extends Controller
             }
             return redirect()->route('menu.detail-order', ['orderId' => $orderId])
                 ->with('message', 'Gagal update: ' . $err);
+        }
+        $updateStatus = $this->orderUpdate->updateOrder($orderId, [
+            'Status' => ' LOADOTW',
+        ]);
+
+        if (is_array($updateStatus) && isset($updateStatus['Error'])) {
+            $err = is_array($updateStatus['Error']) ? json_encode($updateStatus['Error']) : $updateStatus['Error'];
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal update: ' . $err,
+            ], 400);
         }
 
         $nextUrl = route('utama.konfirmasi-tiba-muat', ['orderId' => $orderId]);
@@ -402,7 +413,7 @@ class UtamaController extends Controller
 
         $update = $this->orderUpdate->updateOrder($orderId, [
             'Status' => 'LOADWAIT',
-            'LoadDateEnd' => now()->format('Y-m-d H:i:s'),
+            'OutLoadDate' => now()->format('Y-m-d H:i:s'),
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
@@ -708,7 +719,7 @@ class UtamaController extends Controller
 
         $update = $this->orderUpdate->updateOrder($orderId, [
             'Status' => 'UNLOADWAIT',
-            'UnloadDateEnd' => now()->format('Y-m-d H:i:s'),
+            'OutUnloadDate' => now()->format('Y-m-d H:i:s'),
         ]);
 
         if (is_array($update) && isset($update['Error'])) {
