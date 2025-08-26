@@ -20,7 +20,7 @@ class OrderApi extends BaseApi
                     <adin:ModelCRUD>
                        <adin:serviceType>API-GetOrderList</adin:serviceType>
                        <adin:TableName>XX_TransOrder</adin:TableName>
-                       <adin:Filter>XM_Driver_ID=' . $driverId . '</adin:Filter>
+                       <adin:Filter>XM_Driver_ID=' . $driverId . ' AND IsSend=\'Y\' AND IsComplete=\'N\' AND IsVoid=\'N\'</adin:Filter>
                        <adin:Action>Read</adin:Action>
                        <adin:DataRow>
                           <adin:field column="IsActive">
