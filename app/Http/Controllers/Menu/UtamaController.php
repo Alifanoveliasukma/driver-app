@@ -199,7 +199,7 @@ class UtamaController extends Controller
         $update = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOADOTW',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'KMTake' => $kmTake,
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
@@ -311,10 +311,9 @@ class UtamaController extends Controller
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOADWAIT',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
-
         return response()->json([
             'success' => true,
             'message' => 'Status diubah ke LOADWAIT.',
@@ -396,7 +395,7 @@ class UtamaController extends Controller
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOAD',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -478,7 +477,7 @@ class UtamaController extends Controller
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'LOADWAIT',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -563,7 +562,7 @@ class UtamaController extends Controller
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'UNLOADWAIT',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -647,7 +646,7 @@ class UtamaController extends Controller
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'UNLOAD',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
         ]);
 
@@ -720,7 +719,7 @@ class UtamaController extends Controller
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
             'Status' => 'FINISHED',
             'Note' => 'driver confirmation',
-            'Reference' => 'TMS',
+            'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
             'DocumentDir' => $signPath,
             'DocumentDir2' => $fotoDocPath
@@ -786,7 +785,7 @@ class UtamaController extends Controller
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
-        dd($mappedDetail);
+        // dd($mappedDetail);
         // return view('menu.utama.konfirmasi-keluar-bongkar', [
         //     'mappedDetail' => $mappedDetail,
         //     'orderId'      => $orderId,
