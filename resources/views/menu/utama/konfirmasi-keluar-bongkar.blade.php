@@ -153,64 +153,81 @@
             </div>
         </div>
         <script>
-            let signPath = "";
-            let fotoDocPath = "";
-            document.addEventListener('DOMContentLoaded', function () {
-               
+                let signPath = "";
+                let fotoDocPath = "";
+                let selectedDocFile = null; // dipakai di preview
+
+                document.addEventListener('DOMContentLoaded', function () {
+                // === SIGN PAD ===
                 (function () {
                     const c = document.getElementById('signPad');
                     if (!c) return;
                     const ctx = c.getContext('2d');
-                    let drawing = false,
-                        last = null;
+                    let drawing = false, last = null;
 
                     const pos = (e) => {
-                        const r = c.getBoundingClientRect();
-                        const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-                        const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-                        return {
-                            x,
-                            y
-                        };
+                    const r = c.getBoundingClientRect();
+                    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+                    const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+                    return { x, y };
                     };
-                    const start = (e) => {
-                        drawing = true;
-                        last = pos(e);
-                        e.preventDefault();
+                    const start = (e) => { drawing = true; last = pos(e); e.preventDefault(); };
+                    const move  = (e) => {
+                    if (!drawing) return;
+                    const p = pos(e);
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = '#000';
+                    ctx.beginPath();
+                    ctx.moveTo(last.x, last.y);
+                    ctx.lineTo(p.x, p.y);
+                    ctx.stroke();
+                    last = p;
+                    e.preventDefault();
                     };
-                    const move = (e) => {
-                        if (!drawing) return;
-                        const p = pos(e);
-                        ctx.lineWidth = 2;
-                        ctx.lineCap = 'round';
-                        ctx.strokeStyle = '#000';
-                        ctx.beginPath();
-                        ctx.moveTo(last.x, last.y);
-                        ctx.lineTo(p.x, p.y);
-                        ctx.stroke();
-                        last = p;
-                        e.preventDefault();
-                    };
-                    const end = () => {
-                        drawing = false;
-                    };
+                    const end   = () => { drawing = false; };
 
                     c.addEventListener('mousedown', start);
                     c.addEventListener('mousemove', move);
                     window.addEventListener('mouseup', end);
-                    c.addEventListener('touchstart', start, {
-                        passive: false
-                    });
-                    c.addEventListener('touchmove', move, {
-                        passive: false
-                    });
-                    c.addEventListener('touchend', end);
+                    c.addEventListener('touchstart', start, { passive: false });
+                    c.addEventListener('touchmove',  move,  { passive: false });
+                    c.addEventListener('touchend',   end);
 
                     const clearBtn = document.getElementById('clearSign');
                     if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
+
+                    const uploadBtn = document.getElementById('uploadSign');
+                    if (uploadBtn) {
+                    uploadBtn.addEventListener('click', async () => {
+                        const dataURL = c.toDataURL('image/png');
+                        const blob = await (await fetch(dataURL)).blob();
+                        const formData = new FormData();
+                        formData.append('foto', blob, 'signature.png');
+                        formData.append('folder', 'signature');
+
+                        try {
+                        const res = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        });
+                        if (!res.ok) throw new Error('Gagal upload tanda tangan');
+                        const data = await res.json();
+                        // simpan apa adanya (biasanya object { path: "..." })
+                        signPath = data;
+                        alert('Tanda Tangan Tersimpan');
+                        } catch (err) {
+                        console.error(err);
+                        alert('Upload tanda tangan gagal');
+                        }
+                    });
+                    }
                 })();
 
-                // === FILE PREVIEW TANPA UPLOAD ===
+                // === FILE PREVIEW + UPLOAD (restore upload agar fotoDocPath terisi) ===
                 function setupFilePreview(opts) {
                     const input = document.getElementById(opts.inputId);
                     const preview = document.getElementById(opts.previewId);
@@ -221,44 +238,90 @@
                     if (!input) return;
 
                     function reset() {
-                        input.value = '';
-                        if (preview) {
-                            preview.src = '';
-                            preview.style.display = 'none';
-                        }
-                        if (placeholder) placeholder.style.display = 'flex';
-                        if (removeBtn) removeBtn.style.display = 'none';
-                        if (nameEl) nameEl.textContent = '';
-                        if (box) box.classList.remove('has-file');
-                        selectedDocFile = null;
+                    input.value = '';
+                    if (preview) { preview.src = ''; preview.style.display = 'none'; }
+                    if (placeholder) placeholder.style.display = 'flex';
+                    if (removeBtn) removeBtn.style.display = 'none';
+                    if (nameEl) nameEl.textContent = '';
+                    if (box) box.classList.remove('has-file');
+                    selectedDocFile = null;
+                    // kalau mau memaksa isi ulang:
+                    // fotoDocPath = "";
                     }
 
-                    input.addEventListener('change', () => {
-                        const f = input.files && input.files[0];
-                        if (!f) {
-                            reset();
-                            return;
+                    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+                    let isUploading = false;
+
+                    async function uploadFile(file, folderName = 'default') {
+                        if (!file) throw new Error('File kosong');
+
+                        const formData = new FormData();
+                        formData.append('foto', file);
+                        formData.append('folder', folderName);
+
+                        const res = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: formData,
+                             headers: {
+                                'X-CSRF-TOKEN': csrf,
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            credentials: 'same-origin', // pastikan cookie sesi ikut
+                            cache: 'no-store',
+                        });
+
+                        const text = await res.text();
+                        let data;
+                        try {
+                        data = JSON.parse(text);
+                        } catch {
+                        // Biasanya ini terjadi saat respon pertama redirect/HTML
+                        throw new Error(`Respon bukan JSON (HTTP ${res.status}).`);
                         }
-                        selectedDocFile = f; // simpan untuk upload nanti
-                        if (nameEl) nameEl.textContent = f.name;
-                        const r = new FileReader();
-                        r.onload = e => {
-                            if (preview) {
-                                preview.src = e.target.result;
-                                preview.style.display = 'block';
-                            }
-                            if (placeholder) placeholder.style.display = 'none';
-                            if (removeBtn) removeBtn.style.display = 'inline-flex';
-                            if (box) box.classList.add('has-file');
-                        };
-                        r.readAsDataURL(f);
+
+                        if (!res.ok || data?.success === false) {
+                        const msg = data?.message || `HTTP ${res.status}`;
+                        throw new Error(`Upload gagal: ${msg}`);
+                        }
+
+                        const pathObj =
+                            data?.path ? { path: data.path } :
+                            data?.data?.path ? { path: data.data.path } :
+                            data;
+                            fotoDocPath = pathObj; // <-- penting: TERISI pada percobaan pertama juga
+                            return pathObj;
+                        }
+
+                    input.addEventListener('change', async () => {
+                    const f = input.files && input.files[0];
+                    if (!f) { reset(); return; }
+
+                    const r = new FileReader();
+                    r.onload = e => {
+                        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
+                        if (placeholder) placeholder.style.display = 'none';
+                        if (removeBtn) removeBtn.style.display = 'inline-flex';
+                        if (box) box.classList.add('has-file');
+                    };
+                    r.readAsDataURL(f);
+                    if (isUploading) return;      
+                        isUploading = true;
+                        try {
+                        await uploadFile(f, opts.folder || 'default');
+
+                        } catch (err) {
+                        console.error(err);
+                        alert(err.message || 'Gagal upload file');
+                        reset();                     
+                        } finally {
+                        isUploading = false;
+                        }
                     });
-                    if (removeBtn) removeBtn.addEventListener('click', e => {
-                        e.preventDefault();
-                        reset();
-                    });
+
+                    if (removeBtn) removeBtn.addEventListener('click', e => { e.preventDefault(); reset(); });
                 }
 
+                // panggil untuk dokumen & (opsional) foto sopir
                 setupFilePreview({
                     inputId: 'docFile',
                     previewId: 'docPreview',
@@ -274,46 +337,47 @@
                     removeBtnId: 'clearFoto',
                     folder: 'foto-sopir'
                 });
-            });
+                }); // END DOMContentLoaded
 
-            let isDragging = false;
-let offsetX = 0;
+                // === SLIDER (HP friendly) — backend & payload tetap sama ===
+                let isDragging = false;
+                let offsetX = 0;
 
-            // berangkat
-            function startSlide(e) {
+                function startSlide(e) {
                 isDragging = true;
-                offsetX = e.clientX || (e.touches && e.touches[0].clientX);
-                document.addEventListener("mousemove", onSlide);
-                document.addEventListener("mouseup", stopSlide);
-                document.addEventListener("touchmove", onSlide);
-                document.addEventListener("touchend", stopSlide);
-            }
+                if (e.type === 'touchstart') e.preventDefault();
+                const btn = document.querySelector('.slide-button');
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const currentLeft = parseInt(btn.style.left || '0', 10);
+                offsetX = clientX - currentLeft;
+                document.addEventListener('mousemove', onSlide);
+                document.addEventListener('mouseup', stopSlide);
+                document.addEventListener('touchmove', onSlide, { passive: false });
+                document.addEventListener('touchend', stopSlide);
+                }
 
-            function onSlide(e) {
+                function onSlide(e) {
                 if (!isDragging) return;
+                if (e.type === 'touchmove') e.preventDefault();
 
-                const btn = document.querySelector(".slide-button");
-                const container = document.querySelector(".slide-track");
-                let clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const btn = document.querySelector('.slide-button');
+                const container = document.querySelector('.slide-track');
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+
                 let moveX = clientX - offsetX;
-                moveX = Math.max(
-                    0,
-                    Math.min(moveX, container.clientWidth - btn.clientWidth)
-                );
-                btn.style.left = moveX + "px";
+                moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
+                btn.style.left = moveX + 'px';
 
                 if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-                    btn.style.background = "#198754";
-                    btn.innerHTML =
-                        '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
+                    btn.style.background = '#198754';
+                    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
                 } else {
-                    btn.style.background = "#ffffff";
-                    btn.innerHTML =
-                        '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+                    btn.style.background = '#ffffff';
+                    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
                 }
-            }
+                }
 
-            function stopSlide(e) {
+                function stopSlide(e) {
                 isDragging = false;
 
                 const btn = document.querySelector(".slide-button");
@@ -323,58 +387,48 @@ let offsetX = 0;
                 const nextUrl = @json(route('menu.list-order'));
                 const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
 
-
                 const left = parseInt(btn.style.left || "0", 10);
                 const threshold = container.clientWidth - btn.clientWidth - 5;
 
                 if (left >= threshold) {
-                    // optional: cegah double submit
                     if (fotoDocPath.length != 0 && signPath.length != 0) {
-                        btn.style.pointerEvents = "none";
-                        console.log({
-                            orderId,
-                            signPath: signPath?.path,
-                            fotoDocPath: fotoDocPath?.path
-                        })
-                        fetch(postUrl, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Accept": "application/json",
-                                "X-Requested-With": "XMLHttpRequest",
-                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                            },
-                            body: JSON.stringify({
-                                orderId,
-                                signPath: signPath?.path,
-                                fotoDocPath: fotoDocPath?.path
-                            }),
-                        })
-                            .then(async (res) => {
-                                const ct = res.headers.get("content-type") || "";
-                                const isJson = ct.includes("application/json");
-                                const data = isJson ? await res.json() : null;
+                    btn.style.pointerEvents = "none";
 
-                                if (res.ok && isJson && data?.success) {
-                                    window.location.href = data.nextUrl; // pindah ke halaman tiba muat
-                                } else if (res.status === 419) {
-                                    alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
-                                    resetSlider();
-                                } else {
-                                    alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-                                    resetSlider();
-                                }
-                            })
-                            .catch(() => {
-                                alert("Kesalahan jaringan.");
-                                resetSlider();
-                            })
-                            .finally(() => {
-                                btn.style.pointerEvents = "";
-                            });
-                    }
-                    else {
-                        window.alert("Tandatangan dan Foto dokumen Harus diisi")
+                    fetch(postUrl, {
+                        method: "POST",
+                        headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                        },
+                        body: JSON.stringify({
+                        orderId,
+                        signPath: signPath?.path,
+                        fotoDocPath: fotoDocPath?.path
+                        }),
+                    })
+                    .then(async (res) => {
+                        const ct = res.headers.get("content-type") || "";
+                        const isJson = ct.includes("application/json");
+                        const data = isJson ? await res.json() : null;
+
+                        if (res.ok && isJson && data?.success) {
+                        window.location.href = data.nextUrl ?? nextUrl;
+                        } else if (res.status === 419) {
+                        alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
+                        resetSlider();
+                        } else {
+                        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+                        resetSlider();
+                        }
+                    })
+                    .catch(() => { alert("Kesalahan jaringan."); resetSlider(); })
+                    .finally(() => { btn.style.pointerEvents = ""; });
+
+                    } else {
+                    window.alert("Tandatangan dan Foto dokumen Harus diisi");
+                    resetSlider();
                     }
                 } else {
                     resetSlider();
@@ -389,10 +443,9 @@ let offsetX = 0;
                     btn.style.left = "0px";
                     btn.style.background = "#ffffff";
                     btn.innerHTML =
-                        '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
                 }
-            }
-
+                }
 
             function initRealtimeDateTime() {
                 function updateDateTime() {

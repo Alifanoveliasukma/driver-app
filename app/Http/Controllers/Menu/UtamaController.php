@@ -754,7 +754,7 @@ class UtamaController extends Controller
 
     public function cek_status()
     {
-        $orderId = '1446524';
+        $orderId = '1446792';
         if (empty($orderId)) {
             return redirect()->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
