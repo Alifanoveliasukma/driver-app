@@ -15,16 +15,8 @@ class AuthController extends Controller
         $this->auth = $auth;
     }
 
-    private function isLoginRedirect()
-    {
-        if (session('is_login') === true) {
-            return redirect()->route('menu.list-order')->send();
-        }
-    }
-
     public function login(Request $request, AuthApi $api)
     {
-        $this->isLoginRedirect();
 
         $step = $request->query('step');
 

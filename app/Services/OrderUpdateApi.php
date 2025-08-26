@@ -39,9 +39,6 @@ class OrderUpdateApi extends BaseApi
             $request .= '
                                         <adin:field column="' . $column . '">
                                             <adin:val>' . $value . '</adin:val>
-                                            <adin:lookup>
-                                                <adin:lv val="?" key="?"/>
-                                            </adin:lookup>
                                         </adin:field>';
         }
         $request .= '

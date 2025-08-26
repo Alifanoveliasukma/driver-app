@@ -31,7 +31,7 @@
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
                     <div style="font-weight: bold;">{{ $mappedDetail['delivery_address'] ?? '-' }}</div>
-                    {{-- <div style="font-weight: bold;">Jakarta Utara</div> --}}
+                    
                 </div>
                 <div class="text-center">
 

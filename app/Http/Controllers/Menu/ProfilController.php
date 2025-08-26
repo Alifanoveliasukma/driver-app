@@ -12,6 +12,7 @@ class ProfilController extends Controller
     public function __construct(DriverApi $driver)
     {
         $this->driver = $driver;
+        $this->middleware('checklogin');
     }
     public function profil()
     {
