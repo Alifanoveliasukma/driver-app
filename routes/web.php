@@ -46,12 +46,6 @@ Route::get('/utama/selesai-muat/{orderId}', [UtamaController::class, 'selesaiMua
 Route::post('/utama/selesai-muat', [UtamaController::class, 'selesaiMuat'])
     ->name('utama.konfirmasi-selesai-muat.submit');
 
-Route::get('/utama/keluar-muat/{orderId}', [UtamaController::class, 'keluarMuatPage'])
-    ->name('utama.konfirmasi-keluar-muat');
-
-Route::post('/utama/keluar-muat', [UtamaController::class, 'keluarMuat'])
-    ->name('utama.konfirmasi-keluar-muat.submit');
-
 Route::get('/utama/tiba-tujuan/{orderId}', [UtamaController::class, 'tibaTujuanPage'])
     ->name('utama.konfirmasi-tiba-tujuan');
 
@@ -69,11 +63,6 @@ Route::get('/utama/keluar-bongkar/{orderId}', [UtamaController::class, 'keluarBo
 
 Route::post('/utama/keluar-bongkar', [UtamaController::class, 'keluarBongkar'])
     ->name('utama.konfirmasi-keluar-bongkar.submit');
-
-Route::get('/utama/selesai-bongkar/{orderId}', [UtamaController::class, 'selesaiBongkarPage'])
-    ->name('utama.konfirmasi-selesai-bongkar');
-Route::post('/utama/selesai-bongkar', [UtamaController::class, 'selesaiBongkar'])
-    ->name('utama.konfirmasi-selesai-bongkar.submit');
 
 Route::get('/cek_status', [UtamaController::class, 'cek_status']);
 

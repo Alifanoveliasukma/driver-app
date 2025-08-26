@@ -28,6 +28,10 @@
                 <span class="label">Pelanggan</span>
                 <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
             </div>
+            <div class="row-item">
+                <span class="label">Status</span>
+                <span class="value">{{ $mappedDetail['Status'] ?? '-' }}</span>
+            </div>
         </div>
     </div>
 
@@ -126,7 +130,7 @@
             const postUrl = @json(route('utama.konfirmasi-berangkat'));
             const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
             const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
-            const status = @json($mappedDetail['status'] ?? '');
+            const status = @json($mappedDetail['Status'] ?? '');
 
 
             const kmTake = document.getElementById("kmTake").value || 0;
@@ -140,19 +144,19 @@
                 btn.style.pointerEvents = "none";
 
                 fetch(postUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
-                            "X-Requested-With": "XMLHttpRequest",
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                        },
-                        body: JSON.stringify({
-                            orderId,
-                            kmTake: kmTake,
-                            status,
-                        }),
-                    })
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                    },
+                    body: JSON.stringify({
+                        orderId,
+                        kmTake: kmTake,
+                        status,
+                    }),
+                })
                     .then(async (res) => {
                         const ct = res.headers.get("content-type") || "";
                         const isJson = ct.includes("application/json");

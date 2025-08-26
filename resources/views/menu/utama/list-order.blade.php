@@ -1,4 +1,5 @@
 @extends('layouts.template')
+
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Order')</title>
@@ -15,7 +16,7 @@
         <div class="history-hero"> </div>
 
         @foreach ($orders as $i => $o)
-            @break($i === 5)
+            @break($i === 40)
 
             @php
                 $noSp = data_get($o, 'Value', '-');
@@ -44,64 +45,64 @@
 
             <div class="history-card">
 
-            <div class="row-top">
-                <div>
-                    <div class="muted">Surat Jalan</div>
-                    <div class="strong">
-                        {{ $noSp }}
-                        @if ($orderId)
-                            <small class="text-muted d-block">ID: {{ $orderId }}</small>
+                <div class="row-top">
+                    <div>
+                        <div class="muted">Surat Jalan</div>
+                        <div class="strong">
+                            {{ $noSp }}
+                            @if ($orderId)
+                                <small class="text-muted d-block">ID: {{ $orderId }}</small>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        @if ($tglSelesai)
+                            <div class="muted">Tanggal Selesai</div>
+                            <a href="#" class="date-link">{{ $tglSelesai }}</a>
+                        @endif
+
+                        {{-- ⬇️ Status langsung di bawah tanggal selesai --}}
+                        @if ($status)
+                            <div class="muted">Status</div>
+                            <div class="fw-bold text-danger">{{ $status }}</div>
                         @endif
                     </div>
                 </div>
 
-                <div class="text-end">
-                    @if ($tglSelesai)
-                        <div class="muted">Tanggal Selesai</div>
-                        <a href="#" class="date-link">{{ $tglSelesai }}</a>
-                    @endif
+                @if ($route)
+                    <div class="pair">
+                        <div class="muted">Route</div>
+                        <div class="strong">{{ $route }}</div>
+                    </div>
+                @endif
 
-                    {{-- ⬇️ Status langsung di bawah tanggal selesai --}}
-                    @if ($status)
-                        <div class="muted">Status</div>
-                        <div class="fw-bold text-danger">{{ $status }}</div>
-                    @endif
-                </div>
+                @if ($customerName)
+                    <div class="pair">
+                        <div class="muted">Customer Name</div>
+                        <div class="strong">{{ $customerName }}</div>
+                    </div>
+                @endif
+
+                @if ($tglBerangkat)
+                    <div class="pair">
+                        <div class="muted">Tanggal Berangkat (ETD)</div>
+                        <div class="strong">{{ $tglBerangkat }}</div>
+                    </div>
+                @endif
+
+                {{-- Tombol Pilih --}}
+                @if ($orderId)
+                    <div class="text-end">
+                        <a class="btn btn-primary btn-sm"
+                            href="{{ route('menu.detail-order', ['orderId' => $o['XX_TransOrder_ID']]) }}">
+                            Pilih
+                        </a>
+                    </div>
+                @endif
             </div>
 
-            @if ($route)
-                <div class="pair">
-                    <div class="muted">Route</div>
-                    <div class="strong">{{ $route }}</div>
-                </div>
-            @endif
+        @endforeach
 
-            @if ($customerName)
-                <div class="pair">
-                    <div class="muted">Customer Name</div>
-                    <div class="strong">{{ $customerName }}</div>
-                </div>
-            @endif
-
-            @if ($tglBerangkat)
-                <div class="pair">
-                    <div class="muted">Tanggal Berangkat (ETD)</div>
-                    <div class="strong">{{ $tglBerangkat }}</div>
-                </div>
-            @endif
-
-            {{-- Tombol Pilih --}}
-            @if ($orderId)
-                <div class="text-end">
-                    <a class="btn btn-primary btn-sm"
-                    href="{{ route('menu.detail-order', ['orderId' => $o['XX_TransOrder_ID']]) }}">
-                        Pilih
-                    </a>
-                </div>
-            @endif
-            </div>
-
-                @endforeach
-
-            </div>
+    </div>
 @endsection

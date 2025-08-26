@@ -1,4 +1,5 @@
 @extends('layouts.template')
+
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Konfirmasi Mulai Muat')</title>
@@ -14,6 +15,10 @@
             <div class="row-item">
                 <span class="label">Pelanggan</span>
                 <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
+            </div>
+            <div class="row-item">
+                <span class="label">Status</span>
+                <span class="value">{{ $mappedDetail['Status'] ?? '-' }}</span>
             </div>
         </div>
     </div>
@@ -31,7 +36,7 @@
                     {{-- <div style="font-weight: bold;">Jl Veteran</div> --}}
                 </div>
                 <div class="text-center">
-                    
+
                 </div>
             </div>
         </div>
@@ -44,7 +49,7 @@
                 <div id="tanggalKeluarUnload" style="font-weight: bold;">--</div>
             </div>
             <div class="bg-light rounded p-3 text-center flex-fill">
-                <div id="jamKeluarUnload"style="font-weight: bold;">--</div>
+                <div id="jamKeluarUnload" style="font-weight: bold;">--</div>
             </div>
         </div>
         <input type="hidden" name="LoadDateStart" id="LoadDateStart">
@@ -125,19 +130,19 @@
                 btn.style.pointerEvents = "none";
 
                 fetch(postUrl, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
-                            "X-Requested-With": "XMLHttpRequest",
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                        },
-                        body: JSON.stringify({
-                            orderId,
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-Requested-With": "XMLHttpRequest",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                    },
+                    body: JSON.stringify({
+                        orderId,
 
 
-                        }),
-                    })
+                    }),
+                })
                     .then(async (res) => {
                         const ct = res.headers.get("content-type") || "";
                         const isJson = ct.includes("application/json");

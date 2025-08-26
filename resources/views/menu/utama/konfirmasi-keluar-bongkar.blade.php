@@ -1,4 +1,5 @@
 @extends('layouts.template')
+
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Konfirmasi Keluar Bongkar')</title>
@@ -16,6 +17,10 @@
                 <span class="label">Pelanggan</span>
                 <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
             </div>
+            <div class="row-item">
+                <span class="label">Status</span>
+                <span class="value">{{ $mappedDetail['Status'] ?? '-' }}</span>
+            </div>
         </div>
     </div>
 
@@ -31,7 +36,7 @@
                     <div style="font-weight: bold;">Jakarta Utara</div>
                 </div>
                 <div class="text-center">
-                    
+
                 </div>
             </div>
         </div>
@@ -43,7 +48,7 @@
                 <div id="tanggalKeluarBongkar" style="font-weight: bold;">--</div>
             </div>
             <div class="bg-light rounded p-3 text-center flex-fill">
-                <div id="jamKeluarBongkar"style="font-weight: bold;">--</div>
+                <div id="jamKeluarBongkar" style="font-weight: bold;">--</div>
             </div>
         </div>
         <input type="hidden" name="UnloadStd" id="UnloadStd">
@@ -53,37 +58,27 @@
 
         <div class="form-rows">
             <div class="unit-row">
-                <label for="total_muat">Total Muat</label>
+                <label for="total_tonase">Tonase</label>
                 <div class="unit-input">
-                    <input type="number" id="total_muat" name="total_muat" value="1" min="0" step="1">
-                    <span class="unit">Ton</span>
-                </div>
-            </div>
-
-            <div class="unit-row">
-                <label for="total_bongkar">Total Bongkar</label>
-                <div class="unit-input">
-                    <input type="number" id="total_bongkar" name="total_bongkar" value="1" min="0"
-                        step="1">
-                    <span class="unit">Ton</span>
-                </div>
-            </div>
-
-            <div class="unit-row">
-                <label for="total_tonase">Total Tonase</label>
-                <div class="unit-input">
-                    <input type="number" id="total_tonase" name="total_tonase" value="0.001" min="0"
-                        step="0.001">
+                    <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
+                        value="{{$mappedDetail['Tonnage']}}" disabled>
                     <span class="unit">Tonase</span>
                 </div>
             </div>
 
             <div class="unit-row">
-                <label for="total_kubikasi">Total Kubikasi</label>
+                <label for="biaya_tonase">Biaya Tonase</label>
                 <div class="unit-input">
-                    <input type="number" id="total_kubikasi" name="total_kubikasi" value="0" min="0"
-                        step="0.001">
-                    <span class="unit">Kubikasi</span>
+                    <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
+                        value="{{$mappedDetail['TonnageCost']}}" disabled>
+                </div>
+            </div>
+
+            <div class="unit-row">
+                <label for="total_kubikasi">Penjualan Tonase</label>
+                <div class="unit-input">
+                    <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
+                        value="{{$mappedDetail['TonnageSales']}}" disabled>
                 </div>
             </div>
         </div>
@@ -118,7 +113,7 @@
                 <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
             </div>
 
-            <div class="foto-upload-wrapper mt-3">
+            {{-- <div class="foto-upload-wrapper mt-3">
                 <label for="fotoSopir" class="foto-upload-box" id="fotoBox">
                     <i class="bi bi-camera-fill icon"></i>
                     <span class="placeholder">Foto Sopir</span>
@@ -129,12 +124,12 @@
                 <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
                     <i class="bi bi-trash"></i> Hapus Foto
                 </button>
-            </div>
+            </div> --}}
 
             <!-- <div class="inline-input mt-3">
-                <label for="noDo">NO DO-SPJ Order</label>
-                <input id="noDo" type="text" class="form-control">
-            </div> -->
+                                                                                    <label for="noDo">NO DO-SPJ Order</label>
+                                                                                    <input id="noDo" type="text" class="form-control">
+                                                                                </div> -->
         </div>
         <div class="mt-3" style="max-width:400px;margin:0 auto;">
             <button type="button" class="btn-next-order w-100">
@@ -162,9 +157,11 @@
             </div>
         </div>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            let signPath = "";
+            let fotoDocPath = "";
+            document.addEventListener('DOMContentLoaded', function () {
                 // === SIGN PAD ===
-                (function() {
+                (function () {
                     const c = document.getElementById('signPad');
                     if (!c) return;
                     const ctx = c.getContext('2d');
@@ -234,7 +231,7 @@
                                     body: formData,
                                     headers: {
                                         'X-CSRF-TOKEN': document.querySelector(
-                                                'meta[name="csrf-token"]')
+                                            'meta[name="csrf-token"]')
                                             .getAttribute('content')
                                     }
                                 });
@@ -242,6 +239,8 @@
                                 if (!res.ok) throw new Error('Gagal upload tanda tangan');
                                 const data = await res.json();
                                 console.log('Upload tanda tangan sukses:', data);
+                                signPath = data;
+                                window.alert("Tanda Tangan Tersimpan");
 
                             } catch (err) {
                                 console.error(err);
@@ -289,6 +288,8 @@
                             if (!res.ok) throw new Error('Upload gagal: ' + res.status);
                             const data = await res.json();
                             console.log('Upload sukses:', data);
+                            fotoDocPath = data;
+                            window.alert("Foto Dokumen Tersimpan");
                         } catch (err) {
                             console.error(err);
                             alert('Gagal upload file');
@@ -343,10 +344,6 @@
                 });
 
             });
-        </script>
-
-
-        <script>
             let isDragging = false;
             let offsetX = 0;
 
@@ -400,9 +397,14 @@
 
                 if (left >= threshold) {
                     // optional: cegah double submit
-                    btn.style.pointerEvents = "none";
-
-                    fetch(postUrl, {
+                    if (fotoDocPath.length != 0 && signPath.length != 0) {
+                        btn.style.pointerEvents = "none";
+                        console.log({
+                            orderId,
+                            signPath: signPath?.path,
+                            fotoDocPath: fotoDocPath?.path
+                        })
+                        fetch(postUrl, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -411,32 +413,37 @@
                                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
                             },
                             body: JSON.stringify({
-                                orderId
+                                orderId,
+                                signPath: signPath?.path,
+                                fotoDocPath: fotoDocPath?.path
                             }),
                         })
-                        .then(async (res) => {
-                            const ct = res.headers.get("content-type") || "";
-                            const isJson = ct.includes("application/json");
-                            const data = isJson ? await res.json() : null;
+                            .then(async (res) => {
+                                const ct = res.headers.get("content-type") || "";
+                                const isJson = ct.includes("application/json");
+                                const data = isJson ? await res.json() : null;
 
-                            if (res.ok && isJson && data?.success) {
-                                window.location.href = data.nextUrl; // pindah ke halaman tiba muat
-                            } else if (res.status === 419) {
-                                alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
+                                if (res.ok && isJson && data?.success) {
+                                    window.location.href = data.nextUrl; // pindah ke halaman tiba muat
+                                } else if (res.status === 419) {
+                                    alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
+                                    resetSlider();
+                                } else {
+                                    alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+                                    resetSlider();
+                                }
+                            })
+                            .catch(() => {
+                                alert("Kesalahan jaringan.");
                                 resetSlider();
-                            } else {
-                                alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-                                resetSlider();
-                            }
-                        })
-                        .catch(() => {
-                            alert("Kesalahan jaringan.");
-                            resetSlider();
-                        })
-                        .finally(() => {
-                            btn.style.pointerEvents = "";
-                        });
-
+                            })
+                            .finally(() => {
+                                btn.style.pointerEvents = "";
+                            });
+                    }
+                    else {
+                        window.alert("Tandatangan dan Foto dokumen Harus diisi")
+                    }
                 } else {
                     resetSlider();
                 }
@@ -496,4 +503,4 @@
 
             document.addEventListener("DOMContentLoaded", initRealtimeDateTime);
         </script>
-    @endsection
+@endsection
