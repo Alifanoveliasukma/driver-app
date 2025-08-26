@@ -29,6 +29,7 @@ class UtamaController extends Controller
         $status = $orderDetail['Status'] ?? null;
 
         $map = [
+            '' => 'menu.detail-order',
             'EXECUTE' => 'menu.detail-order',
             'LOADOTW' => 'utama.konfirmasi-tiba-muat',
             'LOADWAIT' => 'utama.konfirmasi-mulai-muat',
@@ -40,7 +41,12 @@ class UtamaController extends Controller
         ];
 
 
-        if ($status && isset($map[$status]) && $status !== $except && $status !== "FINISHED") {
+        // if ($status && isset($map[$status]) && $status !== $except && $status !== "FINISHED") {
+        //     return redirect()->route($map[$status], [
+        //         'orderId' => $orderDetail['XX_TransOrder_ID'] ?? null,
+        //     ]);
+        // }
+        if ($status && isset($map[$status]) && $status !== $except) {
             return redirect()->route($map[$status], [
                 'orderId' => $orderDetail['XX_TransOrder_ID'] ?? null,
             ]);
@@ -679,7 +685,7 @@ class UtamaController extends Controller
             if (isset($attr['column']))
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
-
+        // dd($mappedDetail);
         $redirect = $this->checkStatus($mappedDetail, 'UNLOAD');
 
         if ($redirect) {

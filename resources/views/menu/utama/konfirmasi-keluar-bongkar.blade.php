@@ -61,7 +61,7 @@
                 <label for="total_tonase">Tonase</label>
                 <div class="unit-input">
                     <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
-                        value="{{$mappedDetail['Tonnage']}}" disabled>
+                        value="{{ $mappedDetail['Tonnage'] }}" disabled>
                     <span class="unit">Tonase</span>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                 <label for="biaya_tonase">Biaya Tonase</label>
                 <div class="unit-input">
                     <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
-                        value="{{$mappedDetail['TonnageCost']}}" disabled>
+                        value="{{ $mappedDetail['TonnageCost'] }}" disabled>
                 </div>
             </div>
 
@@ -78,7 +78,7 @@
                 <label for="total_kubikasi">Penjualan Tonase</label>
                 <div class="unit-input">
                     <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
-                        value="{{$mappedDetail['TonnageSales']}}" disabled>
+                        value="{{ $mappedDetail['TonnageSales'] }}" disabled>
                 </div>
             </div>
         </div>
@@ -91,7 +91,7 @@
             <div class="sign-box">
                 <canvas id="signPad" width="360" height="150"></canvas>
             </div>
-            <button id="uploadSign">Upload Sign</button>
+
             <button type="button" id="clearSign" class="btn btn-sm btn-outline-danger mt-2">
                 Hapus Tanda Tangan
             </button>
@@ -127,9 +127,9 @@
             </div> --}}
 
             <!-- <div class="inline-input mt-3">
-                                                                                    <label for="noDo">NO DO-SPJ Order</label>
-                                                                                    <input id="noDo" type="text" class="form-control">
-                                                                                </div> -->
+                                                                                                                                <label for="noDo">NO DO-SPJ Order</label>
+                                                                                                                                <input id="noDo" type="text" class="form-control">
+                                                                                                                            </div> -->
         </div>
         <div class="mt-3" style="max-width:400px;margin:0 auto;">
             <button type="button" class="btn-next-order w-100">
@@ -159,9 +159,10 @@
         <script>
             let signPath = "";
             let fotoDocPath = "";
-            document.addEventListener('DOMContentLoaded', function () {
+            let selectedDocFile = null; // simpan file dokumen
+            document.addEventListener('DOMContentLoaded', function() {
                 // === SIGN PAD ===
-                (function () {
+                (function() {
                     const c = document.getElementById('signPad');
                     if (!c) return;
                     const ctx = c.getContext('2d');
@@ -212,45 +213,9 @@
 
                     const clearBtn = document.getElementById('clearSign');
                     if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
-
-                    // === Tombol upload/sign submit ===
-                    const uploadBtn = document.getElementById('uploadSign');
-                    if (uploadBtn) {
-                        uploadBtn.addEventListener('click', async () => {
-                            // ambil isi canvas sebagai data URL
-                            const dataURL = c.toDataURL('image/png');
-                            // konversi ke blob agar bisa diupload layaknya file
-                            const blob = await (await fetch(dataURL)).blob();
-                            const formData = new FormData();
-                            formData.append('foto', blob, 'signature.png');
-                            formData.append('folder', 'signature');
-
-                            try {
-                                const res = await fetch('/api/upload-foto', {
-                                    method: 'POST',
-                                    body: formData,
-                                    headers: {
-                                        'X-CSRF-TOKEN': document.querySelector(
-                                            'meta[name="csrf-token"]')
-                                            .getAttribute('content')
-                                    }
-                                });
-
-                                if (!res.ok) throw new Error('Gagal upload tanda tangan');
-                                const data = await res.json();
-                                console.log('Upload tanda tangan sukses:', data);
-                                signPath = data;
-                                window.alert("Tanda Tangan Tersimpan");
-
-                            } catch (err) {
-                                console.error(err);
-                                alert('Upload tanda tangan gagal', err);
-                            }
-                        });
-                    }
                 })();
 
-                // === GENERIC FILE UPLOAD PREVIEW + UPLOAD ===
+                // === FILE PREVIEW TANPA UPLOAD ===
                 function setupFilePreview(opts) {
                     const input = document.getElementById(opts.inputId);
                     const preview = document.getElementById(opts.previewId);
@@ -270,32 +235,8 @@
                         if (removeBtn) removeBtn.style.display = 'none';
                         if (nameEl) nameEl.textContent = '';
                         if (box) box.classList.remove('has-file');
+                        selectedDocFile = null;
                     }
-
-                    async function uploadFile(file, folderName = 'default') {
-                        const formData = new FormData();
-                        formData.append('foto', file);
-                        formData.append('folder', folderName);
-                        try {
-                            const res = await fetch('/api/upload-foto', {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                        .getAttribute('content')
-                                }
-                            });
-                            if (!res.ok) throw new Error('Upload gagal: ' + res.status);
-                            const data = await res.json();
-                            console.log('Upload sukses:', data);
-                            fotoDocPath = data;
-                            window.alert("Foto Dokumen Tersimpan");
-                        } catch (err) {
-                            console.error(err);
-                            alert('Gagal upload file');
-                        }
-                    }
-
 
                     input.addEventListener('change', () => {
                         const f = input.files && input.files[0];
@@ -303,6 +244,7 @@
                             reset();
                             return;
                         }
+                        selectedDocFile = f; // simpan untuk upload nanti
                         if (nameEl) nameEl.textContent = f.name;
                         const r = new FileReader();
                         r.onload = e => {
@@ -313,8 +255,6 @@
                             if (placeholder) placeholder.style.display = 'none';
                             if (removeBtn) removeBtn.style.display = 'inline-flex';
                             if (box) box.classList.add('has-file');
-                            uploadFile(f, opts.folder || 'default');
-
                         };
                         r.readAsDataURL(f);
                     });
@@ -324,7 +264,6 @@
                     });
                 }
 
-
                 setupFilePreview({
                     inputId: 'docFile',
                     previewId: 'docPreview',
@@ -332,8 +271,6 @@
                     removeBtnId: 'removeDoc',
                     folder: 'document'
                 });
-
-
                 setupFilePreview({
                     inputId: 'fotoSopir',
                     previewId: 'fotoPreview',
@@ -342,12 +279,11 @@
                     removeBtnId: 'clearFoto',
                     folder: 'foto-sopir'
                 });
-
             });
+
             let isDragging = false;
             let offsetX = 0;
 
-            // berangkat
             function startSlide(e) {
                 isDragging = true;
                 offsetX = e.clientX || (e.touches && e.touches[0].clientX);
@@ -359,21 +295,16 @@
 
             function onSlide(e) {
                 if (!isDragging) return;
-
                 const btn = document.querySelector(".slide-button");
                 const container = document.querySelector(".slide-track");
                 let clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 let moveX = clientX - offsetX;
-                moveX = Math.max(
-                    0,
-                    Math.min(moveX, container.clientWidth - btn.clientWidth)
-                );
+                moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
                 btn.style.left = moveX + "px";
 
                 if (moveX >= container.clientWidth - btn.clientWidth - 5) {
                     btn.style.background = "#198754";
-                    btn.innerHTML =
-                        '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
+                    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
                 } else {
                     btn.style.background = "#ffffff";
                     btn.innerHTML =
@@ -381,68 +312,83 @@
                 }
             }
 
-            function stopSlide(e) {
+            async function stopSlide(e) {
                 isDragging = false;
-
                 const btn = document.querySelector(".slide-button");
                 const container = document.querySelector(".slide-track");
-
                 const postUrl = @json(route('utama.konfirmasi-keluar-bongkar.submit'));
-                const nextUrl = @json(route('menu.list-order'));
                 const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
-
-
                 const left = parseInt(btn.style.left || "0", 10);
                 const threshold = container.clientWidth - btn.clientWidth - 5;
 
                 if (left >= threshold) {
-                    // optional: cegah double submit
-                    if (fotoDocPath.length != 0 && signPath.length != 0) {
-                        btn.style.pointerEvents = "none";
-                        console.log({
-                            orderId,
-                            signPath: signPath?.path,
-                            fotoDocPath: fotoDocPath?.path
-                        })
-                        fetch(postUrl, {
+                    if (!selectedDocFile) {
+                        alert("Foto dokumen harus diisi");
+                        resetSlider();
+                        return;
+                    }
+                    const signCanvas = document.getElementById('signPad');
+                    const signBlob = await (await fetch(signCanvas.toDataURL('image/png'))).blob();
+
+                    try {
+                        // upload sign
+                        const signFd = new FormData();
+                        signFd.append('foto', signBlob, 'signature.png');
+                        signFd.append('folder', 'signature');
+                        const signRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: signFd,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+                        if (!signRes.ok) throw new Error('Upload tanda tangan gagal');
+                        const signData = await signRes.json();
+
+                        // upload dokumen
+                        const docFd = new FormData();
+                        docFd.append('foto', selectedDocFile);
+                        docFd.append('folder', 'document');
+                        const docRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: docFd,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+                        if (!docRes.ok) throw new Error('Upload dokumen gagal');
+                        const docData = await docRes.json();
+
+                        // submit konfirmasi
+                        const res = await fetch(postUrl, {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
                                 "Accept": "application/json",
                                 "X-Requested-With": "XMLHttpRequest",
-                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    "content"),
                             },
                             body: JSON.stringify({
                                 orderId,
-                                signPath: signPath?.path,
-                                fotoDocPath: fotoDocPath?.path
+                                signPath: signData?.path,
+                                fotoDocPath: docData?.path
                             }),
-                        })
-                            .then(async (res) => {
-                                const ct = res.headers.get("content-type") || "";
-                                const isJson = ct.includes("application/json");
-                                const data = isJson ? await res.json() : null;
-
-                                if (res.ok && isJson && data?.success) {
-                                    window.location.href = data.nextUrl; // pindah ke halaman tiba muat
-                                } else if (res.status === 419) {
-                                    alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
-                                    resetSlider();
-                                } else {
-                                    alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-                                    resetSlider();
-                                }
-                            })
-                            .catch(() => {
-                                alert("Kesalahan jaringan.");
-                                resetSlider();
-                            })
-                            .finally(() => {
-                                btn.style.pointerEvents = "";
-                            });
-                    }
-                    else {
-                        window.alert("Tandatangan dan Foto dokumen Harus diisi")
+                        });
+                        const ct = res.headers.get("content-type") || "";
+                        const isJson = ct.includes("application/json");
+                        const data = isJson ? await res.json() : null;
+                        if (res.ok && isJson && data?.success) {
+                            window.location.href = data.nextUrl;
+                        } else {
+                            alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+                            resetSlider();
+                        }
+                    } catch (err) {
+                        alert(err.message);
+                        resetSlider();
                     }
                 } else {
                     resetSlider();
@@ -461,46 +407,29 @@
                 }
             }
 
-
             function initRealtimeDateTime() {
                 function updateDateTime() {
                     let now = new Date();
-
                     const bulan = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
                     let tanggal = String(now.getDate()).padStart(2, "0") + " " + bulan[now.getMonth()] + " " + now
                         .getFullYear();
                     let jam = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-
-
-                    // UNLOAD
                     let tanggalElUnload = document.getElementById("tanggalKeluarBongkar");
                     let jamElUnload = document.getElementById("jamKeluarBongkar");
                     let hiddenElUnload = document.getElementById("UnloadStd");
-
                     if (tanggalElUnload) tanggalElUnload.innerText = tanggal;
                     if (jamElUnload) jamElUnload.innerText = jam;
-
-
-
-
-                    // format SQL datetime
                     let yyyy = now.getFullYear();
                     let mm = String(now.getMonth() + 1).padStart(2, "0");
                     let dd = String(now.getDate()).padStart(2, "0");
                     let HH = String(now.getHours()).padStart(2, "0");
                     let ii = String(now.getMinutes()).padStart(2, "0");
                     let ss = String(now.getSeconds()).padStart(2, "0");
-                    let formatted = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
-
-                    if (hiddenElUnload) hiddenElUnload.value = formatted;
-
+                    if (hiddenElUnload) hiddenElUnload.value = `${yyyy}-${mm}-${dd} ${HH}:${ii}:${ss}`;
                 }
-
                 setInterval(updateDateTime, 1000);
                 updateDateTime();
             }
-
-
             document.addEventListener("DOMContentLoaded", initRealtimeDateTime);
         </script>
-@endsection
+    @endsection
