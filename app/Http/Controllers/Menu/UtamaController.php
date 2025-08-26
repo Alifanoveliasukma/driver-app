@@ -24,6 +24,33 @@ class UtamaController extends Controller
         $this->TrackingUpdate = $TrackingUpdate;
     }
 
+    public function checkStatus(array $orderDetail, string $except)
+    {
+        $status = $orderDetail['Status'] ?? null;
+
+        $map = [
+            'EXECUTE'   => 'menu.detail-order',
+            'LOADOTW'   => 'utama.konfirmasi-tiba-muat',
+            'LOADWAIT'  => 'utama.konfirmasi-mulai-muat',
+            'LOAD'      => 'utama.konfirmasi-selesai-muat',
+            'SHIPMENT'  => 'utama.konfirmasi-tiba-tujuan',
+            'UNLOADWAIT' => 'utama.konfirmasi-mulai-bongkar',
+            'UNLOAD'    => 'utama.konfirmasi-selesai-bongkar',
+            'FINISHED'  => 'menu.list-order',
+        ];
+
+
+        if ($status && isset($map[$status]) && $status !== $except && $status !== "FINISHED") {
+            return redirect()->route($map[$status], [
+                'orderId' => $orderDetail['XX_TransOrder_ID'] ?? null,
+            ]);
+        }
+        // return null;
+        // kalau gak ada match, bisa fallback ke halaman awal
+        // return redirect()->route('utama.berangkat.list');
+    }
+
+
     public function getOrder()
     {
         $c_bpartner_id = session('c_bpartner_id');
@@ -125,14 +152,18 @@ class UtamaController extends Controller
             }
         }
 
-        $status = $mappedDetail['Status'] ?? null;
+
         // dd($mappedDetail);
 
-        if ($status !== '' && $status !== 'EXECUTE') {
-            return redirect()->route('utama.konfirmasi-tiba-muat', [
-                'orderId' => $orderId,
-            ]);
+
+
+
+        $redirect = $this->checkStatus($mappedDetail, 'EXECUTE');
+
+        if ($redirect) {
+            return $redirect;
         }
+
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
@@ -225,10 +256,13 @@ class UtamaController extends Controller
             if (isset($attr['column']))
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
-        $status = $mappedDetail['Status'] ?? null;
-        if ($status !== 'LOADOTW') {
-            return redirect()->route('utama.konfirmasi-mulai-muat', ['orderId' => $orderId]);
+
+        $redirect = $this->checkStatus($mappedDetail, 'LOADOTW');
+
+        if ($redirect) {
+            return $redirect;
         }
+
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
@@ -308,6 +342,13 @@ class UtamaController extends Controller
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
+        $redirect = $this->checkStatus($mappedDetail, 'LOADWAIT');
+
+        if ($redirect) {
+            return $redirect;
+        }
+
+
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
@@ -384,6 +425,13 @@ class UtamaController extends Controller
             if (isset($attr['column']))
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
+
+        $redirect = $this->checkStatus($mappedDetail, 'LOAD');
+
+        if ($redirect) {
+            return $redirect;
+        }
+
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
@@ -536,6 +584,12 @@ class UtamaController extends Controller
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
+        $redirect = $this->checkStatus($mappedDetail, 'SHIPMENT');
+
+        if ($redirect) {
+            return $redirect;
+        }
+
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
@@ -611,6 +665,13 @@ class UtamaController extends Controller
             $attr = $f['@attributes'] ?? [];
             if (isset($attr['column']))
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+        }
+
+
+        $redirect = $this->checkStatus($mappedDetail, 'UNLOADWAIT');
+
+        if ($redirect) {
+            return $redirect;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
@@ -690,6 +751,12 @@ class UtamaController extends Controller
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
         }
 
+        $redirect = $this->checkStatus($mappedDetail, 'UNLOAD');
+
+        if ($redirect) {
+            return $redirect;
+        }
+
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
             ? DB::table('mzl.c_bpartner')->where('c_bpartner_id', $customerId)->value('name')
@@ -765,6 +832,12 @@ class UtamaController extends Controller
             $attr = $f['@attributes'] ?? [];
             if (isset($attr['column']))
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
+        }
+
+        $redirect = $this->checkStatus($mappedDetail, 'UNLOADWAIT');
+
+        if ($redirect) {
+            return $redirect;
         }
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;

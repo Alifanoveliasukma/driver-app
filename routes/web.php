@@ -70,6 +70,11 @@ Route::get('/utama/keluar-bongkar/{orderId}', [UtamaController::class, 'keluarBo
 Route::post('/utama/keluar-bongkar', [UtamaController::class, 'keluarBongkar'])
     ->name('utama.konfirmasi-keluar-bongkar.submit');
 
+Route::get('/utama/selesai-bongkar/{orderId}', [UtamaController::class, 'selesaiBongkarPage'])
+    ->name('utama.konfirmasi-selesai-bongkar');
+Route::post('/utama/selesai-bongkar', [UtamaController::class, 'selesaiBongkar'])
+    ->name('utama.konfirmasi-selesai-bongkar.submit');
+
 Route::get('/cek_status', [UtamaController::class, 'cek_status']);
 
 Route::get('/cek_xml', [UtamaController::class, 'getOrderDetail']);
