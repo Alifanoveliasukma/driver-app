@@ -8,15 +8,12 @@ use App\Http\Controllers\Menu\HistoriController;
 use App\Http\Controllers\Menu\UjpController;
 use App\Http\Controllers\Menu\ProfilController;
 
-Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login');
+Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login')->middleware('redirectIfLoggedIn');
 Route::get('/', function () {
     return redirect()->route('login');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Route::get('/', function () {
-//     return redirect('/login');
-// });
 
 Route::get('/no-order', function () {
     return view('menu.utama.no-order');
@@ -78,3 +75,7 @@ Route::get('/cek_xml', [UtamaController::class, 'getOrderDetail']);
 Route::get('/ujp', [UjpController::class, 'ujp'])->name('menu.ujp');
 Route::get('/histori', [HistoriController::class, 'histori'])->name('menu.histori');
 Route::get('/profil', [ProfilController::class, 'profil'])->name('menu.profil');
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});

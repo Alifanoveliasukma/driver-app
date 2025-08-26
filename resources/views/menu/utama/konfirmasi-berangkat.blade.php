@@ -13,12 +13,12 @@
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
-        <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
+        <!-- <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
             @csrf
             <button type="submit" class="btn btn-sm btn-light text-dark">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </button>
-        </form>
+        </form> -->
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>

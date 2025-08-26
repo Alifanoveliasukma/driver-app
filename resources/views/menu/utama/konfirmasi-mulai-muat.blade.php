@@ -151,7 +151,7 @@ function stopSlide() {
       const data = isJson ? await res.json() : null;
 
       if (res.ok && isJson && data?.success) {
-        window.location.href = data.nextUrl ?? nextUrl; // pakai nextUrl dari backend, fallback ke blade
+        // window.location.href = data.nextUrl ?? nextUrl; // pakai nextUrl dari backend, fallback ke blade
       } else if (res.status === 419) {
         alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
         resetSlider();
