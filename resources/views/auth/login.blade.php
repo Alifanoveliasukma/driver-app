@@ -78,7 +78,7 @@
         </div>
     </div>
     <div class="text-center pb-5">
-             <img src="{{ asset('assets/img/logo.jpg') }}" alt="Logo" style="max-height: 150px;">
+             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" style="max-height: 150px;">
         </div>
 
 </body>
