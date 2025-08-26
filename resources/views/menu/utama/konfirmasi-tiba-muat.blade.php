@@ -74,130 +74,136 @@
         <input type="hidden" name="LoadDateStart" id="LoadDateStart">
     </div>
 
-    <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
-        <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">
-            <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-                style="max-width: 400px; margin: 0 auto;" data-action="{{ route('utama.konfirmasi-tiba-muat.submit') }}"
-                data-redirect="{{ route('utama.konfirmasi-selesai-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']) }}"
-                data-orderid="{{ $mappedDetail['XX_TransOrder_ID'] ?? '' }}">
 
-                <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                    onmousedown="startSlide(event)" style="width: 48px; height: 48px; border-radius: 0;">
-                    <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                        style="width: 30px; height: 30px; filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
-                </div>
-
-                <span class="slide-label text-primary fw-semibold">Konfirmasi Tiba</span>
+    <div class="slide-confirm-container px-3">
+        <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
+            style="max-width:400px; margin:0 auto; position:relative;">
+            <div class="slide-button bg-white d-flex justify-content-center align-items-center"
+                onmousedown="startSlide(event)"
+                ontouchstart="startSlide(event)"   
+                style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
+                        touch-action:none; -webkit-user-select:none; user-select:none;">
+            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
+                style="width:30px;height:30px; pointer-events:none;" draggable="false">
             </div>
+            <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Tiba Muat</span>
         </div>
     </div>
 
     <script>
-        let isDragging = false;
-        let offsetX = 0;
+let isDragging = false;
+let offsetX = 0;
 
-        // berangkat
-        function startSlide(e) {
-            isDragging = true;
-            offsetX = e.clientX || (e.touches && e.touches[0].clientX);
-            document.addEventListener("mousemove", onSlide);
-            document.addEventListener("mouseup", stopSlide);
-            document.addEventListener("touchmove", onSlide);
-            document.addEventListener("touchend", stopSlide);
-        }
+// mulai geser
+function startSlide(e) {
+  isDragging = true;
 
-        function onSlide(e) {
-            if (!isDragging) return;
+  // cegah halaman ikut scroll saat sentuh
+  if (e.type === 'touchstart') e.preventDefault();
 
-            const btn = document.querySelector(".slide-button");
-            const container = document.querySelector(".slide-track");
-            let clientX = e.clientX || (e.touches && e.touches[0].clientX);
-            let moveX = clientX - offsetX;
-            moveX = Math.max(
-                0,
-                Math.min(moveX, container.clientWidth - btn.clientWidth)
-            );
-            btn.style.left = moveX + "px";
+  const btn = document.querySelector('.slide-button');
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-            if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-                btn.style.background = "#198754";
-                btn.innerHTML =
-                    '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
-            } else {
-                btn.style.background = "#ffffff";
-                btn.innerHTML =
-                    '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
-            }
-        }
+  // supaya tombol tidak "loncat" saat awal geser
+  const currentLeft = parseInt(btn.style.left || '0', 10);
+  offsetX = clientX - currentLeft;
 
-        function stopSlide(e) {
-            isDragging = false;
+  document.addEventListener('mousemove', onSlide);
+  document.addEventListener('mouseup', stopSlide);
+  // passive:false agar preventDefault() bekerja di touchmove
+  document.addEventListener('touchmove', onSlide, { passive: false });
+  document.addEventListener('touchend', stopSlide);
+}
 
-            const btn = document.querySelector(".slide-button");
-            const container = document.querySelector(".slide-track");
+function onSlide(e) {
+  if (!isDragging) return;
+  if (e.type === 'touchmove') e.preventDefault();
 
-            const postUrl = @json(route('utama.konfirmasi-tiba-muat.submit'));
-            const nextUrl = @json(route('utama.konfirmasi-selesai-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+  const btn = document.querySelector('.slide-button');
+  const container = document.querySelector('.slide-track');
 
-            const left = parseInt(btn.style.left || "0", 10);
-            const threshold = container.clientWidth - btn.clientWidth - 5;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-            if (left >= threshold) {
-                // optional: cegah double submit
-                btn.style.pointerEvents = "none";
+  let moveX = clientX - offsetX;
+  moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
+  btn.style.left = moveX + 'px';
 
-                fetch(postUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                    },
-                    body: JSON.stringify({
-                        orderId
-                    }),
-                })
-                    .then(async (res) => {
-                        const ct = res.headers.get("content-type") || "";
-                        const isJson = ct.includes("application/json");
-                        const data = isJson ? await res.json() : null;
-                        console.log(data, "TEST TEST")
-                        if (res.ok && isJson && data?.success) {
-                            window.location.href = data.nextUrl; // pindah ke halaman tiba muat
-                        } else if (res.status === 419) {
-                            alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
-                            resetSlider();
-                        } else {
-                            alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-                            resetSlider();
-                        }
-                    })
-                    .catch(() => {
-                        alert("Kesalahan jaringan.");
-                        resetSlider();
-                    })
-                    .finally(() => {
-                        btn.style.pointerEvents = "";
-                    });
+  if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+    btn.style.background = '#198754';
+    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color: purple;"></i>';
+  } else {
+    btn.style.background = '#ffffff';
+    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+  }
+}
 
-            } else {
-                resetSlider();
-            }
+function stopSlide() {
+  isDragging = false;
 
-            document.removeEventListener("mousemove", onSlide);
-            document.removeEventListener("mouseup", stopSlide);
-            document.removeEventListener("touchmove", onSlide);
-            document.removeEventListener("touchend", stopSlide);
+  const btn = document.querySelector('.slide-button');
+  const container = document.querySelector('.slide-track');
 
-            function resetSlider() {
-                btn.style.left = "0px";
-                btn.style.background = "#ffffff";
-                btn.innerHTML =
-                    '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
-            }
-        }
+  const postUrl = @json(route('utama.konfirmasi-tiba-muat.submit'));
+  const nextUrl = @json(route('utama.konfirmasi-selesai-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
+  const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+
+  const left = parseInt(btn.style.left || '0', 10);
+  const threshold = container.clientWidth - btn.clientWidth - 5;
+
+  if (left >= threshold) {
+    // cegah double submit
+    btn.style.pointerEvents = 'none';
+
+    fetch(postUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+      },
+      body: JSON.stringify({ orderId }),
+    })
+    .then(async (res) => {
+      const ct = res.headers.get('content-type') || '';
+      const isJson = ct.includes('application/json');
+      const data = isJson ? await res.json() : null;
+
+      if (res.ok && isJson && data?.success) {
+        // backend mengirim nextUrl → pakai itu
+        window.location.href = data.nextUrl ?? nextUrl;
+      } else if (res.status === 419) {
+        alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
+        resetSlider();
+      } else {
+        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+        resetSlider();
+      }
+    })
+    .catch(() => {
+      alert('Kesalahan jaringan.');
+      resetSlider();
+    })
+    .finally(() => {
+      btn.style.pointerEvents = '';
+    });
+
+  } else {
+    resetSlider();
+  }
+
+  document.removeEventListener('mousemove', onSlide);
+  document.removeEventListener('mouseup', stopSlide);
+  document.removeEventListener('touchmove', onSlide);
+  document.removeEventListener('touchend', stopSlide);
+
+  function resetSlider() {
+    btn.style.left = '0px';
+    btn.style.background = '#ffffff';
+    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+  }
+}
+
 
 
         function initRealtimeDateTime() {

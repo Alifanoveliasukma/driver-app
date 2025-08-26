@@ -154,12 +154,6 @@ class UtamaController extends Controller
             }
         }
 
-
-        // dd($mappedDetail);
-
-
-
-
         $redirect = $this->checkStatus($mappedDetail, 'EXECUTE');
         // dd($redirect);
         if ($redirect) {
@@ -754,7 +748,7 @@ class UtamaController extends Controller
 
     public function cek_status()
     {
-        $orderId = '1138674';
+        $orderId = '1446524';
         if (empty($orderId)) {
             return redirect()->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
@@ -785,7 +779,7 @@ class UtamaController extends Controller
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
 
-        // dd($mappedDetail);
+        dd($mappedDetail);
         // return view('menu.utama.konfirmasi-keluar-bongkar', [
         //     'mappedDetail' => $mappedDetail,
         //     'orderId'      => $orderId,

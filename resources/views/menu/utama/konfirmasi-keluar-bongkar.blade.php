@@ -142,25 +142,24 @@
         </div>
 
         <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
-            <div class="slide-confirm-container position-fixed start-0 end-0 px-3" style="bottom: 50px; z-index: 999;">
-                <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-                    style="max-width: 400px; margin: 0 auto;">
-
-                    <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                        onmousedown="startSlide(event)" style="width: 48px; height: 48px; border-radius: 0;">
-                        <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                            style="width: 30px; height: 30px; filter: brightness(0) saturate(100%) invert(29%) sepia(94%) saturate(5096%) hue-rotate(202deg) brightness(95%) contrast(94%);">
-                    </div>
-
-                    <span class="slide-label text-primary fw-semibold">Konfirmasi Keluar Bongkar</span>
-                </div>
+            <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
+            style="max-width:400px; margin:0 auto; position:relative;">
+            <div class="slide-button bg-white d-flex justify-content-center align-items-center"
+                onmousedown="startSlide(event)"
+                ontouchstart="startSlide(event)"   
+                style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
+                        touch-action:none; -webkit-user-select:none; user-select:none;">
+            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
+                style="width:30px;height:30px; pointer-events:none;" draggable="false">
+            </div>
+            <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Keluar Bongkar</span>
             </div>
         </div>
         <script>
             let signPath = "";
             let fotoDocPath = "";
             document.addEventListener('DOMContentLoaded', function () {
-                // === SIGN PAD ===
+               
                 (function () {
                     const c = document.getElementById('signPad');
                     if (!c) return;
@@ -345,121 +344,130 @@
 
             });
             let isDragging = false;
-            let offsetX = 0;
+let offsetX = 0;
 
-            // berangkat
-            function startSlide(e) {
-                isDragging = true;
-                offsetX = e.clientX || (e.touches && e.touches[0].clientX);
-                document.addEventListener("mousemove", onSlide);
-                document.addEventListener("mouseup", stopSlide);
-                document.addEventListener("touchmove", onSlide);
-                document.addEventListener("touchend", stopSlide);
-            }
+function startSlide(e) {
+  isDragging = true;
 
-            function onSlide(e) {
-                if (!isDragging) return;
+  // cegah halaman ikut scroll saat touch
+  if (e.type === 'touchstart') e.preventDefault();
 
-                const btn = document.querySelector(".slide-button");
-                const container = document.querySelector(".slide-track");
-                let clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                let moveX = clientX - offsetX;
-                moveX = Math.max(
-                    0,
-                    Math.min(moveX, container.clientWidth - btn.clientWidth)
-                );
-                btn.style.left = moveX + "px";
+  const btn = document.querySelector('.slide-button');
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-                if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-                    btn.style.background = "#198754";
-                    btn.innerHTML =
-                        '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
-                } else {
-                    btn.style.background = "#ffffff";
-                    btn.innerHTML =
-                        '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
-                }
-            }
+  // agar tidak "loncat" saat mulai geser
+  const currentLeft = parseInt(btn.style.left || '0', 10);
+  offsetX = clientX - currentLeft;
 
-            function stopSlide(e) {
-                isDragging = false;
+  document.addEventListener('mousemove', onSlide);
+  document.addEventListener('mouseup', stopSlide);
+  // passive:false agar preventDefault() di touchmove bisa bekerja
+  document.addEventListener('touchmove', onSlide, { passive: false });
+  document.addEventListener('touchend', stopSlide);
+}
 
-                const btn = document.querySelector(".slide-button");
-                const container = document.querySelector(".slide-track");
+function onSlide(e) {
+  if (!isDragging) return;
+  if (e.type === 'touchmove') e.preventDefault();
 
-                const postUrl = @json(route('utama.konfirmasi-keluar-bongkar.submit'));
-                const nextUrl = @json(route('menu.list-order'));
-                const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+  const btn = document.querySelector('.slide-button');
+  const container = document.querySelector('.slide-track');
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
+  let moveX = clientX - offsetX;
+  moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
+  btn.style.left = moveX + 'px';
 
-                const left = parseInt(btn.style.left || "0", 10);
-                const threshold = container.clientWidth - btn.clientWidth - 5;
+  if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+    btn.style.background = '#198754';
+    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color: purple;"></i>';
+  } else {
+    btn.style.background = '#ffffff';
+    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+  }
+}
 
-                if (left >= threshold) {
-                    // optional: cegah double submit
-                    if (fotoDocPath.length != 0 && signPath.length != 0) {
-                        btn.style.pointerEvents = "none";
-                        console.log({
-                            orderId,
-                            signPath: signPath?.path,
-                            fotoDocPath: fotoDocPath?.path
-                        })
-                        fetch(postUrl, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Accept": "application/json",
-                                "X-Requested-With": "XMLHttpRequest",
-                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                            },
-                            body: JSON.stringify({
-                                orderId,
-                                signPath: signPath?.path,
-                                fotoDocPath: fotoDocPath?.path
-                            }),
-                        })
-                            .then(async (res) => {
-                                const ct = res.headers.get("content-type") || "";
-                                const isJson = ct.includes("application/json");
-                                const data = isJson ? await res.json() : null;
+function stopSlide(e) {
+  isDragging = false;
 
-                                if (res.ok && isJson && data?.success) {
-                                    window.location.href = data.nextUrl; // pindah ke halaman tiba muat
-                                } else if (res.status === 419) {
-                                    alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
-                                    resetSlider();
-                                } else {
-                                    alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-                                    resetSlider();
-                                }
-                            })
-                            .catch(() => {
-                                alert("Kesalahan jaringan.");
-                                resetSlider();
-                            })
-                            .finally(() => {
-                                btn.style.pointerEvents = "";
-                            });
-                    }
-                    else {
-                        window.alert("Tandatangan dan Foto dokumen Harus diisi")
-                    }
-                } else {
-                    resetSlider();
-                }
+  const btn = document.querySelector(".slide-button");
+  const container = document.querySelector(".slide-track");
 
-                document.removeEventListener("mousemove", onSlide);
-                document.removeEventListener("mouseup", stopSlide);
-                document.removeEventListener("touchmove", onSlide);
-                document.removeEventListener("touchend", stopSlide);
+  const postUrl = @json(route('utama.konfirmasi-keluar-bongkar.submit'));
+  const nextUrl = @json(route('menu.list-order'));
+  const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
 
-                function resetSlider() {
-                    btn.style.left = "0px";
-                    btn.style.background = "#ffffff";
-                    btn.innerHTML =
-                        '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
-                }
-            }
+  const left = parseInt(btn.style.left || "0", 10);
+  const threshold = container.clientWidth - btn.clientWidth - 5;
+
+  if (left >= threshold) {
+    // optional: cegah double submit (pakai validasi lama)
+    if (fotoDocPath.length != 0 && signPath.length != 0) {
+      btn.style.pointerEvents = "none";
+      console.log({
+        orderId,
+        signPath: signPath?.path,
+        fotoDocPath: fotoDocPath?.path
+      });
+
+      fetch(postUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
+        },
+        body: JSON.stringify({
+          orderId,
+          signPath: signPath?.path,
+          fotoDocPath: fotoDocPath?.path
+        }),
+      })
+      .then(async (res) => {
+        const ct = res.headers.get("content-type") || "";
+        const isJson = ct.includes("application/json");
+        const data = isJson ? await res.json() : null;
+
+        if (res.ok && isJson && data?.success) {
+          window.location.href = data.nextUrl ?? nextUrl; // tetap aman kalau backend tidak kirim nextUrl
+        } else if (res.status === 419) {
+          alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
+          resetSlider();
+        } else {
+          alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+          resetSlider();
+        }
+      })
+      .catch(() => {
+        alert("Kesalahan jaringan.");
+        resetSlider();
+      })
+      .finally(() => {
+        btn.style.pointerEvents = "";
+      });
+
+    } else {
+      window.alert("Tandatangan dan Foto dokumen Harus diisi");
+      resetSlider();
+    }
+
+  } else {
+    resetSlider();
+  }
+
+  document.removeEventListener("mousemove", onSlide);
+  document.removeEventListener("mouseup", stopSlide);
+  document.removeEventListener("touchmove", onSlide);
+  document.removeEventListener("touchend", stopSlide);
+
+  function resetSlider() {
+    btn.style.left = "0px";
+    btn.style.background = "#ffffff";
+    btn.innerHTML =
+      '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+  }
+}
 
 
             function initRealtimeDateTime() {

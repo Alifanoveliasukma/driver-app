@@ -9,6 +9,9 @@ use App\Http\Controllers\Menu\UjpController;
 use App\Http\Controllers\Menu\ProfilController;
 
 Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login');
+Route::get('/', function () {
+    return redirect()->route('login');
+});
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Route::get('/', function () {
