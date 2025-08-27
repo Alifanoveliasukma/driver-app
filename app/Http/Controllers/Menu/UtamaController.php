@@ -137,7 +137,6 @@ class UtamaController extends Controller
             if (empty($orders)) {
                 return view('menu.utama.no-order');
             }
-        // dd($orders);
 
         return view('menu.utama.list-order', compact('orders'));
     }
@@ -450,7 +449,7 @@ class UtamaController extends Controller
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
-        dd($mappedDetail);
+        // dd($mappedDetail);
 
         return view('menu.utama.konfirmasi-selesai-muat', [
             'mappedDetail' => $mappedDetail,
@@ -826,7 +825,7 @@ class UtamaController extends Controller
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
-        dd($mappedDetail);
+        // dd($mappedDetail);
 
         // return view('menu.utama.konfirmasi-selesai-muat', [
         //     'mappedDetail' => $mappedDetail,

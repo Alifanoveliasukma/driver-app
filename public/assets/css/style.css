@@ -1,12 +1,11 @@
-body {
-    background-color: #ffffff;
-    min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
-    font-family: 'Poppins', sans-serif;
-}
+html, body 
+{ 
+  background-color: #ffffff;
+  min-height: 100vh !important;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
 
-html, body { min-height: 100dvh; }
+}
 
 .scrollable-content{
   margin-top: 20px;

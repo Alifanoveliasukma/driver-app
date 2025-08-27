@@ -8,12 +8,7 @@
 @section('content')
     <div class="history-wrap">
         
-        <div class="history-hero"><form action="{{ route('logout') }}" method="POST" class="tile mt-3">
-            @csrf
-            <button type="submit" class="" style="width: 100%;">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
-        </form>
+        <div class="history-hero">
     </div>
 
         @foreach ($orders as $i => $o)
