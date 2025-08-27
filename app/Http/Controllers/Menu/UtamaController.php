@@ -163,13 +163,11 @@ class UtamaController extends Controller
                 $mappedDetail[$attr['column']] = $attr['lval'] ?? null;
             }
         }
-
         $redirect = $this->checkStatus($mappedDetail, 'EXECUTE');
         // dd($redirect);
         if ($redirect) {
             return $redirect;
         }
-
 
         $customerId = $mappedDetail['Customer_ID'] ?? null;
         $mappedDetail['Customer_Name'] = $customerId
@@ -178,12 +176,11 @@ class UtamaController extends Controller
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
-
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
         $mappedDetail['route'] = $detailTransOrder->route;
 
-        // dd($mappedDetail);
+       
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
 
@@ -482,7 +479,7 @@ class UtamaController extends Controller
         }
 
         $updateTracking = $this->TrackingUpdate->UpdateTracking($orderId, [
-            'Status' => 'LOADWAIT',
+            'Status' => 'SHIPMENT',
             'Note' => 'driver confirmation',
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
