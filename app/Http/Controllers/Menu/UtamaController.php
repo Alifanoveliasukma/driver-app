@@ -115,7 +115,7 @@ class UtamaController extends Controller
             ->whereIn('t.xx_transorder_id', $transOrderIds)
             ->get()
             ->keyBy('xx_transorder_id');
-        
+
 
         $orders = collect($mappedOrders)
             ->filter(function ($r) {
@@ -133,10 +133,10 @@ class UtamaController extends Controller
                 $r['route'] = $route->route ?? '-';
                 return $r;
             })
-            ->all();// === cek kalau order kosong ===
-            if (empty($orders)) {
-                return view('menu.utama.no-order');
-            }
+            ->all(); // === cek kalau order kosong ===
+        if (empty($orders)) {
+            return view('menu.utama.no-order');
+        }
 
         return view('menu.utama.list-order', compact('orders'));
     }
@@ -176,11 +176,11 @@ class UtamaController extends Controller
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
         $mappedDetail['route'] = $detailTransOrder->route;
 
-       
+
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
 
@@ -275,8 +275,8 @@ class UtamaController extends Controller
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
 
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-muat', [
@@ -360,8 +360,8 @@ class UtamaController extends Controller
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
 
         return view('menu.utama.konfirmasi-mulai-muat', [
             'mappedDetail' => $mappedDetail,
@@ -384,7 +384,7 @@ class UtamaController extends Controller
             'Status' => 'LOAD',
             'LoadDateStart' => now()->format('Y-m-d H:i:s'),
         ]);
-       
+
 
         if (is_array($update) && isset($update['Error'])) {
             $err = is_array($update['Error']) ? json_encode($update['Error']) : $update['Error'];
@@ -410,7 +410,7 @@ class UtamaController extends Controller
 
     public function selesaiMuatPage($orderId)
     {
-        
+
         if (empty($orderId)) {
             return redirect()->route('utama.berangkat.list')
                 ->with('message', 'Order ID tidak ditemukan.');
@@ -444,8 +444,8 @@ class UtamaController extends Controller
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
         // dd($mappedDetail);
 
         return view('menu.utama.konfirmasi-selesai-muat', [
@@ -531,8 +531,8 @@ class UtamaController extends Controller
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
 
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-tiba-tujuan', [
@@ -615,8 +615,8 @@ class UtamaController extends Controller
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
 
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-mulai-bongkar', [
@@ -700,8 +700,8 @@ class UtamaController extends Controller
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
 
         // dd($mappedDetail);
         return view('menu.utama.konfirmasi-keluar-bongkar', [
@@ -820,8 +820,8 @@ class UtamaController extends Controller
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
-        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
-        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
+        $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
+        $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
         // dd($mappedDetail);
 
         // return view('menu.utama.konfirmasi-selesai-muat', [
@@ -829,7 +829,7 @@ class UtamaController extends Controller
         //     'orderId' => $orderId,
         // ]);
 
-        
+
         // return view('menu.utama.konfirmasi-keluar-bongkar', [
         //     'mappedDetail' => $mappedDetail,
         //     'orderId'      => $orderId,

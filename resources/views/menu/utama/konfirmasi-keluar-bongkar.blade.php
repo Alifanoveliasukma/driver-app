@@ -90,8 +90,8 @@
             <div class="sign-box">
                 <canvas id="signPad" width="360" height="150"></canvas>
             </div>
-            
-            <button id="uploadSign">Upload Sign</button>
+
+
             <button type="button" id="clearSign" class="btn btn-sm btn-outline-danger mt-2">
                 Hapus Tanda Tangan
             </button>
@@ -128,9 +128,9 @@
 
         </div>
         <div class="mt-3" style="max-width:400px;margin:0 auto;">
-            <button type="button" class="btn-next-order w-100">
+            <div class="next-order w-100">
                 Tunggu Order Berikutnya
-            </button>
+            </div>
         </div>
 
         <div class="confirm-note mt-3" style="max-width:400px;margin:0 auto;">
@@ -139,188 +139,129 @@
 
         <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
             <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
-            style="max-width:400px; margin:0 auto; position:relative;">
-            <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                onmousedown="startSlide(event)"
-                ontouchstart="startSlide(event)"   
-                style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
+                style="max-width:400px; margin:0 auto; position:relative;">
+                <div class="slide-button bg-white d-flex justify-content-center align-items-center"
+                    onmousedown="startSlide(event)" ontouchstart="startSlide(event)"
+                    style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
                         touch-action:none; -webkit-user-select:none; user-select:none;">
-            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                style="width:30px;height:30px; pointer-events:none;" draggable="false">
-            </div>
-            <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Keluar Bongkar</span>
+                    <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
+                        style="width:30px;height:30px; pointer-events:none;" draggable="false">
+                </div>
+                <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Keluar
+                    Bongkar</span>
             </div>
         </div>
         <script>
-                let signPath = "";
-                let fotoDocPath = "";
-                let selectedDocFile = null; // dipakai di preview
+            let signCanvas;
+            let fotoFile;
+            let signPath = "";
+            let fotoDocPath = "";
+            let selectedDocFile = null;
 
-                document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 // === SIGN PAD ===
-                (function () {
+                (function() {
                     const c = document.getElementById('signPad');
+                    signCanvas = c;
                     if (!c) return;
                     const ctx = c.getContext('2d');
-                    let drawing = false, last = null;
+                    let drawing = false,
+                        last = null;
 
                     const pos = (e) => {
-                    const r = c.getBoundingClientRect();
-                    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-                    const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-                    return { x, y };
+                        const r = c.getBoundingClientRect();
+                        const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+                        const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+                        return {
+                            x,
+                            y
+                        };
                     };
-                    const start = (e) => { drawing = true; last = pos(e); e.preventDefault(); };
-                    const move  = (e) => {
-                    if (!drawing) return;
-                    const p = pos(e);
-                    ctx.lineWidth = 2;
-                    ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#000';
-                    ctx.beginPath();
-                    ctx.moveTo(last.x, last.y);
-                    ctx.lineTo(p.x, p.y);
-                    ctx.stroke();
-                    last = p;
-                    e.preventDefault();
+                    const start = (e) => {
+                        drawing = true;
+                        last = pos(e);
+                        e.preventDefault();
                     };
-                    const end   = () => { drawing = false; };
+                    const move = (e) => {
+                        if (!drawing) return;
+                        const p = pos(e);
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.strokeStyle = '#000';
+                        ctx.beginPath();
+                        ctx.moveTo(last.x, last.y);
+                        ctx.lineTo(p.x, p.y);
+                        ctx.stroke();
+                        last = p;
+                        e.preventDefault();
+                    };
+                    const end = () => {
+                        drawing = false;
+                    };
 
                     c.addEventListener('mousedown', start);
                     c.addEventListener('mousemove', move);
                     window.addEventListener('mouseup', end);
-                    c.addEventListener('touchstart', start, { passive: false });
-                    c.addEventListener('touchmove',  move,  { passive: false });
-                    c.addEventListener('touchend',   end);
+                    c.addEventListener('touchstart', start, {
+                        passive: false
+                    });
+                    c.addEventListener('touchmove', move, {
+                        passive: false
+                    });
+                    c.addEventListener('touchend', end);
 
                     const clearBtn = document.getElementById('clearSign');
                     if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
-
-                    const uploadBtn = document.getElementById('uploadSign');
-                    if (uploadBtn) {
-                    uploadBtn.addEventListener('click', async () => {
-                        const dataURL = c.toDataURL('image/png');
-                        const blob = await (await fetch(dataURL)).blob();
-                        const formData = new FormData();
-                        formData.append('foto', blob, 'signature.png');
-                        formData.append('folder', 'signature');
-
-                        try {
-                        const res = await fetch('/api/upload-foto', {
-                            method: 'POST',
-                            body: formData,
-                            headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                            }
-                        });
-                        if (!res.ok) throw new Error('Gagal upload tanda tangan');
-                        const data = await res.json();
-                        // simpan apa adanya (biasanya object { path: "..." })
-                        signPath = data;
-                        alert('Tanda Tangan Tersimpan');
-                        } catch (err) {
-                        console.error(err);
-                        alert('Upload tanda tangan gagal');
-                        }
-                    });
-                    }
                 })();
 
-                // === FILE PREVIEW + UPLOAD (restore upload agar fotoDocPath terisi) ===
+                // FILE PREVIEW
                 function setupFilePreview(opts) {
                     const input = document.getElementById(opts.inputId);
                     const preview = document.getElementById(opts.previewId);
                     const placeholder = opts.placeholderId ? document.getElementById(opts.placeholderId) : null;
                     const removeBtn = opts.removeBtnId ? document.getElementById(opts.removeBtnId) : null;
-                    const nameEl = opts.nameElId ? document.getElementById(opts.nameElId) : null;
                     const box = opts.boxId ? document.getElementById(opts.boxId) : null;
                     if (!input) return;
 
                     function reset() {
-                    input.value = '';
-                    if (preview) { preview.src = ''; preview.style.display = 'none'; }
-                    if (placeholder) placeholder.style.display = 'flex';
-                    if (removeBtn) removeBtn.style.display = 'none';
-                    if (nameEl) nameEl.textContent = '';
-                    if (box) box.classList.remove('has-file');
-                    selectedDocFile = null;
-                    // kalau mau memaksa isi ulang:
-                    // fotoDocPath = "";
+                        input.value = '';
+                        if (preview) {
+                            preview.src = '';
+                            preview.style.display = 'none';
+                        }
+                        if (placeholder) placeholder.style.display = 'flex';
+                        if (removeBtn) removeBtn.style.display = 'none';
+                        if (box) box.classList.remove('has-file');
+                        selectedDocFile = null;
+                        fotoFile = null;
                     }
 
-                    const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-                    let isUploading = false;
-
-                    async function uploadFile(file, folderName = 'default') {
-                        if (!file) throw new Error('File kosong');
-
-                        const formData = new FormData();
-                        formData.append('foto', file);
-                        formData.append('folder', folderName);
-
-                        const res = await fetch('/api/upload-foto', {
-                            method: 'POST',
-                            body: formData,
-                             headers: {
-                                'X-CSRF-TOKEN': csrf,
-                                'X-Requested-With': 'XMLHttpRequest',
-                            },
-                            credentials: 'same-origin', // pastikan cookie sesi ikut
-                            cache: 'no-store',
-                        });
-
-                        const text = await res.text();
-                        let data;
-                        try {
-                        data = JSON.parse(text);
-                        } catch {
-                        // Biasanya ini terjadi saat respon pertama redirect/HTML
-                        throw new Error(`Respon bukan JSON (HTTP ${res.status}).`);
+                    input.addEventListener('change', () => {
+                        const f = input.files && input.files[0];
+                        if (!f) {
+                            reset();
+                            return;
                         }
-
-                        if (!res.ok || data?.success === false) {
-                        const msg = data?.message || `HTTP ${res.status}`;
-                        throw new Error(`Upload gagal: ${msg}`);
-                        }
-
-                        const pathObj =
-                            data?.path ? { path: data.path } :
-                            data?.data?.path ? { path: data.data.path } :
-                            data;
-                            fotoDocPath = pathObj; // <-- penting: TERISI pada percobaan pertama juga
-                            return pathObj;
-                        }
-
-                    input.addEventListener('change', async () => {
-                    const f = input.files && input.files[0];
-                    if (!f) { reset(); return; }
-
-                    const r = new FileReader();
-                    r.onload = e => {
-                        if (preview) { preview.src = e.target.result; preview.style.display = 'block'; }
-                        if (placeholder) placeholder.style.display = 'none';
-                        if (removeBtn) removeBtn.style.display = 'inline-flex';
-                        if (box) box.classList.add('has-file');
-                    };
-                    r.readAsDataURL(f);
-                    if (isUploading) return;      
-                        isUploading = true;
-                        try {
-                        await uploadFile(f, opts.folder || 'default');
-
-                        } catch (err) {
-                        console.error(err);
-                        alert(err.message || 'Gagal upload file');
-                        reset();                     
-                        } finally {
-                        isUploading = false;
-                        }
+                        const r = new FileReader();
+                        r.onload = e => {
+                            if (preview) {
+                                preview.src = e.target.result;
+                                preview.style.display = 'block';
+                            }
+                            if (placeholder) placeholder.style.display = 'none';
+                            if (removeBtn) removeBtn.style.display = 'inline-flex';
+                            if (box) box.classList.add('has-file');
+                        };
+                        r.readAsDataURL(f);
+                        fotoFile = f; //simpen file untuk diupload nanti pas stopSlide
                     });
 
-                    if (removeBtn) removeBtn.addEventListener('click', e => { e.preventDefault(); reset(); });
+                    if (removeBtn) removeBtn.addEventListener('click', e => {
+                        e.preventDefault();
+                        reset();
+                    });
                 }
 
-                // panggil untuk dokumen & (opsional) foto sopir
                 setupFilePreview({
                     inputId: 'docFile',
                     previewId: 'docPreview',
@@ -336,13 +277,13 @@
                     removeBtnId: 'clearFoto',
                     folder: 'foto-sopir'
                 });
-                }); // END DOMContentLoaded
+            });
 
-                // === SLIDER (HP friendly) — backend & payload tetap sama ===
-                let isDragging = false;
-                let offsetX = 0;
+            // SLIDER
+            let isDragging = false;
+            let offsetX = 0;
 
-                function startSlide(e) {
+            function startSlide(e) {
                 isDragging = true;
                 if (e.type === 'touchstart') e.preventDefault();
                 const btn = document.querySelector('.slide-button');
@@ -351,83 +292,110 @@
                 offsetX = clientX - currentLeft;
                 document.addEventListener('mousemove', onSlide);
                 document.addEventListener('mouseup', stopSlide);
-                document.addEventListener('touchmove', onSlide, { passive: false });
+                document.addEventListener('touchmove', onSlide, {
+                    passive: false
+                });
                 document.addEventListener('touchend', stopSlide);
-                }
+            }
 
-                function onSlide(e) {
+            function onSlide(e) {
                 if (!isDragging) return;
                 if (e.type === 'touchmove') e.preventDefault();
-
                 const btn = document.querySelector('.slide-button');
                 const container = document.querySelector('.slide-track');
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-
                 let moveX = clientX - offsetX;
                 moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
                 btn.style.left = moveX + 'px';
-
                 if (moveX >= container.clientWidth - btn.clientWidth - 5) {
                     btn.style.background = '#198754';
-                    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size: 24px; color: purple;"></i>';
+                    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px;color:purple;"></i>';
                 } else {
-                    btn.style.background = '#ffffff';
-                    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+                    btn.style.background = '#fff';
+                    btn.innerHTML =
+                        '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px;transform:translateX(8px);"></i>';
                 }
-                }
+            }
 
-                function stopSlide(e) {
+            async function stopSlide() {
                 isDragging = false;
-
                 const btn = document.querySelector(".slide-button");
                 const container = document.querySelector(".slide-track");
-
+                const left = parseInt(btn.style.left || "0", 10);
+                const threshold = container.clientWidth - btn.clientWidth - 5;
                 const postUrl = @json(route('utama.konfirmasi-keluar-bongkar.submit'));
                 const nextUrl = @json(route('menu.list-order'));
                 const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
 
-                const left = parseInt(btn.style.left || "0", 10);
-                const threshold = container.clientWidth - btn.clientWidth - 5;
-
                 if (left >= threshold) {
-                    if (fotoDocPath.length != 0 && signPath.length != 0) {
+                    if (!fotoFile && !signCanvas) {
+                        alert("Tandatangan dan Foto dokumen harus diisi");
+                        resetSlider();
+                        return;
+                    }
                     btn.style.pointerEvents = "none";
+                    try {
+                        // upload tanda tangan
+                        const dataURL = signCanvas.toDataURL('image/png');
+                        const blob = await (await fetch(dataURL)).blob();
+                        const fd1 = new FormData();
+                        fd1.append('foto', blob, 'signature.png');
+                        fd1.append('folder', 'signature');
+                        const signRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: fd1,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+                        const signData = await signRes.json();
+                        signPath = signData;
 
-                    fetch(postUrl, {
-                        method: "POST",
-                        headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        "X-Requested-With": "XMLHttpRequest",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content"),
-                        },
-                        body: JSON.stringify({
-                        orderId,
-                        signPath: signPath?.path,
-                        fotoDocPath: fotoDocPath?.path
-                        }),
-                    })
-                    .then(async (res) => {
-                        const ct = res.headers.get("content-type") || "";
-                        const isJson = ct.includes("application/json");
-                        const data = isJson ? await res.json() : null;
+                        // upload foto doc
+                        const fd2 = new FormData();
+                        fd2.append('foto', fotoFile);
+                        fd2.append('folder', 'document');
+                        const fotoRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: fd2,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+                        const fotoData = await fotoRes.json();
+                        fotoDocPath = fotoData;
 
-                        if (res.ok && isJson && data?.success) {
-                        window.location.href = data.nextUrl ?? nextUrl;
-                        } else if (res.status === 419) {
-                        alert("Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.");
-                        resetSlider();
+                        // submit konfirmasi
+                        const resp = await fetch(postUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Accept": "application/json",
+                                "X-Requested-With": "XMLHttpRequest",
+                                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    "content"),
+                            },
+                            body: JSON.stringify({
+                                orderId,
+                                signPath: signPath?.path,
+                                fotoDocPath: fotoDocPath?.path
+                            })
+                        });
+                        const data = await resp.json();
+                        if (resp.ok && data?.success) {
+                            window.location.href = data.nextUrl ?? nextUrl;
                         } else {
-                        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-                        resetSlider();
+                            alert(data?.message || `Gagal konfirmasi (HTTP ${resp.status})`);
+                            resetSlider();
                         }
-                    })
-                    .catch(() => { alert("Kesalahan jaringan."); resetSlider(); })
-                    .finally(() => { btn.style.pointerEvents = ""; });
-
-                    } else {
-                    window.alert("Tandatangan dan Foto dokumen Harus diisi");
-                    resetSlider();
+                    } catch (err) {
+                        console.error(err);
+                        alert("Upload atau konfirmasi gagal");
+                        resetSlider();
+                    } finally {
+                        btn.style.pointerEvents = "";
                     }
                 } else {
                     resetSlider();
@@ -440,11 +408,11 @@
 
                 function resetSlider() {
                     btn.style.left = "0px";
-                    btn.style.background = "#ffffff";
+                    btn.style.background = "#fff";
                     btn.innerHTML =
-                    '<i class="bi bi-chevron-double-right text-primary" style="font-size: 24px; transform: translateX(8px);"></i>';
+                        '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px;transform:translateX(8px);"></i>';
                 }
-                }
+            }
 
             function initRealtimeDateTime() {
                 function updateDateTime() {
