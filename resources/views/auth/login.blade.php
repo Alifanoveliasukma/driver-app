@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MZL Driver - Login Sopir</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
     <!-- CSS Custom -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
@@ -15,12 +17,15 @@
     <script src="{{ asset('assets/js/script.js') }}"></script>
 
 </head>
+
 <body>
-    <div class="position-relative bg-purple text-white" style="height: 280px;">
+    <div class="position-relative bg-purple text-white" style="height: 280px; overflow: hidden;">
         <div class="text-center pt-5">
-             <img src="{{ asset('assets/img/logo-perusahaan.jpg') }}" alt="Logo" style="max-height: 150px;">
+            <img src="{{ asset('assets/img/logo-perusahaan.jpg') }}" alt="Logo" style="max-height: 150px;">
             <p>Sopir</p>
         </div>
+
+
 
         <div class="circle circle1"></div>
         <div class="circle circle2"></div>
@@ -31,22 +36,23 @@
     </div>
 
     <div class="truck-icon text-center" style="margin-top: -30px; z-index: 10; position: relative;">
-        <i class="fas fa-truck" style="font-size: 32px; color: white; background-color: #3F2F96; padding: 12px; border-radius: 50%;"></i>
+        <i class="fas fa-truck"
+            style="font-size: 32px; color: white; background-color: #3F2F96; padding: 12px; border-radius: 50%;"></i>
     </div>
 
     <!-- <div class="container d-flex justify-content-center align-items-start mt-n5" style="min-height: 60vh;"> -->
-        <div class="container-fluid d-flex justify-content-center align-items-start mt-n5" style="min-height: 60vh;">
+    <div class="container-fluid d-flex justify-content-center align-items-start mt-n5" style="min-height: 60vh;">
         <div class="w-100" style="max-width: 400px;">
 
             {{-- Tampilkan pesan dari session --}}
-            @if(session('message'))
+            @if (session('message'))
                 <div class="alert alert-danger">
                     {{ is_array(session('message')) ? json_encode(session('message')) : session('message') }}
                 </div>
             @endif
 
             {{-- Kalau mau tetap ada validasi bawaan errors --}}
-            @if($errors->any())
+            @if ($errors->any())
                 <div class="alert alert-danger">
                     {{ is_array($errors->first()) ? json_encode($errors->first()) : $errors->first() }}
                 </div>
@@ -63,14 +69,14 @@
 
                 {{-- Username --}}
                 <div class="mb-3">
-                    <input type="text" name="username" class="form-control form-control-lg"
-                        placeholder="Username" value="{{ old('username') }}" required>
+                    <input type="text" name="username" class="form-control form-control-lg" placeholder="Username"
+                        value="{{ old('username') }}" required>
                 </div>
 
                 {{-- Password --}}
                 <div class="mb-4 position-relative">
-                    <input type="password" name="password" class="form-control form-control-lg"
-                        placeholder="Kata Sandi" required>
+                    <input type="password" name="password" class="form-control form-control-lg" placeholder="Kata Sandi"
+                        required>
                 </div>
 
                 <button type="submit" class="btn w-100 text-white btn-purple">Masuk</button>
@@ -78,27 +84,27 @@
         </div>
     </div>
     <div class="text-center pb-5">
-             <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" style="max-height: 150px;">
-        </div>
+        <img src="{{ asset('assets/img/logo.png') }}" alt="Logo" style="max-height: 150px;">
+    </div>
 
 </body>
-    <script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
+<script src="{{ asset('assets/libs/select2/js/select2.min.js') }}"></script>
 
-	<script type="text/javascript">
-		document.addEventListener('DOMContentLoaded', function () {
-			"use strict";
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        "use strict";
 
-			const org = document.getElementById('org');
-			if (org && window.$ && $.fn.select2) {
-				$('#org').select2({
-					placeholder: "Pilih Cabang / Gerai",
-					allowClear: true,
-				});
+        const org = document.getElementById('org');
+        if (org && window.$ && $.fn.select2) {
+            $('#org').select2({
+                placeholder: "Pilih Cabang / Gerai",
+                allowClear: true,
+            });
 
-				if ($('#org').data('invalid')) {
-					$('#org + span').addClass('is-invalid');
-				}
-			}
-		});
-	</script>
+            if ($('#org').data('invalid')) {
+                $('#org + span').addClass('is-invalid');
+            }
+        }
+    });
+</script>
 </body>
