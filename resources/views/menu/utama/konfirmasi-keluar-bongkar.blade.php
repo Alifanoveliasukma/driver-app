@@ -24,7 +24,6 @@
         </div>
     </div>
 
-
     <div class="scrollable-content px-3" style="margin-top: 20px; margin-bottom: 100px;">
 
         <div class="alamat-box"
@@ -39,9 +38,11 @@
                 </div>
             </div>
         </div>
+
         <div class="text-center mt-3 mb-2">
             <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Keluar Tempat Bongkar</span>
         </div>
+
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
                 <div id="tanggalKeluarBongkar" style="font-weight: bold;">--</div>
@@ -50,13 +51,15 @@
                 <div id="jamKeluarBongkar" style="font-weight: bold;">--</div>
             </div>
         </div>
+
         <input type="hidden" name="UnloadStd" id="UnloadStd">
-        <div class="section-divider my-3">
+
+        <!-- <div class="section-divider my-3">
             <span>DO - SPJ Detail</span>
-        </div>
+        </div> -->
 
         <div class="form-rows">
-            <div class="unit-row">
+            <!-- <div class="unit-row">
                 <label for="total_tonase">Tonase</label>
                 <div class="unit-input">
                     <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
@@ -79,7 +82,7 @@
                     <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
                         value="{{ $mappedDetail['TonnageSales'] }}" disabled>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <hr>
@@ -127,11 +130,11 @@
             </div> --}}
 
         </div>
-        <div class="mt-3" style="max-width:400px;margin:0 auto;">
+        <!-- <div class="mt-3" style="max-width:400px;margin:0 auto;">
             <div class="next-order w-100">
                 Tunggu Order Berikutnya
             </div>
-        </div>
+        </div> -->
 
         <div class="confirm-note mt-3" style="max-width:400px;margin:0 auto;">
             Dengan melakukan konfirmasi, anda menyetujui hasil proses pembongkaran

@@ -61,7 +61,7 @@
 
 
         <div class="text-center mt-3 mb-2">
-            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Berangkat Tiba Lokasi Muat</span>
+            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Berangkat Tiba di lokasi Muat</span>
         </div>
         <div class="d-flex justify-content-between gap-2 mb-5" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">

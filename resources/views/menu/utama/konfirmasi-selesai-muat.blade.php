@@ -40,8 +40,9 @@
         </div>
 
         <div class="text-center mt-3 mb-2">
-            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Mulai Muat</span>
+            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Selesai Muat</span>
         </div>
+        
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
                 <div id="tanggalSelesaiMuat" style="font-weight: bold;">--</div>
@@ -51,6 +52,19 @@
             </div>
         </div>
         <input type="hidden" name="LoadDateEnd" id="LoadDateEnd">
+
+        <div class="foto-upload-wrapper mt-3">
+            <label for="fotoSopir" class="foto-upload-box" id="fotoBox">
+                <i class="bi bi-camera-fill icon"></i>
+                <span class="placeholder">Foto Muatan</span>
+                <img id="fotoPreview" class="preview" alt="Preview foto" />
+                <span id="fotoName" class="filename"></span>
+                <input type="file" id="fotoSopir" accept="image/*" capture="environment" hidden>
+            </label>
+            <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
+                <i class="bi bi-trash"></i> Hapus Foto
+            </button>
+        </div> 
     </div>
 
     <!-- Tombol fixed -->

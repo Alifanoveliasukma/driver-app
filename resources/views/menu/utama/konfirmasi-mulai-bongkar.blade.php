@@ -39,9 +39,11 @@
                 </div>
             </div>
         </div>
+
         <div class="text-center mt-3 mb-2">
-            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Bongkar</span>
+            <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Mulai Bongkar</span>
         </div>
+
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
                 <div id="tanggalMulaiBongkar" style="font-weight: bold;">--</div>
@@ -67,6 +69,21 @@
                     <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Mulai Bongkar</span>
                 </div>
             </div>
+        </div>
+
+        <div class="foto-upload-wrapper mt-3">
+            <label for="fotoSopir" class="foto-upload-box" id="fotoBox">
+                <i class="bi bi-camera-fill icon"></i>
+                <span class="placeholder">Foto Muatan Sebelum bongkar</span>
+                <img id="fotoPreview" class="preview" alt="Preview foto" />
+                <span id="fotoName" class="filename"></span>
+                <input type="file" id="fotoSopir" accept="image/*" capture="environment" hidden>
+            </label>
+            <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
+                <i class="bi bi-trash"></i> Hapus Foto
+            </button>
+        </div> 
+    </div>
 
     <script>
         let isDragging = false;
