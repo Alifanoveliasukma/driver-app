@@ -115,8 +115,8 @@ class UtamaController extends Controller
         //     ->whereIn('t.xx_transorder_id', $transOrderIds)
         //     ->get()
         //     ->keyBy('xx_transorder_id');
-        $routes = "Jakarta - Surabaya"; 
-        $customers = "PT Maju Jaya"; 
+        $routes = "Jakarta - Surabaya";
+        $customers = "PT Maju Jaya";
 
 
         $orders = collect($mappedOrders)
@@ -135,7 +135,7 @@ class UtamaController extends Controller
                 $r['route'] = $route->route ?? '-';
                 return $r;
             })
-            ->all(); 
+            ->all();
         // dd($orders);
         if (empty($orders)) {
             return view('menu.utama.no-order');
@@ -179,10 +179,10 @@ class UtamaController extends Controller
 
         $detailTransOrder = $this->order->getTransOrderWithCustomerAddress($orderId);
 
+
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
-        $mappedDetail['route'] = $detailTransOrder->route;
-
+        $mappedDetail['route'] = $detailTransOrder->route ?? "-";
 
         return view('menu.utama.konfirmasi-berangkat', compact('mappedDetail', 'orderId'));
     }
@@ -460,7 +460,7 @@ class UtamaController extends Controller
     public function selesaiMuat(Request $request)
     {
         $orderId = $request->input('orderId');
-
+        $fotoSupirPath = env('APP_URL') . $request->input("fotoSupirPath");
         if (empty($orderId)) {
             return response()->json([
                 'success' => false,
@@ -486,6 +486,7 @@ class UtamaController extends Controller
             'Note' => 'driver confirmation',
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
+            'DocumentDir' => $fotoSupirPath
         ]);
 
         return response()->json([
@@ -631,7 +632,7 @@ class UtamaController extends Controller
     public function mulaiBongkar(Request $request)
     {
         $orderId = $request->input('orderId');
-
+        $fotoMuatanPath = env('APP_URL') . $request->input("fotoMuatanPath");
         if (empty($orderId)) {
             return response()->json([
                 'success' => false,
@@ -657,12 +658,15 @@ class UtamaController extends Controller
             'Note' => 'driver confirmation',
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
+            'DocumentDir' => $fotoMuatanPath
         ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Status diubah ke UNLOAD',
             'nextUrl' => route('utama.konfirmasi-keluar-bongkar', ['orderId' => $orderId]),
+            'debug_update' => $update,
+            'debug_tracking' => $updateTracking,
         ]);
     }
 

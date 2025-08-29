@@ -59,14 +59,14 @@
                 <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
                     style="max-width:400px; margin:0 auto; position:relative;">
                     <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                        onmousedown="startSlide(event)"
-                        ontouchstart="startSlide(event)"   
+                        onmousedown="startSlide(event)" ontouchstart="startSlide(event)"
                         style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
                                 touch-action:none; -webkit-user-select:none; user-select:none;">
-                    <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                        style="width:30px;height:30px; pointer-events:none;" draggable="false">
+                        <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
+                            style="width:30px;height:30px; pointer-events:none;" draggable="false">
                     </div>
-                    <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Mulai Bongkar</span>
+                    <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Mulai
+                        Bongkar</span>
                 </div>
             </div>
         </div>
@@ -82,119 +82,215 @@
             <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
                 <i class="bi bi-trash"></i> Hapus Foto
             </button>
-        </div> 
+        </div>
     </div>
 
     <script>
         let isDragging = false;
-let offsetX = 0;
+        let offsetX = 0;
+        let fotoMuatan;
+        let fotoMuatanPath = "";
 
-// mulai geser
-function startSlide(e) {
-  isDragging = true;
 
-  // cegah halaman ikut scroll saat sentuh
-  if (e.type === 'touchstart') e.preventDefault();
+        // FILE PREVIEW
+        function setupFilePreview(opts) {
+            const input = document.getElementById(opts.inputId);
+            const preview = document.getElementById(opts.previewId);
+            const removeBtn = document.getElementById(opts.removeBtnId);
+            const box = document.getElementById(opts.boxId);
+            const fileName = document.getElementById(opts.fileNameId);
 
-  const btn = document.querySelector('.slide-button');
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            if (!input) return;
 
-  // supaya tidak "loncat" saat mulai geser
-  const currentLeft = parseInt(btn.style.left || '0', 10);
-  offsetX = clientX - currentLeft;
+            function reset() {
+                input.value = '';
+                fotoMuatan = null;
+                if (preview) {
+                    preview.src = '';
+                    preview.style.display = 'none';
+                }
+                if (fileName) fileName.innerText = '';
+                if (removeBtn) removeBtn.style.display = 'none';
+                if (box) box.classList.remove('has-file');
+            }
 
-  document.addEventListener('mousemove', onSlide);
-  document.addEventListener('mouseup', stopSlide);
-  document.addEventListener('touchmove', onSlide, { passive: false });
-  document.addEventListener('touchend', stopSlide);
-}
+            input.addEventListener('change', () => {
+                const f = input.files && input.files[0];
+                if (!f) {
+                    reset();
+                    return;
+                }
+                const r = new FileReader();
+                r.onload = e => {
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    if (fileName) fileName.innerText = f.name;
+                    if (removeBtn) removeBtn.style.display = 'inline-flex';
+                    if (box) box.classList.add('has-file');
+                };
+                r.readAsDataURL(f);
+                fotoMuatan = f; // simpan file untuk submit
+            });
 
-function onSlide(e) {
-  if (!isDragging) return;
-  if (e.type === 'touchmove') e.preventDefault();
+            if (removeBtn) removeBtn.addEventListener('click', e => {
+                e.preventDefault();
+                reset();
+            });
+        }
 
-  const btn = document.querySelector('.slide-button');
-  const container = document.querySelector('.slide-track');
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        setupFilePreview({
+            inputId: 'fotoSopir',
+            previewId: 'fotoPreview',
+            removeBtnId: 'clearFoto',
+            boxId: 'fotoBox',
+            fileNameId: 'fotoName'
+        });
 
-  let moveX = clientX - offsetX;
-  moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
-  btn.style.left = moveX + 'px';
 
-  if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-    btn.style.background = '#198754';
-    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color:purple;"></i>';
-  } else {
-    btn.style.background = '#ffffff';
-    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
-  }
-}
+        // mulai geser
+        function startSlide(e) {
+            isDragging = true;
 
-function stopSlide() {
-  isDragging = false;
+            // cegah halaman ikut scroll saat sentuh
+            if (e.type === 'touchstart') e.preventDefault();
 
-  const btn = document.querySelector('.slide-button');
-  const container = document.querySelector('.slide-track');
+            const btn = document.querySelector('.slide-button');
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-  // backend tetap sama
-  const postUrl = @json(route('utama.konfirmasi-mulai-bongkar.submit'));
-  const nextUrl = @json(route('utama.konfirmasi-keluar-bongkar', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-  const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+            // supaya tidak "loncat" saat mulai geser
+            const currentLeft = parseInt(btn.style.left || '0', 10);
+            offsetX = clientX - currentLeft;
 
-  const left = parseInt(btn.style.left || '0', 10);
-  const threshold = container.clientWidth - btn.clientWidth - 5;
+            document.addEventListener('mousemove', onSlide);
+            document.addEventListener('mouseup', stopSlide);
+            document.addEventListener('touchmove', onSlide, {
+                passive: false
+            });
+            document.addEventListener('touchend', stopSlide);
+        }
 
-  if (left >= threshold) {
-    btn.style.pointerEvents = 'none'; // cegah double submit
+        function onSlide(e) {
+            if (!isDragging) return;
+            if (e.type === 'touchmove') e.preventDefault();
 
-    fetch(postUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      },
-      body: JSON.stringify({ orderId }),
-    })
-    .then(async (res) => {
-      const ct = res.headers.get('content-type') || '';
-      const isJson = ct.includes('application/json');
-      const data = isJson ? await res.json() : null;
+            const btn = document.querySelector('.slide-button');
+            const container = document.querySelector('.slide-track');
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-      if (res.ok && isJson && data?.success) {
-        window.location.href = data.nextUrl ?? nextUrl;
-      } else if (res.status === 419) {
-        alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
-        resetSlider();
-      } else {
-        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-        resetSlider();
-      }
-    })
-    .catch(() => {
-      alert('Kesalahan jaringan.');
-      resetSlider();
-    })
-    .finally(() => {
-      btn.style.pointerEvents = '';
-    });
+            let moveX = clientX - offsetX;
+            moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
+            btn.style.left = moveX + 'px';
 
-  } else {
-    resetSlider();
-  }
+            if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+                btn.style.background = '#198754';
+                btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color:purple;"></i>';
+            } else {
+                btn.style.background = '#ffffff';
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+            }
+        }
 
-  document.removeEventListener('mousemove', onSlide);
-  document.removeEventListener('mouseup', stopSlide);
-  document.removeEventListener('touchmove', onSlide);
-  document.removeEventListener('touchend', stopSlide);
+        async function stopSlide() {
+            isDragging = false;
 
-  function resetSlider() {
-    btn.style.left = '0px';
-    btn.style.background = '#ffffff';
-    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
-  }
-}
+            const btn = document.querySelector('.slide-button');
+            const container = document.querySelector('.slide-track');
+
+            // backend tetap sama
+            const postUrl = @json(route('utama.konfirmasi-mulai-bongkar.submit'));
+            const nextUrl = @json(route('utama.konfirmasi-keluar-bongkar', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
+            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+
+            const left = parseInt(btn.style.left || '0', 10);
+            const threshold = container.clientWidth - btn.clientWidth - 5;
+
+            if (left >= threshold) {
+                btn.style.pointerEvents = 'none'; // cegah double submit
+
+                try {
+                    // === Upload foto sopir ===
+
+                    if (fotoMuatan) {
+                        const fd2 = new FormData();
+                        fd2.append('foto', fotoMuatan);
+                        fd2.append('folder', 'muatan');
+
+                        const fotoRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: fd2,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+
+                        if (!fotoRes.ok) {
+                            throw new Error(`Gagal upload foto (HTTP ${fotoRes.status})`);
+                        }
+
+                        const fotoData = await fotoRes.json();
+                        fotoMuatanPath = fotoData;
+                        console.log(fotoMuatanPath, "TEST TEST")
+
+                    }
+
+                    // // === Submit konfirmasi ===
+                    const resp = await fetch(postUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                        },
+                        body: JSON.stringify({
+                            orderId,
+                            fotoMuatanPath: fotoMuatanPath?.path ?? null,
+                        }),
+                    });
+
+                    const ct = resp.headers.get('content-type') || '';
+                    const isJson = ct.includes('application/json');
+                    const data = isJson ? await resp.json() : null;
+                    // console.log(data, "TEST TEST")
+                    if (resp.ok && isJson && data?.success) {
+                        window.location.href = data.nextUrl ?? nextUrl;
+                    } else if (resp.status === 419) {
+                        alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
+                        resetSlider();
+                    } else {
+                        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${resp.status}).`);
+                        resetSlider();
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    alert(err.message || 'Kesalahan jaringan / upload.');
+                    resetSlider();
+                } finally {
+                    btn.style.pointerEvents = '';
+                }
+
+            } else {
+                resetSlider();
+            }
+
+            document.removeEventListener('mousemove', onSlide);
+            document.removeEventListener('mouseup', stopSlide);
+            document.removeEventListener('touchmove', onSlide);
+            document.removeEventListener('touchend', stopSlide);
+
+            function resetSlider() {
+                btn.style.left = '0px';
+                btn.style.background = '#ffffff';
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+            }
+        }
 
         function initRealtimeDateTime() {
             function updateDateTime() {

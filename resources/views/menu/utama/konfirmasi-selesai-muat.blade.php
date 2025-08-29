@@ -31,7 +31,7 @@
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
                     <div style="font-weight: bold;">{{ $mappedDetail['delivery_address'] ?? '-' }}</div>
-                    
+
                 </div>
                 <div class="text-center">
 
@@ -42,7 +42,7 @@
         <div class="text-center mt-3 mb-2">
             <span class="text-muted" style="font-weight: 500;">Tanggal-Jam Selesai Muat</span>
         </div>
-        
+
         <div class="d-flex justify-content-between gap-2 mb-3" style="max-width: 400px; margin: 0 auto;">
             <div class="bg-light rounded p-3 text-center flex-fill">
                 <div id="tanggalSelesaiMuat" style="font-weight: bold;">--</div>
@@ -64,7 +64,7 @@
             <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
                 <i class="bi bi-trash"></i> Hapus Foto
             </button>
-        </div> 
+        </div>
     </div>
 
     <!-- Tombol fixed -->
@@ -72,12 +72,11 @@
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
             style="max-width:400px; margin:0 auto; position:relative;">
             <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                onmousedown="startSlide(event)"
-                ontouchstart="startSlide(event)"   
+                onmousedown="startSlide(event)" ontouchstart="startSlide(event)"
                 style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
                         touch-action:none; -webkit-user-select:none; user-select:none;">
-            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                style="width:30px;height:30px; pointer-events:none;" draggable="false">
+                <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
+                    style="width:30px;height:30px; pointer-events:none;" draggable="false">
             </div>
             <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Selesai Muat</span>
         </div>
@@ -100,116 +99,211 @@
 
     <script>
         let isDragging = false;
-let offsetX = 0;
+        let offsetX = 0;
+        let fotoSupir;
+        let fotoSupirPath = "";
 
-// mulai geser
-function startSlide(e) {
-  isDragging = true;
+        // FILE PREVIEW
+        // FILE PREVIEW
+        function setupFilePreview(opts) {
+            const input = document.getElementById(opts.inputId);
+            const preview = document.getElementById(opts.previewId);
+            const removeBtn = document.getElementById(opts.removeBtnId);
+            const box = document.getElementById(opts.boxId);
+            const fileName = document.getElementById(opts.fileNameId);
 
-  // cegah halaman ikut scroll saat mulai sentuh
-  if (e.type === 'touchstart') e.preventDefault();
+            if (!input) return;
 
-  const btn = document.querySelector('.slide-button');
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            function reset() {
+                input.value = '';
+                fotoSupir = null;
+                if (preview) {
+                    preview.src = '';
+                    preview.style.display = 'none';
+                }
+                if (fileName) fileName.innerText = '';
+                if (removeBtn) removeBtn.style.display = 'none';
+                if (box) box.classList.remove('has-file');
+            }
 
-  // agar tidak "loncat" saat mulai geser
-  const currentLeft = parseInt(btn.style.left || '0', 10);
-  offsetX = clientX - currentLeft;
+            input.addEventListener('change', () => {
+                const f = input.files && input.files[0];
+                if (!f) {
+                    reset();
+                    return;
+                }
+                const r = new FileReader();
+                r.onload = e => {
+                    if (preview) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    if (fileName) fileName.innerText = f.name;
+                    if (removeBtn) removeBtn.style.display = 'inline-flex';
+                    if (box) box.classList.add('has-file');
+                };
+                r.readAsDataURL(f);
+                fotoSupir = f; // simpan file untuk submit
+            });
 
-  document.addEventListener('mousemove', onSlide);
-  document.addEventListener('mouseup', stopSlide);
-  document.addEventListener('touchmove', onSlide, { passive: false }); // penting
-  document.addEventListener('touchend', stopSlide);
-}
+            if (removeBtn) removeBtn.addEventListener('click', e => {
+                e.preventDefault();
+                reset();
+            });
+        }
 
-function onSlide(e) {
-  if (!isDragging) return;
-  if (e.type === 'touchmove') e.preventDefault();
+        setupFilePreview({
+            inputId: 'fotoSopir',
+            previewId: 'fotoPreview',
+            removeBtnId: 'clearFoto',
+            boxId: 'fotoBox',
+            fileNameId: 'fotoName'
+        });
 
-  const btn = document.querySelector('.slide-button');
-  const container = document.querySelector('.slide-track');
+        // mulai geser
+        function startSlide(e) {
+            isDragging = true;
 
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            // cegah halaman ikut scroll saat mulai sentuh
+            if (e.type === 'touchstart') e.preventDefault();
 
-  let moveX = clientX - offsetX;
-  moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
-  btn.style.left = moveX + 'px';
+            const btn = document.querySelector('.slide-button');
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-  if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-    btn.style.background = '#198754';
-    btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color:purple;"></i>';
-  } else {
-    btn.style.background = '#ffffff';
-    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
-  }
-}
+            // agar tidak "loncat" saat mulai geser
+            const currentLeft = parseInt(btn.style.left || '0', 10);
+            offsetX = clientX - currentLeft;
 
-function stopSlide() {
-  isDragging = false;
+            document.addEventListener('mousemove', onSlide);
+            document.addEventListener('mouseup', stopSlide);
+            document.addEventListener('touchmove', onSlide, {
+                passive: false
+            }); // penting
+            document.addEventListener('touchend', stopSlide);
+        }
 
-  const btn = document.querySelector('.slide-button');
-  const container = document.querySelector('.slide-track');
+        function onSlide(e) {
+            if (!isDragging) return;
+            if (e.type === 'touchmove') e.preventDefault();
 
- 
-  const postUrl = @json(route('utama.konfirmasi-selesai-muat.submit'));
-  const nextUrl = @json(route('utama.konfirmasi-tiba-tujuan', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-  const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+            const btn = document.querySelector('.slide-button');
+            const container = document.querySelector('.slide-track');
 
-  const left = parseInt(btn.style.left || '0', 10);
-  const threshold = container.clientWidth - btn.clientWidth - 5;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-  if (left >= threshold) {
-    // cegah double submit
-    btn.style.pointerEvents = 'none';
+            let moveX = clientX - offsetX;
+            moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
+            btn.style.left = moveX + 'px';
 
-    fetch(postUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-      },
-      body: JSON.stringify({ orderId }),
-    })
-    .then(async (res) => {
-      const ct = res.headers.get('content-type') || '';
-      const isJson = ct.includes('application/json');
-      const data = isJson ? await res.json() : null;
+            if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+                btn.style.background = '#198754';
+                btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color:purple;"></i>';
+            } else {
+                btn.style.background = '#ffffff';
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+            }
+        }
 
-      if (res.ok && isJson && data?.success) {
-        window.location.href = data.nextUrl ?? nextUrl; // pakai dari backend; fallback ke blade
-      } else if (res.status === 419) {
-        alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
-        resetSlider();
-      } else {
-        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
-        resetSlider();
-      }
-    })
-    .catch(() => {
-      alert('Kesalahan jaringan.');
-      resetSlider();
-    })
-    .finally(() => {
-      btn.style.pointerEvents = '';
-    });
+        async function stopSlide() {
+            isDragging = false;
 
-  } else {
-    resetSlider();
-  }
+            const btn = document.querySelector('.slide-button');
+            const container = document.querySelector('.slide-track');
 
-  document.removeEventListener('mousemove', onSlide);
-  document.removeEventListener('mouseup', stopSlide);
-  document.removeEventListener('touchmove', onSlide);
-  document.removeEventListener('touchend', stopSlide);
 
-  function resetSlider() {
-    btn.style.left = '0px';
-    btn.style.background = '#ffffff';
-    btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
-  }
-}
+            const postUrl = @json(route('utama.konfirmasi-selesai-muat.submit'));
+            const nextUrl = @json(route('utama.konfirmasi-tiba-tujuan', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
+            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+
+            const left = parseInt(btn.style.left || '0', 10);
+            const threshold = container.clientWidth - btn.clientWidth - 5;
+
+            if (left >= threshold) {
+                // cegah double submit
+                btn.style.pointerEvents = 'none';
+
+                try {
+                    // === Upload foto sopir ===
+
+                    if (fotoSupir) {
+                        const fd2 = new FormData();
+                        fd2.append('foto', fotoSupir);
+                        fd2.append('folder', 'muatan');
+
+                        const fotoRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: fd2,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+
+                        if (!fotoRes.ok) {
+                            throw new Error(`Gagal upload foto (HTTP ${fotoRes.status})`);
+                        }
+
+                        const fotoData = await fotoRes.json();
+                        fotoSupirPath = fotoData;
+
+                    }
+
+                    // === Submit konfirmasi ===
+                    const resp = await fetch(postUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                        },
+                        body: JSON.stringify({
+                            orderId,
+                            fotoSupirPath: fotoSupirPath?.path ?? null,
+                        }),
+                    });
+
+                    const ct = resp.headers.get('content-type') || '';
+                    const isJson = ct.includes('application/json');
+                    const data = isJson ? await resp.json() : null;
+                    // console.log(data, "TEST TEST")
+                    if (resp.ok && isJson && data?.success) {
+                        window.location.href = data.nextUrl ?? nextUrl;
+                    } else if (resp.status === 419) {
+                        alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
+                        resetSlider();
+                    } else {
+                        alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${resp.status}).`);
+                        resetSlider();
+                    }
+
+                } catch (err) {
+                    console.error(err);
+                    alert(err.message || 'Kesalahan jaringan / upload.');
+                    resetSlider();
+                } finally {
+                    btn.style.pointerEvents = '';
+                }
+
+
+            } else {
+                resetSlider();
+            }
+
+            document.removeEventListener('mousemove', onSlide);
+            document.removeEventListener('mouseup', stopSlide);
+            document.removeEventListener('touchmove', onSlide);
+            document.removeEventListener('touchend', stopSlide);
+
+            function resetSlider() {
+                btn.style.left = '0px';
+                btn.style.background = '#ffffff';
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+            }
+        }
 
 
         function initRealtimeDateTime() {
