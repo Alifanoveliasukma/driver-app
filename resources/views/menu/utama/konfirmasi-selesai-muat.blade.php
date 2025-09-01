@@ -56,7 +56,7 @@
         <div class="foto-upload-wrapper mt-3">
             <label for="fotoSopir" class="foto-upload-box" id="fotoBox">
                 <i class="bi bi-camera-fill icon"></i>
-                <span class="placeholder">Foto Muatan</span>
+                <span class="placeholder">Foto Sopir</span>
                 <img id="fotoPreview" class="preview" alt="Preview foto" />
                 <span id="fotoName" class="filename"></span>
                 <input type="file" id="fotoSopir" accept="image/*" capture="environment" hidden>
@@ -65,6 +65,24 @@
                 <i class="bi bi-trash"></i> Hapus Foto
             </button>
         </div>
+
+        <div class="section-label mt-3">Upload Dokumen</div>
+
+            <div class="doc-card" id="docCard">
+                <span class="doc-title">Surat Jalan</span>
+                <button type="button" class="doc-remove" id="removeDoc" style="display:none;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+                <label for="docFile" class="doc-placeholder" id="docPh">
+                    <i class="bi bi-camera-fill"></i>
+                    <span>Upload Foto Surat Jalan</span>
+                </label>
+                <input type="file" id="docFile" accept="image/*" hidden>
+
+                <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
+            </div>
+
     </div>
 
     <!-- Tombol fixed -->

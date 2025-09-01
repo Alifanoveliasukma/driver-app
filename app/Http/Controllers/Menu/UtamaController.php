@@ -721,7 +721,7 @@ class UtamaController extends Controller
     {
         $orderId = $request->input('orderId');
         $signPath = env('APP_URL') . $request->input("signPath");
-        $fotoDocPath = env('APP_URL') . $request->input("fotoDocPath");
+        // $fotoDocPath = env('APP_URL') . $request->input("fotoDocPath");
 
         if (empty($orderId)) {
             return response()->json([
@@ -735,7 +735,7 @@ class UtamaController extends Controller
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
             'DocumentDir' => $signPath,
-            'DocumentDir2' => $fotoDocPath
+            // 'DocumentDir2' => $fotoDocPath
         ]);
         if (is_array($updateTracking) && isset($updateTracking['error'])) {
             $err = is_array($updateTracking['error']) ? json_encode($updateTracking['error']) : $updateTracking['error'];

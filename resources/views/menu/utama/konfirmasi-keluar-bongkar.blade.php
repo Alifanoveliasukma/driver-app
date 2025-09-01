@@ -99,7 +99,7 @@
                 Hapus Tanda Tangan
             </button>
 
-            <div class="section-label mt-3">Upload Dokumen</div>
+            {{-- <div class="section-label mt-3">Upload Dokumen</div>
 
             <div class="doc-card" id="docCard">
                 <span class="doc-title">Surat Jalan</span>
@@ -109,12 +109,12 @@
 
                 <label for="docFile" class="doc-placeholder" id="docPh">
                     <i class="bi bi-camera-fill"></i>
-                    <span>Upload Foto</span>
+                    <span>Upload Foto Surat Jalan</span>
                 </label>
                 <input type="file" id="docFile" accept="image/*" hidden>
 
                 <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
-            </div>
+            </div>--}}
 
             {{-- <div class="foto-upload-wrapper mt-3">
                 <label for="fotoSopir" class="foto-upload-box" id="fotoBox">
@@ -162,7 +162,6 @@
             let selectedDocFile = null;
 
             document.addEventListener('DOMContentLoaded', function() {
-                // === SIGN PAD ===
                 (function() {
                     const c = document.getElementById('signPad');
                     signCanvas = c;
@@ -217,7 +216,6 @@
                     if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
                 })();
 
-                // FILE PREVIEW
                 function setupFilePreview(opts) {
                     const input = document.getElementById(opts.inputId);
                     const preview = document.getElementById(opts.previewId);
@@ -256,7 +254,7 @@
                             if (box) box.classList.add('has-file');
                         };
                         r.readAsDataURL(f);
-                        fotoFile = f; //simpen file untuk diupload nanti pas stopSlide
+                        fotoFile = f; 
                     });
 
                     if (removeBtn) removeBtn.addEventListener('click', e => {
@@ -282,7 +280,6 @@
                 });
             });
 
-            // SLIDER
             let isDragging = false;
             let offsetX = 0;
 
@@ -332,7 +329,7 @@
 
                 if (left >= threshold) {
                     if (!fotoFile && !signCanvas) {
-                        alert("Tandatangan dan Foto dokumen harus diisi");
+                        alert("Tandatangan diisi");
                         resetSlider();
                         return;
                     }
@@ -356,19 +353,19 @@
                         signPath = signData;
 
                         // upload foto doc
-                        const fd2 = new FormData();
-                        fd2.append('foto', fotoFile);
-                        fd2.append('folder', 'document');
-                        const fotoRes = await fetch('/api/upload-foto', {
-                            method: 'POST',
-                            body: fd2,
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                    'content')
-                            }
-                        });
-                        const fotoData = await fotoRes.json();
-                        fotoDocPath = fotoData;
+                        // const fd2 = new FormData();
+                        // fd2.append('foto', fotoFile);
+                        // fd2.append('folder', 'document');
+                        // const fotoRes = await fetch('/api/upload-foto', {
+                        //     method: 'POST',
+                        //     body: fd2,
+                        //     headers: {
+                        //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                        //             'content')
+                        //     }
+                        // });
+                        // const fotoData = await fotoRes.json();
+                        // fotoDocPath = fotoData;
 
                         // submit konfirmasi
                         const resp = await fetch(postUrl, {
@@ -383,7 +380,6 @@
                             body: JSON.stringify({
                                 orderId,
                                 signPath: signPath?.path,
-                                fotoDocPath: fotoDocPath?.path
                             })
                         });
                         const data = await resp.json();
