@@ -106,17 +106,17 @@ class UtamaController extends Controller
         $transOrderIds = collect($mappedOrders)->pluck('XX_TransOrder_ID')->filter()->unique();
 
 
-        // $customers = DB::table('mzl.c_bpartner')
-        //     ->whereIn('c_bpartner_id', $customerIds)
-        //     ->pluck('name', 'c_bpartner_id');
+        $customers = DB::table('mzl.c_bpartner')
+            ->whereIn('c_bpartner_id', $customerIds)
+            ->pluck('name', 'c_bpartner_id');
 
-        // $routes = DB::table('mzl.xx_transorder as t')
-        //     ->select('t.xx_transorder_id', 't.route')
-        //     ->whereIn('t.xx_transorder_id', $transOrderIds)
-        //     ->get()
-        //     ->keyBy('xx_transorder_id');
-        $routes = "Jakarta - Surabaya";
-        $customers = "PT Maju Jaya";
+        $routes = DB::table('mzl.xx_transorder as t')
+            ->select('t.xx_transorder_id', 't.route')
+            ->whereIn('t.xx_transorder_id', $transOrderIds)
+            ->get()
+            ->keyBy('xx_transorder_id');
+        // $routes = "Jakarta - Surabaya";
+        // $customers = "PT Maju Jaya";
 
 
         $orders = collect($mappedOrders)
