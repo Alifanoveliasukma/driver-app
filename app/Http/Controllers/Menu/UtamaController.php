@@ -461,12 +461,14 @@ class UtamaController extends Controller
     {
         $orderId = $request->input('orderId');
         $fotoSupirPath = env('APP_URL') . $request->input("fotoSupirPath");
+        $fotoMuatanPath = env('APP_URL') . $request->input("dokumenFilePath");
         if (empty($orderId)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Order ID tidak ditemukan.'
             ], 422);
         }
+
 
         $update = $this->orderUpdate->updateOrder($orderId, [
             'Status' => 'SHIPMENT',
@@ -486,7 +488,8 @@ class UtamaController extends Controller
             'Note' => 'driver confirmation',
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
-            'DocumentDir' => $fotoSupirPath
+            'DocumentDir' => $fotoSupirPath,
+            'DocumentDir2' => $fotoMuatanPath
         ]);
 
         return response()->json([

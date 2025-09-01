@@ -68,20 +68,20 @@
 
         <div class="section-label mt-3">Upload Dokumen</div>
 
-            <div class="doc-card" id="docCard">
-                <span class="doc-title">Surat Jalan</span>
-                <button type="button" class="doc-remove" id="removeDoc" style="display:none;">
-                    <i class="bi bi-x-lg"></i>
-                </button>
+        <div class="doc-card" id="docCard">
+            <span class="doc-title">Surat Jalan</span>
+            <button type="button" class="doc-remove" id="removeDoc" style="display:none;">
+                <i class="bi bi-x-lg"></i>
+            </button>
 
-                <label for="docFile" class="doc-placeholder" id="docPh">
-                    <i class="bi bi-camera-fill"></i>
-                    <span>Upload Foto Surat Jalan</span>
-                </label>
-                <input type="file" id="docFile" accept="image/*" hidden>
+            <label for="docFile" class="doc-placeholder" id="docPh">
+                <i class="bi bi-camera-fill"></i>
+                <span>Upload Foto Surat Jalan</span>
+            </label>
+            <input type="file" id="docFile" accept="image/*" hidden>
 
-                <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
-            </div>
+            <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
+        </div>
 
     </div>
 
@@ -118,9 +118,8 @@
     <script>
         let isDragging = false;
         let offsetX = 0;
-        let fotoSupir;
-        let fotoSupirPath = "";
-
+        let fotoSupir, fotoSupirPath = "";
+        let dokumenFile, dokumenFilePath = "";
         // FILE PREVIEW
         // FILE PREVIEW
         function setupFilePreview(opts) {
@@ -134,7 +133,9 @@
 
             function reset() {
                 input.value = '';
-                fotoSupir = null;
+                if (opts.type === 'foto') fotoSupir = null;
+                if (opts.type === 'dokumen') dokumenFile = null;
+
                 if (preview) {
                     preview.src = '';
                     preview.style.display = 'none';
@@ -143,6 +144,7 @@
                 if (removeBtn) removeBtn.style.display = 'none';
                 if (box) box.classList.remove('has-file');
             }
+
 
             input.addEventListener('change', () => {
                 const f = input.files && input.files[0];
@@ -161,7 +163,10 @@
                     if (box) box.classList.add('has-file');
                 };
                 r.readAsDataURL(f);
-                fotoSupir = f; // simpan file untuk submit
+
+
+                if (opts.type === 'foto') fotoSupir = f;
+                if (opts.type === 'dokumen') dokumenFile = f;
             });
 
             if (removeBtn) removeBtn.addEventListener('click', e => {
@@ -175,7 +180,18 @@
             previewId: 'fotoPreview',
             removeBtnId: 'clearFoto',
             boxId: 'fotoBox',
-            fileNameId: 'fotoName'
+            fileNameId: 'fotoName',
+            type: 'foto'
+        });
+
+
+        setupFilePreview({
+            inputId: 'docFile',
+            previewId: 'docPreview',
+            removeBtnId: 'removeDoc',
+            boxId: 'docPh',
+            fileNameId: null, // optional
+            type: 'dokumen'
         });
 
         // mulai geser
@@ -247,7 +263,7 @@
                     if (fotoSupir) {
                         const fd2 = new FormData();
                         fd2.append('foto', fotoSupir);
-                        fd2.append('folder', 'muatan');
+                        fd2.append('folder', 'supir');
 
                         const fotoRes = await fetch('/api/upload-foto', {
                             method: 'POST',
@@ -267,6 +283,24 @@
 
                     }
 
+                    if (dokumenFile) {
+                        const fdDoc = new FormData();
+                        fdDoc.append('foto', dokumenFile);
+                        fdDoc.append('folder', 'dokumen');
+                        const resDoc = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: fdDoc,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+                        if (!resDoc.ok) throw new Error(`Gagal upload dokumen (HTTP ${resDoc.status})`);
+                        const dataDoc = await resDoc.json();
+                        dokumenFilePath = dataDoc.path;
+                    }
+
+
                     // === Submit konfirmasi ===
                     const resp = await fetch(postUrl, {
                         method: 'POST',
@@ -280,6 +314,7 @@
                         body: JSON.stringify({
                             orderId,
                             fotoSupirPath: fotoSupirPath?.path ?? null,
+                            dokumenFilePath: dokumenFilePath?.path ?? null,
                         }),
                     });
 
