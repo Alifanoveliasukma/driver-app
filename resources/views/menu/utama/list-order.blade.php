@@ -61,7 +61,9 @@
                         {{-- ⬇️ Status langsung di bawah tanggal selesai --}}
                         @if ($status)
                             <div class="muted">Status</div>
-                            <div class="fw-bold text-danger">{{ $status }}</div>
+                             <div class="fw-bold text-danger">
+                                {{ $status !== null && $status !== '' ? $status : 'EXECUTE' }}
+                            </div>
                         @endif
                     </div>
                 </div>
