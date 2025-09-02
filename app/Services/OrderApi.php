@@ -8,8 +8,9 @@ class OrderApi extends BaseApi
 {
 
 
-    public function getOrderList($driverId)
+    public function getOrderList($driverId, $isComplete = 'N')
     {
+      $filter = "XM_Driver_ID='{$driverId}' AND IsSend='Y' AND IsComplete='{$isComplete}' AND IsVoid='N'";
 
         $request = '
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:adin="http://3e.pl/ADInterface">
@@ -20,13 +21,13 @@ class OrderApi extends BaseApi
                     <adin:ModelCRUD>
                        <adin:serviceType>API-GetOrderList</adin:serviceType>
                        <adin:TableName>XX_TransOrder</adin:TableName>
-                       <adin:Filter>XM_Driver_ID=' . $driverId . ' AND IsSend=\'Y\' AND IsComplete=\'N\' AND IsVoid=\'N\'</adin:Filter>
+                       <adin:Filter>' . $filter . '</adin:Filter>
                        <adin:Action>Read</adin:Action>
                        <adin:DataRow>
-                          <adin:field column="IsActive">
-                             <adin:val>Y</adin:val>
-                          </adin:field>
-                       </adin:DataRow>
+                      <adin:field column="IsActive">
+                         <adin:val>Y</adin:val>
+                      </adin:field>
+                   </adin:DataRow>
                     </adin:ModelCRUD>
                     <adin:ADLoginRequest>
                        <adin:user>' . env('ERP_USER') . '</adin:user>
