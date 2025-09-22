@@ -37,10 +37,10 @@ class HistoriController extends Controller
 
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
-        $order = $this->order->getOrderList($driverId);
+        $order = $this->order->getOrderList($driverId, 'Y');
         $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         if (isset($rows['field'])) $rows = [$rows];
-
+        // dd($order);
         $mappedOrders = [];
         foreach ($rows as $row) {
             $fs = $row['field'] ?? [];

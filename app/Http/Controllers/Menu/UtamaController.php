@@ -77,7 +77,7 @@ class UtamaController extends Controller
 
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
-        $order = $this->order->getOrderList($driverId);
+        $order = $this->order->getOrderList($driverId, 'N');
         
         $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         if (isset($rows['field']))
@@ -101,7 +101,7 @@ class UtamaController extends Controller
                 // if ($tmp["IsSend"] && !$tmp['IsVoid'] && !$tmp['IsComplete'])
                 $mappedOrders[] = $tmp;
         }
-        // dd($mappedOrders);
+        //  dd($mappedOrders);
 
         $customerIds = collect($mappedOrders)->pluck('Customer_ID')->filter()->unique();
         $transOrderIds = collect($mappedOrders)->pluck('XX_TransOrder_ID')->filter()->unique();
@@ -802,8 +802,9 @@ class UtamaController extends Controller
 
         // $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address;
         // $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
-        $orderId = '1454767';
+        $orderId = '1455576';
         $detail = $this->order->getOrderDetail($orderId);
+        dd($detail);
 
         $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
@@ -833,7 +834,7 @@ class UtamaController extends Controller
 
         $mappedDetail["pickup_address"] = $detailTransOrder->pickup_address ?? "-";
         $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address ?? "-";
-        // dd($mappedDetail);
+
 
         // return view('menu.utama.konfirmasi-selesai-muat', [
         //     'mappedDetail' => $mappedDetail,
