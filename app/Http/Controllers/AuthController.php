@@ -148,7 +148,7 @@ class AuthController extends Controller
         if (isset($fields['@attributes'])) {
             $fields = [$fields];
         }
-        
+
         $user_id = $fields[0]['@attributes']['lval'] ?? null;
         $name    = $fields[1]['@attributes']['lval'] ?? null;
         $c_bpartner_id   = $fields[2]['@attributes']['lval'] ?? null;

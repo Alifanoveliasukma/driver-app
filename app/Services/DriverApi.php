@@ -8,6 +8,7 @@ class DriverApi extends BaseApi
 {
     public function getDriver($bpartnerId)
     {
+
         $request = '
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:adin="http://3e.pl/ADInterface">
            <soapenv:Header/>
@@ -38,7 +39,7 @@ class DriverApi extends BaseApi
               </adin:queryData>
            </soapenv:Body>
         </soapenv:Envelope>';
-
+        dd($request);
         return $this->sendRequest($request);
     }
 }

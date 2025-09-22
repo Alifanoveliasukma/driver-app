@@ -87,10 +87,9 @@ class HistoriController extends Controller
 
         // Kalau histori kosong
         if (empty($orders)) {
-            return view('menu.histori.no-history');
+            return view('menu.utama.no-order');
         }
 
         return view('menu.histori.index', compact('orders'));
     }
-
 }
