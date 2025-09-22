@@ -78,7 +78,7 @@ class UtamaController extends Controller
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
         $order = $this->order->getOrderList($driverId, 'N');
-        
+
         $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         if (isset($rows['field']))
             $rows = [$rows];
@@ -804,7 +804,7 @@ class UtamaController extends Controller
         // $mappedDetail["delivery_address"] = $detailTransOrder->delivery_address;
         $orderId = '1455576';
         $detail = $this->order->getOrderDetail($orderId);
-        dd($detail);
+
 
         $row = data_get($detail, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         $fields = data_get($row, 'field', []);
