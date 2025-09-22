@@ -39,7 +39,7 @@ class DriverApi extends BaseApi
               </adin:queryData>
            </soapenv:Body>
         </soapenv:Envelope>';
-        dd($request);
+
         return $this->sendRequest($request);
     }
 }
