@@ -37,10 +37,10 @@ class HistoriController extends Controller
 
         $driverId = $mappedDriver['XM_Driver_ID'] ?? null;
 
-        $order = $this->order->getOrderList($driverId, 'Y');
+        $order = $this->order->getOrderList($driverId);
         $rows = data_get($order, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
         if (isset($rows['field'])) $rows = [$rows];
-        // dd($order);
+
         $mappedOrders = [];
         foreach ($rows as $row) {
             $fs = $row['field'] ?? [];
@@ -87,7 +87,7 @@ class HistoriController extends Controller
 
         // Kalau histori kosong
         if (empty($orders)) {
-            return view('menu.utama.no-order');
+            return view('menu.histori.no-history');
         }
 
         return view('menu.histori.index', compact('orders'));
