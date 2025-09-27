@@ -724,7 +724,7 @@ class UtamaController extends Controller
     public function keluarBongkar(Request $request)
     {
         $orderId = $request->input('orderId');
-        $signPath = env('APP_URL') . $request->input("signPath");
+        $fotoSupirPath = env('APP_URL') . $request->input("fotoSupirPath");
         // $fotoDocPath = env('APP_URL') . $request->input("fotoDocPath");
 
         if (empty($orderId)) {
@@ -738,7 +738,7 @@ class UtamaController extends Controller
             'Note' => 'driver confirmation',
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
-            'DocumentDir' => $signPath,
+            'DocumentDir' => $fotoSupirPath,
             // 'DocumentDir2' => $fotoDocPath
         ]);
         if (is_array($updateTracking) && isset($updateTracking['error'])) {

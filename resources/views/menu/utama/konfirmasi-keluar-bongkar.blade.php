@@ -55,41 +55,53 @@
         <input type="hidden" name="UnloadStd" id="UnloadStd">
 
         <!-- <div class="section-divider my-3">
-                    <span>DO - SPJ Detail</span>
-                </div> -->
+                                                                                                            <span>DO - SPJ Detail</span>
+                                                                                                        </div> -->
 
         <div class="form-rows">
             <!-- <div class="unit-row">
-                        <label for="total_tonase">Tonase</label>
-                        <div class="unit-input">
-                            <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
-                                value="{{ $mappedDetail['Tonnage'] }}" disabled>
-                            <span class="unit">Tonase</span>
-                        </div>
-                    </div>
+                                                                                                                <label for="total_tonase">Tonase</label>
+                                                                                                                <div class="unit-input">
+                                                                                                                    <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
+                                                                                                                        value="{{ $mappedDetail['Tonnage'] }}" disabled>
+                                                                                                                    <span class="unit">Tonase</span>
+                                                                                                                </div>
+                                                                                                            </div>
 
-                    <div class="unit-row">
-                        <label for="biaya_tonase">Biaya Tonase</label>
-                        <div class="unit-input">
-                            <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
-                                value="{{ $mappedDetail['TonnageCost'] }}" disabled>
-                        </div>
-                    </div>
+                                                                                                            <div class="unit-row">
+                                                                                                                <label for="biaya_tonase">Biaya Tonase</label>
+                                                                                                                <div class="unit-input">
+                                                                                                                    <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
+                                                                                                                        value="{{ $mappedDetail['TonnageCost'] }}" disabled>
+                                                                                                                </div>
+                                                                                                            </div>
 
-                    <div class="unit-row">
-                        <label for="total_kubikasi">Penjualan Tonase</label>
-                        <div class="unit-input">
-                            <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
-                                value="{{ $mappedDetail['TonnageSales'] }}" disabled>
-                        </div>
-                    </div> -->
+                                                                                                            <div class="unit-row">
+                                                                                                                <label for="total_kubikasi">Penjualan Tonase</label>
+                                                                                                                <div class="unit-input">
+                                                                                                                    <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
+                                                                                                                        value="{{ $mappedDetail['TonnageSales'] }}" disabled>
+                                                                                                                </div>
+                                                                                                            </div> -->
         </div>
 
         <hr>
         </hr>
 
         <div class="form-rows" style="max-width:400px;margin:0 auto;">
-            <div class="section-label">eSigning</div>
+            <div class="foto-upload-wrapper mt-3">
+                <label for="fotoSuratJalan" class="foto-upload-box" id="fotoBox">
+                    <i class="bi bi-camera-fill icon"></i>
+                    <span class="placeholder">Foto Surat Jalan Sebelum bongkar</span>
+                    <img id="fotoPreview" class="preview" alt="Preview foto" />
+                    <span id="fotoName" class="filename"></span>
+                    <input type="file" id="fotoSuratJalan" required accept="image/*" capture="environment" hidden>
+                </label>
+                <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
+                    <i class="bi bi-trash"></i> Hapus Foto
+                </button>
+            </div>
+            {{-- <div class="section-label">eSigning</div>
             <div class="sign-box">
                 <canvas id="signPad" width="360" height="150"></canvas>
             </div>
@@ -97,7 +109,7 @@
 
             <button type="button" id="clearSign" class="btn btn-sm btn-outline-danger mt-2">
                 Hapus Tanda Tangan
-            </button>
+            </button> --}}
 
             {{-- <div class="section-label mt-3">Upload Dokumen</div>
 
@@ -114,7 +126,7 @@
                 <input type="file" id="docFile" accept="image/*" hidden>
 
                 <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
-            </div>--}}
+            </div> --}}
 
             {{-- <div class="foto-upload-wrapper mt-3">
                 <label for="fotoSopir" class="foto-upload-box" id="fotoBox">
@@ -131,10 +143,12 @@
 
         </div>
         <!-- <div class="mt-3" style="max-width:400px;margin:0 auto;">
-                    <div class="next-order w-100">
-                        Tunggu Order Berikutnya
-                    </div>
-                </div> -->
+                                                                                                            <div class="next-order w-100">
+                                                                                                                Tunggu Order Berikutnya
+                                                                                                            </div>
+                                                                                                        </div> -->
+
+
 
         <div class="confirm-note mt-3" style="max-width:400px;margin:0 auto;">
             Dengan melakukan konfirmasi, anda menyetujui hasil proses pembongkaran
@@ -155,66 +169,64 @@
             </div>
         </div>
         <script>
-            let signCanvas;
-            let fotoFile;
-            let signPath = "";
-            let fotoDocPath = "";
-            let selectedDocFile = null;
+            // let signCanvas;
+            let fotoSuratJalan;
+            let fotoSuratJalanPath = "";
 
             document.addEventListener('DOMContentLoaded', function() {
-                (function() {
-                    const c = document.getElementById('signPad');
-                    signCanvas = c;
-                    if (!c) return;
-                    const ctx = c.getContext('2d');
-                    let drawing = false,
-                        last = null;
+                // (function() {
+                //     const c = document.getElementById('signPad');
+                //     signCanvas = c;
+                //     if (!c) return;
+                //     const ctx = c.getContext('2d');
+                //     let drawing = false,
+                //         last = null;
 
-                    const pos = (e) => {
-                        const r = c.getBoundingClientRect();
-                        const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-                        const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-                        return {
-                            x,
-                            y
-                        };
-                    };
-                    const start = (e) => {
-                        drawing = true;
-                        last = pos(e);
-                        e.preventDefault();
-                    };
-                    const move = (e) => {
-                        if (!drawing) return;
-                        const p = pos(e);
-                        ctx.lineWidth = 2;
-                        ctx.lineCap = 'round';
-                        ctx.strokeStyle = '#000';
-                        ctx.beginPath();
-                        ctx.moveTo(last.x, last.y);
-                        ctx.lineTo(p.x, p.y);
-                        ctx.stroke();
-                        last = p;
-                        e.preventDefault();
-                    };
-                    const end = () => {
-                        drawing = false;
-                    };
+                //     const pos = (e) => {
+                //         const r = c.getBoundingClientRect();
+                //         const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+                //         const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+                //         return {
+                //             x,
+                //             y
+                //         };
+                //     };
+                //     const start = (e) => {
+                //         drawing = true;
+                //         last = pos(e);
+                //         e.preventDefault();
+                //     };
+                //     const move = (e) => {
+                //         if (!drawing) return;
+                //         const p = pos(e);
+                //         ctx.lineWidth = 2;
+                //         ctx.lineCap = 'round';
+                //         ctx.strokeStyle = '#000';
+                //         ctx.beginPath();
+                //         ctx.moveTo(last.x, last.y);
+                //         ctx.lineTo(p.x, p.y);
+                //         ctx.stroke();
+                //         last = p;
+                //         e.preventDefault();
+                //     };
+                //     const end = () => {
+                //         drawing = false;
+                //     };
 
-                    c.addEventListener('mousedown', start);
-                    c.addEventListener('mousemove', move);
-                    window.addEventListener('mouseup', end);
-                    c.addEventListener('touchstart', start, {
-                        passive: false
-                    });
-                    c.addEventListener('touchmove', move, {
-                        passive: false
-                    });
-                    c.addEventListener('touchend', end);
+                //     c.addEventListener('mousedown', start);
+                //     c.addEventListener('mousemove', move);
+                //     window.addEventListener('mouseup', end);
+                //     c.addEventListener('touchstart', start, {
+                //         passive: false
+                //     });
+                //     c.addEventListener('touchmove', move, {
+                //         passive: false
+                //     });
+                //     c.addEventListener('touchend', end);
 
-                    const clearBtn = document.getElementById('clearSign');
-                    if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
-                })();
+                //     const clearBtn = document.getElementById('clearSign');
+                //     if (clearBtn) clearBtn.addEventListener('click', () => ctx.clearRect(0, 0, c.width, c.height));
+                // })();
 
                 function setupFilePreview(opts) {
                     const input = document.getElementById(opts.inputId);
@@ -233,8 +245,8 @@
                         if (placeholder) placeholder.style.display = 'flex';
                         if (removeBtn) removeBtn.style.display = 'none';
                         if (box) box.classList.remove('has-file');
-                        selectedDocFile = null;
-                        fotoFile = null;
+
+                        fotoSuratJalan = null;
                     }
 
                     input.addEventListener('change', () => {
@@ -254,7 +266,7 @@
                             if (box) box.classList.add('has-file');
                         };
                         r.readAsDataURL(f);
-                        fotoFile = f; 
+                        fotoSuratJalan = f;
                     });
 
                     if (removeBtn) removeBtn.addEventListener('click', e => {
@@ -263,20 +275,20 @@
                     });
                 }
 
+                // setupFilePreview({
+                //     inputId: 'docFile',
+                //     previewId: 'docPreview',
+                //     placeholderId: 'docPh',
+                //     removeBtnId: 'removeDoc',
+                //     folder: 'document'
+                // });
                 setupFilePreview({
-                    inputId: 'docFile',
-                    previewId: 'docPreview',
-                    placeholderId: 'docPh',
-                    removeBtnId: 'removeDoc',
-                    folder: 'document'
-                });
-                setupFilePreview({
-                    inputId: 'fotoSopir',
+                    inputId: 'fotoSuratJalan',
                     previewId: 'fotoPreview',
                     nameElId: 'fotoName',
                     boxId: 'fotoBox',
                     removeBtnId: 'clearFoto',
-                    folder: 'foto-sopir'
+                    folder: 'foto-surat-jalan'
                 });
             });
 
@@ -328,44 +340,46 @@
                 const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
 
                 if (left >= threshold) {
-                    if (!fotoFile && !signCanvas) {
-                        alert("Tandatangan diisi");
+                    if (!fotoSuratJalan) {
+
+                        alert("Harap upload foto surat jalan terlebih dahulu sebelum konfirmasi.");
+
                         resetSlider();
                         return;
                     }
                     btn.style.pointerEvents = "none";
                     try {
                         // upload tanda tangan
-                        const dataURL = signCanvas.toDataURL('image/png');
-                        const blob = await (await fetch(dataURL)).blob();
-                        const fd1 = new FormData();
-                        fd1.append('foto', blob, 'signature.png');
-                        fd1.append('folder', 'signature');
-                        const signRes = await fetch('/api/upload-foto', {
-                            method: 'POST',
-                            body: fd1,
-                            headers: {
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                                    'content')
-                            }
-                        });
-                        const signData = await signRes.json();
-                        signPath = signData;
-
-                        // upload foto doc
-                        // const fd2 = new FormData();
-                        // fd2.append('foto', fotoFile);
-                        // fd2.append('folder', 'document');
-                        // const fotoRes = await fetch('/api/upload-foto', {
+                        // const dataURL = signCanvas.toDataURL('image/png');
+                        // const blob = await (await fetch(dataURL)).blob();
+                        // const fd1 = new FormData();
+                        // fd1.append('foto', blob, 'signature.png');
+                        // fd1.append('folder', 'signature');
+                        // const signRes = await fetch('/api/upload-foto', {
                         //     method: 'POST',
-                        //     body: fd2,
+                        //     body: fd1,
                         //     headers: {
                         //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                         //             'content')
                         //     }
                         // });
-                        // const fotoData = await fotoRes.json();
-                        // fotoDocPath = fotoData;
+                        // const signData = await signRes.json();
+                        // signPath = signData;
+
+                        // upload foto doc
+                        const fd2 = new FormData();
+                        fd2.append('foto', fotoSuratJalan);
+                        fd2.append('folder', 'foto-surat-jalan');
+                        const fotoRes = await fetch('/api/upload-foto', {
+                            method: 'POST',
+                            body: fd2,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                    'content')
+                            }
+                        });
+                        const fotoData = await fotoRes.json();
+                        fotoDocPath = fotoData;
 
                         // submit konfirmasi
                         const resp = await fetch(postUrl, {
@@ -379,7 +393,7 @@
                             },
                             body: JSON.stringify({
                                 orderId,
-                                signPath: signPath?.path,
+                                fotoSuratJalanPath: fotoSuratJalanPath?.path,
                             })
                         });
                         const data = await resp.json();

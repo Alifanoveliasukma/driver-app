@@ -52,7 +52,7 @@
                 <div id="jamMulaiBongkar" style="font-weight: bold;">--</div>
             </div>
         </div>
-        <input type="hidden" name="UnloadStd" id="UnloadStd">
+        <input type="hidden" required name="UnloadStd" id="UnloadStd">
 
         <div class="position-fixed start-0 end-0 px-3" style="bottom: 80px; z-index: 999;">
             <div class="slide-confirm-container px-3">
@@ -208,6 +208,11 @@
             const threshold = container.clientWidth - btn.clientWidth - 5;
 
             if (left >= threshold) {
+                if (!fotoMuatan) {
+                    alert("Harap upload foto muatan terlebih dahulu sebelum konfirmasi.");
+                    resetSlider();
+                    return;
+                }
                 btn.style.pointerEvents = 'none'; // cegah double submit
 
                 try {

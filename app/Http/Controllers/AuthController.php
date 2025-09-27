@@ -23,7 +23,7 @@ class AuthController extends Controller
         $data = [
             'title' => 'Log in',
         ];
-
+        // session(['username' => 'Testdrive', 'roleid' => 1000049, 'orgid' => 1000005]);
         switch ($step) {
             case 'roleorg':
                 if (!session()->has('username')) {

@@ -59,7 +59,7 @@
                 <span class="placeholder">Foto Sopir</span>
                 <img id="fotoPreview" class="preview" alt="Preview foto" />
                 <span id="fotoName" class="filename"></span>
-                <input type="file" id="fotoSopir" accept="image/*" capture="environment" hidden>
+                <input type="file" required id="fotoSopir" accept="image/*" capture="environment" hidden>
             </label>
             <button type="button" class="btn-delete-foto" id="clearFoto" style="display:none;">
                 <i class="bi bi-trash"></i> Hapus Foto
@@ -78,7 +78,7 @@
                 <i class="bi bi-camera-fill"></i>
                 <span>Upload Foto Surat Jalan</span>
             </label>
-            <input type="file" id="docFile" accept="image/*" hidden>
+            <input type="file" required id="docFile" accept="image/*" hidden>
 
             <img id="docPreview" class="doc-preview" alt="Preview dokumen" style="display:none;">
         </div>
@@ -254,6 +254,16 @@
             const threshold = container.clientWidth - btn.clientWidth - 5;
 
             if (left >= threshold) {
+                if (!fotoSupir) {
+                    alert("Harap upload foto sopir terlebih dahulu sebelum konfirmasi.");
+                    resetSlider();
+                    return;
+                }
+                if (!dokumenFile) {
+                    alert("Harap upload dokumen file terlebih dahulu sebelum konfirmasi.");
+                    resetSlider();
+                    return;
+                }
                 // cegah double submit
                 btn.style.pointerEvents = 'none';
 
