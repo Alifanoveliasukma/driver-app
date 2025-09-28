@@ -750,7 +750,7 @@ class UtamaController extends Controller
         }
         $update = $this->orderUpdate->updateOrder($orderId, [
             'Status' => 'FINISHED',
-            'IsComplete' => 'Y',
+            // 'IsComplete' => 'Y',
             'OutUnloadDate' => now()->format('Y-m-d H:i:s'),
         ]);
 
