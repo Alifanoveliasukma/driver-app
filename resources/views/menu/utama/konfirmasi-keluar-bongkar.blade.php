@@ -55,34 +55,34 @@
         <input type="hidden" name="UnloadStd" id="UnloadStd">
 
         <!-- <div class="section-divider my-3">
-                                                                                                            <span>DO - SPJ Detail</span>
-                                                                                                        </div> -->
+                                                                                                                                    <span>DO - SPJ Detail</span>
+                                                                                                                                </div> -->
 
         <div class="form-rows">
             <!-- <div class="unit-row">
-                                                                                                                <label for="total_tonase">Tonase</label>
-                                                                                                                <div class="unit-input">
-                                                                                                                    <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
-                                                                                                                        value="{{ $mappedDetail['Tonnage'] }}" disabled>
-                                                                                                                    <span class="unit">Tonase</span>
-                                                                                                                </div>
-                                                                                                            </div>
+                                                                                                                                        <label for="total_tonase">Tonase</label>
+                                                                                                                                        <div class="unit-input">
+                                                                                                                                            <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
+                                                                                                                                                value="{{ $mappedDetail['Tonnage'] }}" disabled>
+                                                                                                                                            <span class="unit">Tonase</span>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
 
-                                                                                                            <div class="unit-row">
-                                                                                                                <label for="biaya_tonase">Biaya Tonase</label>
-                                                                                                                <div class="unit-input">
-                                                                                                                    <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
-                                                                                                                        value="{{ $mappedDetail['TonnageCost'] }}" disabled>
-                                                                                                                </div>
-                                                                                                            </div>
+                                                                                                                                    <div class="unit-row">
+                                                                                                                                        <label for="biaya_tonase">Biaya Tonase</label>
+                                                                                                                                        <div class="unit-input">
+                                                                                                                                            <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
+                                                                                                                                                value="{{ $mappedDetail['TonnageCost'] }}" disabled>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
 
-                                                                                                            <div class="unit-row">
-                                                                                                                <label for="total_kubikasi">Penjualan Tonase</label>
-                                                                                                                <div class="unit-input">
-                                                                                                                    <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
-                                                                                                                        value="{{ $mappedDetail['TonnageSales'] }}" disabled>
-                                                                                                                </div>
-                                                                                                            </div> -->
+                                                                                                                                    <div class="unit-row">
+                                                                                                                                        <label for="total_kubikasi">Penjualan Tonase</label>
+                                                                                                                                        <div class="unit-input">
+                                                                                                                                            <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
+                                                                                                                                                value="{{ $mappedDetail['TonnageSales'] }}" disabled>
+                                                                                                                                        </div>
+                                                                                                                                    </div> -->
         </div>
 
         <hr>
@@ -92,7 +92,7 @@
             <div class="foto-upload-wrapper mt-3">
                 <label for="fotoSuratJalan" class="foto-upload-box" id="fotoBox">
                     <i class="bi bi-camera-fill icon"></i>
-                    <span class="placeholder">Foto Surat Jalan Sebelum bongkar</span>
+                    <span class="placeholder text-center">Foto Surat Jalan yang ada stamplenya Sebelum bongkar</span>
                     <img id="fotoPreview" class="preview" alt="Preview foto" />
                     <span id="fotoName" class="filename"></span>
                     <input type="file" id="fotoSuratJalan" required accept="image/*" capture="environment" hidden>
@@ -143,10 +143,10 @@
 
         </div>
         <!-- <div class="mt-3" style="max-width:400px;margin:0 auto;">
-                                                                                                            <div class="next-order w-100">
-                                                                                                                Tunggu Order Berikutnya
-                                                                                                            </div>
-                                                                                                        </div> -->
+                                                                                                                                    <div class="next-order w-100">
+                                                                                                                                        Tunggu Order Berikutnya
+                                                                                                                                    </div>
+                                                                                                                                </div> -->
 
 
 
@@ -379,7 +379,7 @@
                             }
                         });
                         const fotoData = await fotoRes.json();
-                        fotoDocPath = fotoData;
+                        fotoSuratJalanPath = fotoData;
 
                         // submit konfirmasi
                         const resp = await fetch(postUrl, {

@@ -462,7 +462,8 @@ class UtamaController extends Controller
     {
         $orderId = $request->input('orderId');
         $fotoSupirPath = env('APP_URL') . $request->input("fotoSupirPath");
-        $fotoMuatanPath = env('APP_URL') . $request->input("dokumenFilePath");
+        $dokumenFilePath = env('APP_URL') . $request->input("dokumenFilePath");
+
         if (empty($orderId)) {
             return response()->json([
                 'success' => false,
@@ -490,7 +491,7 @@ class UtamaController extends Controller
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
             'DocumentDir' => $fotoSupirPath,
-            'DocumentDir2' => $fotoMuatanPath
+            'DocumentDir2' => $dokumenFilePath
         ]);
 
         return response()->json([
@@ -724,7 +725,7 @@ class UtamaController extends Controller
     public function keluarBongkar(Request $request)
     {
         $orderId = $request->input('orderId');
-        $fotoSupirPath = env('APP_URL') . $request->input("fotoSupirPath");
+        $fotoSuratJalanPath = env('APP_URL') . $request->input("fotoSuratJalanPath");
         // $fotoDocPath = env('APP_URL') . $request->input("fotoDocPath");
 
         if (empty($orderId)) {
@@ -738,7 +739,7 @@ class UtamaController extends Controller
             'Note' => 'driver confirmation',
             'Reference' => 'AUD',
             'DateDoc' => now()->format('Y-m-d H:i:s'),
-            'DocumentDir' => $fotoSupirPath,
+            'DocumentDir' => $fotoSuratJalanPath,
             // 'DocumentDir2' => $fotoDocPath
         ]);
         if (is_array($updateTracking) && isset($updateTracking['error'])) {

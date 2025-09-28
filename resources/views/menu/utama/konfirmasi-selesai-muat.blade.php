@@ -307,7 +307,8 @@
                         });
                         if (!resDoc.ok) throw new Error(`Gagal upload dokumen (HTTP ${resDoc.status})`);
                         const dataDoc = await resDoc.json();
-                        dokumenFilePath = dataDoc.path;
+
+                        dokumenFilePath = dataDoc;
                     }
 
 
