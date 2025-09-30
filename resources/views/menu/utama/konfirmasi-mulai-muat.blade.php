@@ -156,13 +156,13 @@
 
 
                         if (!isJson) {
-                            const text = await resp.text();
+                            const text = await res.text();
                             console.error('Response bukan JSON:', text.substring(0, 500));
                             alert('Server mengembalikan respons yang tidak valid. Lihat console untuk detail.');
                             resetSlider();
                             return;
                         }
-                        const data = await resp.json();
+                        const data = await res.json();
 
                         if (res.ok && data?.success) {
                             window.location.href = data.nextUrl ??
@@ -175,8 +175,8 @@
                             resetSlider();
                         }
                     })
-                    .catch(() => {
-                        alert('Kesalahan jaringan.');
+                    .catch((e) => {
+                        alert('Kesalahan jaringan.', e.message);
                         resetSlider();
                     })
                     .finally(() => {

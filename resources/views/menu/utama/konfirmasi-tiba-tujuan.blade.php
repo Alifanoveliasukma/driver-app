@@ -153,15 +153,15 @@
 
 
                         if (!isJson) {
-                            const text = await resp.text();
+                            const text = await res.text();
                             console.error('Response bukan JSON:', text.substring(0, 500));
                             alert('Server mengembalikan respons yang tidak valid. Lihat console untuk detail.');
                             resetSlider();
                             return;
                         }
-                        const data = await resp.json();
+                        const data = await res.json();
 
-                        if (res.ok && data?.success) {
+                        if (res.ok && isJson && data?.success) {
                             window.location.href = data.nextUrl ?? nextUrl;
                         } else if (res.status === 419) {
                             alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');

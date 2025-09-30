@@ -55,34 +55,34 @@
         <input type="hidden" name="UnloadStd" id="UnloadStd">
 
         <!-- <div class="section-divider my-3">
-                                                                                                                                        <span>DO - SPJ Detail</span>
-                                                                                                                                    </div> -->
+                                                                                                                                                    <span>DO - SPJ Detail</span>
+                                                                                                                                                </div> -->
 
         <div class="form-rows">
             <!-- <div class="unit-row">
-                                                                                                                                            <label for="total_tonase">Tonase</label>
-                                                                                                                                            <div class="unit-input">
-                                                                                                                                                <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
-                                                                                                                                                    value="{{ $mappedDetail['Tonnage'] }}" disabled>
-                                                                                                                                                <span class="unit">Tonase</span>
-                                                                                                                                            </div>
-                                                                                                                                        </div>
+                                                                                                                                                        <label for="total_tonase">Tonase</label>
+                                                                                                                                                        <div class="unit-input">
+                                                                                                                                                            <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
+                                                                                                                                                                value="{{ $mappedDetail['Tonnage'] }}" disabled>
+                                                                                                                                                            <span class="unit">Tonase</span>
+                                                                                                                                                        </div>
+                                                                                                                                                    </div>
 
-                                                                                                                                        <div class="unit-row">
-                                                                                                                                            <label for="biaya_tonase">Biaya Tonase</label>
-                                                                                                                                            <div class="unit-input">
-                                                                                                                                                <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
-                                                                                                                                                    value="{{ $mappedDetail['TonnageCost'] }}" disabled>
-                                                                                                                                            </div>
-                                                                                                                                        </div>
+                                                                                                                                                    <div class="unit-row">
+                                                                                                                                                        <label for="biaya_tonase">Biaya Tonase</label>
+                                                                                                                                                        <div class="unit-input">
+                                                                                                                                                            <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
+                                                                                                                                                                value="{{ $mappedDetail['TonnageCost'] }}" disabled>
+                                                                                                                                                        </div>
+                                                                                                                                                    </div>
 
-                                                                                                                                        <div class="unit-row">
-                                                                                                                                            <label for="total_kubikasi">Penjualan Tonase</label>
-                                                                                                                                            <div class="unit-input">
-                                                                                                                                                <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
-                                                                                                                                                    value="{{ $mappedDetail['TonnageSales'] }}" disabled>
-                                                                                                                                            </div>
-                                                                                                                                        </div> -->
+                                                                                                                                                    <div class="unit-row">
+                                                                                                                                                        <label for="total_kubikasi">Penjualan Tonase</label>
+                                                                                                                                                        <div class="unit-input">
+                                                                                                                                                            <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
+                                                                                                                                                                value="{{ $mappedDetail['TonnageSales'] }}" disabled>
+                                                                                                                                                        </div>
+                                                                                                                                                    </div> -->
         </div>
 
         <hr>
@@ -143,10 +143,10 @@
 
         </div>
         <!-- <div class="mt-3" style="max-width:400px;margin:0 auto;">
-                                                                                                                                        <div class="next-order w-100">
-                                                                                                                                            Tunggu Order Berikutnya
-                                                                                                                                        </div>
-                                                                                                                                    </div> -->
+                                                                                                                                                    <div class="next-order w-100">
+                                                                                                                                                        Tunggu Order Berikutnya
+                                                                                                                                                    </div>
+                                                                                                                                                </div> -->
 
 
 

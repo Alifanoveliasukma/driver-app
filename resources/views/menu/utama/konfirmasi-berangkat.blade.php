@@ -14,11 +14,11 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         <!-- <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-light text-dark">
-                            <i class="bi bi-box-arrow-right"></i> Logout
-                        </button>
-                    </form> -->
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-light text-dark">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </form> -->
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>
@@ -172,13 +172,13 @@
 
 
                         if (!isJson) {
-                            const text = await resp.text();
+                            const text = await res.text();
                             console.error('Response bukan JSON:', text.substring(0, 500));
                             alert('Server mengembalikan respons yang tidak valid. Lihat console untuk detail.');
                             resetSlider();
                             return;
                         }
-                        const data = await resp.json();
+                        const data = await res.json();
 
                         if (res.ok && data?.success) {
                             window.location.href = data.nextUrl;

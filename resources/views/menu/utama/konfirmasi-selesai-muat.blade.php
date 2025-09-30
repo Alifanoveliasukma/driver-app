@@ -331,7 +331,7 @@
 
                     const ct = resp.headers.get('content-type') || '';
                     const isJson = ct.includes('application/json');
-
+                    console.log(isJson, "TEST TEST")
 
                     if (!isJson) {
                         const text = await resp.text();
@@ -341,7 +341,7 @@
                         return;
                     }
                     const data = await resp.json();
-                    // console.log(data, "TEST TEST")
+                    console.log(data, "TEST TEST")
                     if (resp.ok && data?.success) {
                         window.location.href = data.nextUrl ?? nextUrl;
                     } else if (resp.status === 419) {
