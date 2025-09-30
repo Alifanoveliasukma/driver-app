@@ -14,11 +14,11 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
         <!-- <form action="{{ route('logout') }}" method="POST" style="position: absolute; top: 10px; right: 10px;">
-            @csrf
-            <button type="submit" class="btn btn-sm btn-light text-dark">
-                <i class="bi bi-box-arrow-right"></i> Logout
-            </button>
-        </form> -->
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-light text-dark">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
+                    </form> -->
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>
@@ -76,12 +76,11 @@
         <div class="slide-track bg-light rounded shadow-sm d-flex align-items-center justify-content-between px-3 py-2"
             style="max-width:400px; margin:0 auto; position:relative;">
             <div class="slide-button bg-white d-flex justify-content-center align-items-center"
-                onmousedown="startSlide(event)"
-                ontouchstart="startSlide(event)"   
+                onmousedown="startSlide(event)" ontouchstart="startSlide(event)"
                 style="width:48px;height:48px;border-radius:0; position:absolute; left:0; top:50%; transform:translateY(-50%);
                         touch-action:none; -webkit-user-select:none; user-select:none;">
-            <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
-                style="width:30px;height:30px; pointer-events:none;" draggable="false">
+                <img src="{{ asset('assets/icon/img-right.png') }}" alt="Right Arrow"
+                    style="width:30px;height:30px; pointer-events:none;" draggable="false">
             </div>
             <span class="slide-label text-primary fw-semibold" style="margin-left:56px;">Konfirmasi Berangkat</span>
         </div>
@@ -92,108 +91,127 @@
         let offsetX = 0;
 
         function startSlide(e) {
-        isDragging = true;
+            isDragging = true;
 
-        // cegah halaman scroll saat mulai sentuh
-        if (e.type === 'touchstart') e.preventDefault();
+            // cegah halaman scroll saat mulai sentuh
+            if (e.type === 'touchstart') e.preventDefault();
 
-        const btn = document.querySelector('.slide-button');
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const btn = document.querySelector('.slide-button');
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-        // supaya tombol tidak "loncat" saat awal geser
-        const currentLeft = parseInt(btn.style.left || '0', 10);
-        offsetX = clientX - currentLeft;
+            // supaya tombol tidak "loncat" saat awal geser
+            const currentLeft = parseInt(btn.style.left || '0', 10);
+            offsetX = clientX - currentLeft;
 
-        document.addEventListener('mousemove', onSlide);
-        document.addEventListener('mouseup', stopSlide);
-        document.addEventListener('touchmove', onSlide, { passive: false });
-        document.addEventListener('touchend', stopSlide);
+            document.addEventListener('mousemove', onSlide);
+            document.addEventListener('mouseup', stopSlide);
+            document.addEventListener('touchmove', onSlide, {
+                passive: false
+            });
+            document.addEventListener('touchend', stopSlide);
         }
 
         function onSlide(e) {
-        if (!isDragging) return;
-        if (e.type === 'touchmove') e.preventDefault();
+            if (!isDragging) return;
+            if (e.type === 'touchmove') e.preventDefault();
 
-        const btn = document.querySelector('.slide-button');
-        const container = document.querySelector('.slide-track');
+            const btn = document.querySelector('.slide-button');
+            const container = document.querySelector('.slide-track');
 
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
 
-        let moveX = clientX - offsetX;
-        moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
-        btn.style.left = moveX + 'px';
+            let moveX = clientX - offsetX;
+            moveX = Math.max(0, Math.min(moveX, container.clientWidth - btn.clientWidth));
+            btn.style.left = moveX + 'px';
 
-        if (moveX >= container.clientWidth - btn.clientWidth - 5) {
-            btn.style.background = '#198754';
-            btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color:purple;"></i>';
-        } else {
-            btn.style.background = '#ffffff';
-            btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
-        }
+            if (moveX >= container.clientWidth - btn.clientWidth - 5) {
+                btn.style.background = '#198754';
+                btn.innerHTML = '<i class="bi bi-check-lg" style="font-size:24px; color:purple;"></i>';
+            } else {
+                btn.style.background = '#ffffff';
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+            }
         }
 
         function stopSlide() {
-        isDragging = false;
+            isDragging = false;
 
-        const btn = document.querySelector('.slide-button');
-        const container = document.querySelector('.slide-track');
+            const btn = document.querySelector('.slide-button');
+            const container = document.querySelector('.slide-track');
 
-        const postUrl = @json(route('utama.konfirmasi-berangkat'));
-        const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-        const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
-        const status  = @json($mappedDetail['Status'] ?? '');
-        const kmTake  = document.getElementById('kmTake').value || 0;
+            const postUrl = @json(route('utama.konfirmasi-berangkat'));
+            const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
+            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+            const status = @json($mappedDetail['Status'] ?? '');
+            const kmTake = document.getElementById('kmTake').value || 0;
 
-        const left = parseInt(btn.style.left || '0', 10);
-        const threshold = container.clientWidth - btn.clientWidth - 5;
+            const left = parseInt(btn.style.left || '0', 10);
+            const threshold = container.clientWidth - btn.clientWidth - 5;
 
-        if (left >= threshold) {
-            btn.style.pointerEvents = 'none';
-            fetch(postUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            body: JSON.stringify({ orderId, kmTake, status }),
-            })
-            .then(async (res) => {
-            const ct = res.headers.get('content-type') || '';
-            const isJson = ct.includes('application/json');
-            const data = isJson ? await res.json() : null;
-            if (res.ok && isJson && data?.success) {
-                window.location.href = data.nextUrl;
-            } else if (res.status === 419) {
-                alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
-                resetSlider();
+            if (left >= threshold) {
+                btn.style.pointerEvents = 'none';
+                fetch(postUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: JSON.stringify({
+                            orderId,
+                            kmTake,
+                            status
+                        }),
+                    })
+                    .then(async (res) => {
+                        const ct = res.headers.get('content-type') || '';
+                        const isJson = ct.includes('application/json');
+
+
+
+                        if (!isJson) {
+                            const text = await resp.text();
+                            console.error('Response bukan JSON:', text.substring(0, 500));
+                            alert('Server mengembalikan respons yang tidak valid. Lihat console untuk detail.');
+                            resetSlider();
+                            return;
+                        }
+                        const data = await resp.json();
+
+                        if (res.ok && data?.success) {
+                            window.location.href = data.nextUrl;
+                        } else if (res.status === 419) {
+                            alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
+                            resetSlider();
+                        } else {
+                            alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
+                            resetSlider();
+                        }
+                    })
+                    .catch(() => {
+                        alert('Kesalahan jaringan.');
+                        resetSlider();
+                    })
+                    .finally(() => {
+                        btn.style.pointerEvents = '';
+                    });
             } else {
-                alert((isJson && data?.message) || `Gagal konfirmasi (HTTP ${res.status}).`);
                 resetSlider();
             }
-            })
-            .catch(() => {
-            alert('Kesalahan jaringan.');
-            resetSlider();
-            })
-            .finally(() => {
-            btn.style.pointerEvents = '';
-            });
-        } else {
-            resetSlider();
-        }
 
-        document.removeEventListener('mousemove', onSlide);
-        document.removeEventListener('mouseup', stopSlide);
-        document.removeEventListener('touchmove', onSlide);
-        document.removeEventListener('touchend', stopSlide);
+            document.removeEventListener('mousemove', onSlide);
+            document.removeEventListener('mouseup', stopSlide);
+            document.removeEventListener('touchmove', onSlide);
+            document.removeEventListener('touchend', stopSlide);
 
-        function resetSlider() {
-            btn.style.left = '0px';
-            btn.style.background = '#ffffff';
-            btn.innerHTML = '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
-        }
+            function resetSlider() {
+                btn.style.left = '0px';
+                btn.style.background = '#ffffff';
+                btn.innerHTML =
+                    '<i class="bi bi-chevron-double-right text-primary" style="font-size:24px; transform: translateX(8px);"></i>';
+            }
         }
 
         // let isDragging = false;

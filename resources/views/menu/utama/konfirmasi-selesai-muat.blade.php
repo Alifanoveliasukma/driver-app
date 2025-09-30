@@ -331,9 +331,18 @@
 
                     const ct = resp.headers.get('content-type') || '';
                     const isJson = ct.includes('application/json');
-                    const data = isJson ? await resp.json() : null;
+
+
+                    if (!isJson) {
+                        const text = await resp.text();
+                        console.error('Response bukan JSON:', text.substring(0, 500));
+                        alert('Server mengembalikan respons yang tidak valid. Lihat console untuk detail.');
+                        resetSlider();
+                        return;
+                    }
+                    const data = await resp.json();
                     // console.log(data, "TEST TEST")
-                    if (resp.ok && isJson && data?.success) {
+                    if (resp.ok && data?.success) {
                         window.location.href = data.nextUrl ?? nextUrl;
                     } else if (resp.status === 419) {
                         alert('Sesi kedaluwarsa (419). Refresh halaman lalu coba lagi.');
