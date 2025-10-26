@@ -7,6 +7,9 @@ use App\Http\Controllers\Menu\UtamaController;
 use App\Http\Controllers\Menu\HistoriController;
 use App\Http\Controllers\Menu\UjpController;
 use App\Http\Controllers\Menu\ProfilController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\TransportTrackingController;
+use App\Http\Controllers\DashboardController;
 
 Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name('login')->middleware('redirectIfLoggedIn');
 Route::get('/', function () {
@@ -14,11 +17,7 @@ Route::get('/', function () {
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-
-Route::get('/no-order', function () {
-    return view('menu.utama.no-order');
-});
-
+// proses tracking
 Route::get('/utama/order', [UtamaController::class, 'getOrder'])
     ->name('menu.list-order');
 
@@ -68,6 +67,27 @@ Route::get('/cek_status', [UtamaController::class, 'cek_status']);
 
 Route::get('/cek_xml', [UtamaController::class, 'getOrderDetail']);
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+// Driver
+Route::get('/driver', [DriverController::class, 'index'])->name('driver.index');
+// Step 1 - Data Dasar Driver
+Route::get('driver/create-step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
+Route::post('driver/create-step-one', [DriverController::class, 'postCreateStepOne'])->name('driver.create.step.one.post');
+
+// Step 2 - Informasi Kendaraan & Akun
+Route::get('driver/create-step-two', [DriverController::class, 'createStepTwo'])->name('driver.create.step.two');
+Route::post('driver/create-step-two', [DriverController::class, 'postCreateStepTwo'])->name('driver.create.step.two.post');
+
+// Step 3 - Catatan & Status
+Route::get('driver/create-step-three', [DriverController::class, 'createStepThree'])->name('driver.create.step.three');
+Route::post('driver/create-step-three', [DriverController::class, 'postCreateStepThree'])->name('driver.create.step.three.post');
+// Route::get('/driver/create', [DriverController::class, 'create'])->name('driver.create');
+Route::get('/driver/{id}/edit', [DriverController::class, 'edit'])->name('driver.edit');
+Route::get('/driver/{id}', [DriverController::class, 'detail'])->name('driver.detail');
+
+// Transport Tracking
+Route::get('/histori/all', [HistoriController::class, 'historiPlanner'])->name('histori.planner');
 
 // // Route::get('/konfirmasi-berangkat', [UtamaController::class, 'getOrder'])->name('menu.konfirmasi-berangkat');
 // Route::post('/utama/tiba-muat', [UtamaController::class, 'tibaMuat'])->name('utama.konfirmasi-tiba-muat');
@@ -75,6 +95,10 @@ Route::get('/cek_xml', [UtamaController::class, 'getOrderDetail']);
 Route::get('/ujp', [UjpController::class, 'ujp'])->name('menu.ujp');
 Route::get('/histori', [HistoriController::class, 'histori'])->name('menu.histori');
 Route::get('/profil', [ProfilController::class, 'profil'])->name('menu.profil');
+
+Route::get('/no-order', function () {
+    return view('menu.utama.no-order');
+});
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

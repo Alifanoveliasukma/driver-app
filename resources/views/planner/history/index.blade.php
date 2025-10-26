@@ -1,6 +1,6 @@
 @extends('layouts.template-planner')
 
-@section('title', 'Histori Order')
+@section('title', 'Histori Transport Planner')
 
 @section('content')
 <div class="container py-3">
@@ -8,13 +8,13 @@
         <button class="btn btn-outline-primary me-3" onclick="window.history.back()" aria-label="Kembali">
             <i class="bi bi-chevron-left"></i>
         </button>
-        <h4 class="fw-bold text-primary mb-0">Histori Order</h4>
+        <h4 class="fw-bold text-primary mb-0">Histori Pengiriman - Planner</h4>
     </div>
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="historyTable" class="table table-bordered table-hover align-middle">
+                <table id="plannerHistoryTable" class="table table-bordered table-hover align-middle">
                     <thead class="table-primary text-center">
                         <tr>
                             <th>No</th>
@@ -28,7 +28,7 @@
                     </thead>
                     <tbody>
                         @forelse ($orders as $i => $o)
-                            @php
+                           @php
                                 $noSp = data_get($o, 'Value', '-');
                                 $etaRaw = data_get($o, 'ETA');
                                 $etdRaw = data_get($o, 'ETD');
@@ -45,14 +45,20 @@
                                     $tglSelesai = '-';
                                 }
 
-                                $badgeClass = match (strtoupper($status)) {
-                                    'FINISHED' => 'success',
-                                    'ON GOING', 'IN PROGRESS' => 'warning',
-                                    'DRAFT' => 'secondary',
-                                    'CANCELLED' => 'danger',
-                                    default => 'info',
-                                };
+                                // ✅ Versi aman PHP 7+
+                                if (strtoupper($status) === 'FINISHED') {
+                                    $badgeClass = 'success';
+                                } elseif (in_array(strtoupper($status), ['ON GOING', 'IN PROGRESS'])) {
+                                    $badgeClass = 'warning';
+                                } elseif (strtoupper($status) === 'DRAFT') {
+                                    $badgeClass = 'secondary';
+                                } elseif (strtoupper($status) === 'CANCELLED') {
+                                    $badgeClass = 'danger';
+                                } else {
+                                    $badgeClass = 'info';
+                                }
                             @endphp
+
 
                             <tr>
                                 <td class="text-center">{{ $i + 1 }}</td>
@@ -67,7 +73,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted">Belum ada histori order.</td>
+                                <td colspan="7" class="text-center text-muted">Belum ada histori pengiriman.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -85,7 +91,7 @@
 
 <script>
     $(document).ready(function () {
-        $('#historyTable').DataTable({
+        $('#plannerHistoryTable').DataTable({
             pageLength: 10,
             order: [[3, 'desc']], // urut berdasarkan tanggal selesai
             language: {
@@ -99,3 +105,8 @@
                     previous: "Sebelumnya",
                     next: "Berikutnya"
                 }
+            }
+        });
+    });
+</script>
+@endsection
