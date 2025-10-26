@@ -17,63 +17,44 @@
                 <table id="plannerHistoryTable" class="table table-bordered table-hover align-middle">
                     <thead class="table-primary text-center">
                         <tr>
-                            <th>No</th>
-                            <th>Surat Jalan</th>
-                            <th>ID Order</th>
-                            <th>Tanggal Selesai</th>
-                            <th>Customer</th>
-                            <th>Route</th>
+                            <th>Transport Sales</th>
+                            <th>Reference</th>
                             <th>Status</th>
+                            <th>Document Date</th>
+                            <th>Note</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($orders as $i => $o)
-                           @php
-                                $noSp = data_get($o, 'Value', '-');
-                                $etaRaw = data_get($o, 'ETA');
-                                $etdRaw = data_get($o, 'ETD');
-                                $customerName = data_get($o, 'Customer_Name');
-                                $route = data_get($o, 'route');
-                                $orderId = data_get($o, 'XX_TransOrder_ID');
-                                $status = data_get($o, 'Status');
-
-                                $etaClean = $etaRaw ? str_replace('.0', '', $etaRaw) : null;
-
-                                try {
-                                    $tglSelesai = $etaClean ? \Carbon\Carbon::parse($etaClean)->translatedFormat('d M Y') : '-';
-                                } catch (\Exception $e) {
-                                    $tglSelesai = '-';
-                                }
-
-                                // ✅ Versi aman PHP 7+
-                                if (strtoupper($status) === 'FINISHED') {
-                                    $badgeClass = 'success';
-                                } elseif (in_array(strtoupper($status), ['ON GOING', 'IN PROGRESS'])) {
-                                    $badgeClass = 'warning';
-                                } elseif (strtoupper($status) === 'DRAFT') {
-                                    $badgeClass = 'secondary';
-                                } elseif (strtoupper($status) === 'CANCELLED') {
-                                    $badgeClass = 'danger';
-                                } else {
-                                    $badgeClass = 'info';
-                                }
+                        @forelse ($orders as $row)
+                            @php
+                                $transportSales = data_get($row, 'Value', '-');
+                                $reference = data_get($row, 'Reference', '-');
+                                $status = data_get($row, 'Status', '-');
+                                $documentDate = data_get($row, 'DocumentDate', '-');
+                                $note = data_get($row, 'Note', '-');
                             @endphp
-
-
                             <tr>
-                                <td class="text-center">{{ $i + 1 }}</td>
-                                <td>{{ $noSp }}</td>
-                                <td>{{ $orderId }}</td>
-                                <td class="text-center">{{ $tglSelesai }}</td>
-                                <td>{{ $customerName ?? '-' }}</td>
-                                <td>{{ $route ?? '-' }}</td>
-                                <td class="text-center">
-                                    <span class="badge bg-{{ $badgeClass }}">{{ $status ?? '-' }}</span>
+                                <td>{{ $transportSales }}</td>
+                                <td>{{ $reference }}</td>
+                                <td>
+                                    @php
+                                        $badgeClass = 'secondary';
+                                        switch (strtoupper($status)) {
+                                            case 'FINISHED': $badgeClass = 'success'; break;
+                                            case 'SHIPMENT': $badgeClass = 'info'; break;
+                                            case 'LOAD': $badgeClass = 'warning'; break;
+                                            case 'UNLOAD': $badgeClass = 'primary'; break;
+                                            case 'CANCELLED': $badgeClass = 'danger'; break;
+                                        }
+                                    @endphp
+                                    <span class="badge bg-{{ $badgeClass }}">{{ $status }}</span>
                                 </td>
+                                <td>{{ $documentDate }}</td>
+                                <td>{{ $note }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted">Belum ada histori pengiriman.</td>
+                                <td colspan="5" class="text-center text-muted">Tidak ada data histori untuk order ini.</td>
                             </tr>
                         @endforelse
                     </tbody>

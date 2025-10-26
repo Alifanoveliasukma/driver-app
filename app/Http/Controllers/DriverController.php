@@ -119,9 +119,6 @@ class DriverController extends Controller
             ->with('success', 'Driver baru berhasil ditambahkan ke database.');
     }
 
-    /**
-     * Detail driver.
-     */
     public function detail($id)
     {
         $driver = DB::table('mzl.xm_driver')->where('xm_driver_id', $id)->first();
@@ -131,4 +128,68 @@ class DriverController extends Controller
 
         return view('driver.detail', compact('driver'));
     }
+
+    // EDIT DRIVER
+
+    public function editStepOne($id = null)
+{
+    $driver = (object)[
+        'xm_driver_id' => $id ?? 0,
+        'name' => 'Dummy Driver',
+        'driverstatus' => 'Active',
+        'c_bpartner_id' => 'BP-001',
+        'search_key' => 'DRV-001'
+    ];
+
+    return view('planner.driver.edit-step-one', compact('driver'));
+}
+
+public function updateStepOne(Request $request, $id = null)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'driverstatus' => 'required|string',
+    ]);
+
+    // Dummy update
+    return redirect()->route('driver.edit.step.two')
+                     ->with('success', 'Data dasar driver (dummy) diperbarui.');
+}
+
+public function editStepTwo($xm_driver_id = null)
+{
+    $driver = (object)[
+        'xm_driver_id' => $xm_driver_id ?? 0,
+        'krani_id' => 'KRN-008',
+        'account' => 'BCA - 1234567890 a.n Ahmad Yusuf',
+        'note' => 'Driver dummy untuk testing'
+    ];
+
+    return view('planner.driver.edit-step-two', compact('driver'));
+}
+
+public function updateStepTwo(Request $request, $id = null)
+{
+    return redirect()->route('driver.edit.step.three')
+                     ->with('success', 'Informasi kendaraan & rekening (dummy) diperbarui.');
+}
+
+public function editStepThree($id = null)
+{
+    $driver = (object)[
+        'xm_driver_id' => $id ?? 0,
+        'ad_client_id' => 'CL-001',
+        'ad_org_id' => 'ORG-001',
+        'active' => 1
+    ];
+
+    return view('planner.driver.edit-step-three', compact('driver'));
+}
+
+public function updateStepThree(Request $request, $id = null)
+{
+    return redirect()->route('planner.driver.index')
+                     ->with('success', 'Data driver (dummy) berhasil diperbarui.');
+}
+
 }

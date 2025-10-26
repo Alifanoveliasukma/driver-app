@@ -114,6 +114,7 @@ public function historiPlanner()
         }
         if (!empty($tmp)) $mappedOrders[] = $tmp;
     }
+    // dd($mappedOrders);
 
     // Ambil customer & route
     $customerIds = collect($mappedOrders)->pluck('Customer_ID')->filter()->unique();

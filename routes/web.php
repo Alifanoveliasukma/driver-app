@@ -89,7 +89,7 @@ Route::fallback(function () {
 // ROLE PLANNER
 Route::middleware(['checkrole:1000051'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    // Driver
+    // Driver Create
     Route::get('/driver', [DriverController::class, 'index'])->name('driver.index');
     // Step 1 - Data Dasar Driver
     Route::get('driver/create-step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
@@ -103,7 +103,29 @@ Route::middleware(['checkrole:1000051'])->group(function () {
     Route::get('driver/create-step-three', [DriverController::class, 'createStepThree'])->name('driver.create.step.three');
     Route::post('driver/create-step-three', [DriverController::class, 'postCreateStepThree'])->name('driver.create.step.three.post');
     // Route::get('/driver/create', [DriverController::class, 'create'])->name('driver.create');
-    Route::get('/driver/{id}/edit', [DriverController::class, 'edit'])->name('driver.edit');
+
+
+    // EDIT DRIVER (Step)
+    // === EDIT DRIVER TANPA ID (DUMMY UNTUK TESTING) ===
+
+    Route::get('driver/edit-step-one', [DriverController::class, 'editStepOne'])
+        ->name('driver.edit.step.one');
+    Route::post('driver/edit-step-one', [DriverController::class, 'updateStepOne'])
+        ->name('driver.edit.step.one.post');
+
+    Route::get('driver/edit-step-two', [DriverController::class, 'editStepTwo'])
+        ->name('driver.edit.step.two');
+    Route::post('driver/edit-step-two', [DriverController::class, 'updateStepTwo'])
+        ->name('driver.edit.step.two.post');
+
+    Route::get('driver/edit-step-three', [DriverController::class, 'editStepThree'])
+        ->name('driver.edit.step.three');
+    Route::post('driver/edit-step-three', [DriverController::class, 'updateStepThree'])
+        ->name('driver.edit.step.three.post');
+
+
+
+    // Route::get('/driver/{id}/edit', [DriverController::class, 'edit'])->name('driver.edit');
     Route::get('/driver/{id}', [DriverController::class, 'detail'])->name('driver.detail');
 
     Route::get('/profile/planner', [ProfilController::class, 'profile_planner'])

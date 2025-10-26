@@ -6,6 +6,11 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-md-10">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center">
+                    <h4 class="fw-bold text-primary mb-0">Tambah Driver</h4>
+                </div>
+            </div>
 
             <form action="{{ route('driver.create.step.two.post') }}" method="POST">
                 @csrf
