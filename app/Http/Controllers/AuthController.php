@@ -167,8 +167,13 @@ class AuthController extends Controller
         ]);
 
         if ((int)$roleid === 1000049) {
+            // Driver
             return redirect()->route('menu.list-order');
+        } elseif ((int)$roleid === 1000051) {
+            // Planner Admin
+            return redirect()->route('dashboard');
         }
+
         return redirect()->route('login')->with('error', 'Role tidak dikenali');
     }
 

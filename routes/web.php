@@ -69,7 +69,34 @@ Route::get('/cek_xml', [UtamaController::class, 'getOrderDetail']);
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-// Driver
+// // Route::get('/konfirmasi-berangkat', [UtamaController::class, 'getOrder'])->name('menu.konfirmasi-berangkat');
+// Route::post('/utama/tiba-muat', [UtamaController::class, 'tibaMuat'])->name('utama.konfirmasi-tiba-muat');
+
+Route::get('/ujp', [UjpController::class, 'ujp'])->name('menu.ujp');
+Route::get('/histori', [HistoriController::class, 'histori'])->name('menu.histori');
+Route::get('/profile', function () {
+    $roleid = session('roleid');
+
+    if ($roleid == 1000049) {
+        // Driver
+        return app(ProfilController::class)->profile_driver();
+    } elseif ($roleid == 1000051) {
+        // Planner
+        return app(ProfilController::class)->profile_planner();
+    }
+
+    return redirect()->route('login')->with('error', 'Role tidak dikenali');
+})->name('menu.profil');
+
+Route::get('/no-order', function () {
+    return view('menu.utama.no-order');
+});
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
+
+// ROLE PLANNER// Driver
 Route::get('/driver', [DriverController::class, 'index'])->name('driver.index');
 // Step 1 - Data Dasar Driver
 Route::get('driver/create-step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
@@ -88,18 +115,3 @@ Route::get('/driver/{id}', [DriverController::class, 'detail'])->name('driver.de
 
 // Transport Tracking
 Route::get('/histori/all', [HistoriController::class, 'historiPlanner'])->name('histori.planner');
-
-// // Route::get('/konfirmasi-berangkat', [UtamaController::class, 'getOrder'])->name('menu.konfirmasi-berangkat');
-// Route::post('/utama/tiba-muat', [UtamaController::class, 'tibaMuat'])->name('utama.konfirmasi-tiba-muat');
-
-Route::get('/ujp', [UjpController::class, 'ujp'])->name('menu.ujp');
-Route::get('/histori', [HistoriController::class, 'histori'])->name('menu.histori');
-Route::get('/profil', [ProfilController::class, 'profil'])->name('menu.profil');
-
-Route::get('/no-order', function () {
-    return view('menu.utama.no-order');
-});
-
-Route::fallback(function () {
-    return response()->view('errors.404', [], 404);
-});

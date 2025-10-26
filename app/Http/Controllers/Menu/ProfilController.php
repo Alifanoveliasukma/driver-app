@@ -14,7 +14,7 @@ class ProfilController extends Controller
         $this->driver = $driver;
         $this->middleware('checklogin');
     }
-    public function profil()
+    public function profile_driver()
     {
         if (!session()->has('username')) {
             return redirect()->route('login');
@@ -31,19 +31,6 @@ class ProfilController extends Controller
                 $mappedDriver[$attr['column']] = $attr['lval'];
             }
         }
-        
-        // $krani = $this->driver->getDriver($c_bpartner_id);
-        // $fields = data_get($krani, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
-        // if (isset($fields['@attributes']))
-        //     $fields = [$fields];
-
-        // $mappedKrani = [];
-        // foreach ($fields as $f) {
-        //     $attr = $f['@attributes'] ?? [];
-        //     if (isset($attr['column'], $attr['lval'])) {
-        //         $mappedKrani[$attr['column']] = $attr['lval'];
-        //     }
-        // }
         return view('menu.profil.index', [
             'data' => [
                 'driverId' => $mappedDriver['XM_Driver_ID'] ?? null,
@@ -56,5 +43,22 @@ class ProfilController extends Controller
                 'kraniId' => $mappedDriver['Krani_ID'] ?? null,
             ]
         ]);
+    }
+
+    public function profile_planner()
+    {
+        if (!session('is_login')) {
+            return redirect()->route('login');
+        }
+
+        $data = [
+            'title' => 'Profil Planner',
+            'name' => session('name'),
+            'username' => session('username'),
+            'roleid' => session('roleid'),
+            'orgid' => session('orgid'),
+        ];
+
+        return view('planner.profile.index', $data);
     }
 }

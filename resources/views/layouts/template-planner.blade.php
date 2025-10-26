@@ -48,7 +48,8 @@
                 </li>
 
                 <li class="nav-item mt-auto">
-                    <a href="#" class="nav-link text-white">
+                    <a href="{{ route('menu.profil') }}" 
+                        class="nav-link {{ request()->is('profile') ? 'bg-light text-primary fw-semibold rounded' : 'text-white' }}">
                         <i class="bi bi-person-circle me-2"></i> Profil
                     </a>
                 </li>
