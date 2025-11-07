@@ -6,10 +6,9 @@ class TrackingUpdate extends BaseApi
 {
     public function UpdateTracking($orderId, array $fields)
     {
-        // Tambahkan OrderID ke fields
+
         $fields = array_merge(['OrderID' => $orderId], $fields);
 
-        // Bangun string <adin:field> dari setiap key => value
         $fieldsXml = '';
         foreach ($fields as $column => $value) {
             $fieldsXml .= '
@@ -18,7 +17,6 @@ class TrackingUpdate extends BaseApi
                         </adin:field>';
         }
 
-        // Susun SOAP request
         $request = '
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:adin="http://3e.pl/ADInterface">

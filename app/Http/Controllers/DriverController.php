@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class DriverController extends Controller
 {
@@ -20,28 +21,26 @@ class DriverController extends Controller
     /**
      * Step 1: Form data dasar driver.
      */
-    public function createStepOne(Request $request)
+    public function createStepOne()
     {
-        $driver = $request->session()->get('driver');
-        return view('planner.driver.create-step-one', compact('driver'));
+        return view('planner.driver.create-step-one');
     }
 
     /**
      * Step 1 POST: Simpan ke session.
      */
-    public function postCreateStepOne(Request $request)
+    public function createStepOnePost(Request $request)
     {
-        $validatedData = $request->validate([
-            'search_key' => 'nullable|string|max:100',
-            'name' => 'required|string|max:150',
-            'c_bpartner_id' => 'nullable|string|max:50',
-            'driverstatus' => 'required|string|max:50',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'search_key' => 'required|string|max:255',
+            'password' => 'required|min:6|confirmed',
         ]);
 
-        $driver = $request->session()->get('driver', []);
-        $driver = array_merge($driver, $validatedData);
-
-        $request->session()->put('driver', $driver);
+        // Simpan data ke session
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, $validated);
+        Session::put('driver', $driverData);
 
         return redirect()->route('driver.create.step.two');
     }
@@ -49,27 +48,23 @@ class DriverController extends Controller
     /**
      * Step 2: Form kendaraan / krani / rekening.
      */
-    public function createStepTwo(Request $request)
+    public function createStepTwo()
     {
-        $driver = $request->session()->get('driver');
-        return view('planner.driver.create-step-two', compact('driver'));
+        return view('planner.driver.create-step-two');
     }
 
     /**
      * Step 2 POST: Simpan ke session.
      */
-    public function postCreateStepTwo(Request $request)
+    public function createStepTwoPost(Request $request)
     {
-        $validatedData = $request->validate([
-            'krani_id' => 'nullable|string|max:50',
-            'account' => 'nullable|string|max:100',
-            'note' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'role_id' => 'required|string',
         ]);
 
-        $driver = $request->session()->get('driver', []);
-        $driver = array_merge($driver, $validatedData);
-
-        $request->session()->put('driver', $driver);
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, $validated);
+        Session::put('driver', $driverData);
 
         return redirect()->route('driver.create.step.three');
     }
@@ -77,46 +72,152 @@ class DriverController extends Controller
     /**
      * Step 3: Form final untuk org & client.
      */
-    public function createStepThree(Request $request)
+    public function createStepThree()
     {
-        $driver = $request->session()->get('driver');
-        return view('planner.driver.create-step-three', compact('driver'));
+        return view('planner.driver.create-step-three');
     }
 
     /**
      * Step 3 POST: Simpan ke database.
      */
-    public function postCreateStepThree(Request $request)
+    public function createStepThreePost(Request $request)
     {
-        $validatedData = $request->validate([
-            'ad_client_id' => 'required|string|max:50',
-            'ad_org_id' => 'required|string|max:50',
+        $validated = $request->validate([
+            'org_id' => 'required|string',
         ]);
 
-        $driverData = array_merge(
-            $request->session()->get('driver', []),
-            $validatedData
-        );
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, $validated);
+        Session::put('driver', $driverData);
 
-        // Insert ke DB sementara
-        DB::table('mzl.xm_driver')->insert([
-            'ad_client_id'   => $driverData['ad_client_id'] ?? null,
-            'ad_org_id'      => $driverData['ad_org_id'] ?? null,
-            'search_key'     => $driverData['search_key'] ?? null,
-            'name'           => $driverData['name'] ?? null,
-            'c_bpartner_id'  => $driverData['c_bpartner_id'] ?? null,
-            'driverstatus'   => $driverData['driverstatus'] ?? null,
-            'krani_id'       => $driverData['krani_id'] ?? null,
-            'account'        => $driverData['account'] ?? null,
-            'note'           => $driverData['note'] ?? null,
+        return redirect()->route('driver.create.step.four');
+    }
+
+    public function createStepFour()
+    {
+        return view('planner.driver.create-step-four');
+    }
+
+    public function createStepFourPost(Request $request)
+    {
+        $validated = $request->validate([
+            'cashbox_id' => 'required|string',
         ]);
 
-        // Bersihkan session
-        $request->session()->forget('driver');
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, $validated);
+        Session::put('driver', $driverData);
 
-        return redirect()
-            ->route('planner.driver.index')
-            ->with('success', 'Driver baru berhasil ditambahkan ke database.');
+        return redirect()->route('driver.create.step.five');
+    }
+
+    public function createStepFive()
+    {
+        return view('planner.driver.create-step-five');
+    }
+
+    public function createStepFivePost(Request $request)
+    {
+        $validated = $request->validate([ // BENAR! menggunakan ->
+            'bank_account_id' => 'required|string',
+        ]);
+
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, $validated);
+        Session::put('driver', $driverData);
+
+        return redirect()->route('driver.create.step.six');
+    }
+
+    public function createStepSix()
+    {
+        return view('planner.driver.create-step-six');
+    }
+
+    public function createStepSixPost(Request $request)
+    {
+        $validated = $request->validate([
+            'bp_search_key' => 'nullable|string|max:255',
+            'bp_name' => 'required|string|max:255',
+            'credit_status' => 'required|string',
+            'business_partner_group' => 'required|string',
+        ]);
+
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, $validated);
+        Session::put('driver', $driverData);
+
+        return redirect()->route('driver.create.step.seven');
+    }
+
+    public function createStepSeven()
+    {
+        // Data dummy users
+        $users = [
+            (object)['id' => 1, 'name' => 'Budi Santoso', 'email' => 'budi@example.com', 'phone' => '081234567890'],
+            (object)['id' => 2, 'name' => 'Ahmad Wijaya', 'email' => 'ahmad@example.com', 'phone' => '081234567891'],
+            (object)['id' => 3, 'name' => 'Siti Rahayu', 'email' => 'siti@example.com', 'phone' => '081234567892'],
+            (object)['id' => 4, 'name' => 'Joko Prasetyo', 'email' => 'joko@example.com', 'phone' => '081234567893'],
+            (object)['id' => 5, 'name' => 'Dewi Lestari', 'email' => 'dewi@example.com', 'phone' => '081234567894'],
+        ];
+
+        return view('planner.driver.create-step-seven', compact('users'));
+    }
+
+    public function createStepSevenPost(Request $request)
+    {
+        $validated = $request->validate([
+            'user_contact_id' => 'required|string',
+            'customer_only' => 'nullable|boolean',
+        ]);
+
+        $driverData = Session::get('driver', []);
+        $driverData = array_merge($driverData, [
+            'user_contact_id' => $validated['user_contact_id'],
+            'customer_only' => $request->has('customer_only') ? true : false
+        ]);
+        Session::put('driver', $driverData);
+
+        return redirect()->route('driver.create.step.eight');
+    }
+
+    // Step 8: Detail Informasi Driver (Final Step)
+    public function createStepEight()
+    {
+        return view('planner.driver.create-step-eight');
+    }
+
+    public function createStepEightPost(Request $request)
+    {
+        $validated = $request->validate([
+            'driver_name' => 'required|string|max:255',
+            'driver_status' => 'required|string',
+            'fleet_id' => 'required|string',
+            'krani' => 'nullable|string|max:255',
+            'account_no' => 'nullable|string|max:255',
+            'account' => 'nullable|string|max:255',
+        ]);
+
+        // Ambil semua data dari session
+        $driverData = Session::get('driver', []);
+        $finalData = array_merge($driverData, $validated);
+
+        // Di sini biasanya akan menyimpan ke database
+        // Untuk dummy, kita tampilkan saja datanya
+        
+        // Clear session setelah proses selesai
+        Session::forget('driver');
+
+        // Redirect ke halaman sukses atau summary
+        return redirect()->route('driver.index')
+                         ->with('success', 'Driver berhasil dibuat!')
+                         ->with('driver_data', $finalData);
+    }
+
+    public function resetForm()
+    {
+        Session::forget('driver');
+        return redirect()->route('driver.create.step.one');
     }
 
     public function detail($id)

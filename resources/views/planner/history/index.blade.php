@@ -1,93 +1,152 @@
 @extends('layouts.template-planner')
 
-@section('title', 'Histori Transport Planner')
-
 @section('content')
-<div class="container py-3">
-    <div class="d-flex align-items-center mb-4">
-        <button class="btn btn-outline-primary me-3" onclick="window.history.back()" aria-label="Kembali">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-        <h4 class="fw-bold text-primary mb-0">Histori Pengiriman - Planner</h4>
+<div class="container-fluid mt-4">
+    <h4 class="mb-4">Transport Status History</h4>
+
+    <!-- ✅ Search Form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form action="{{ route('histori.planner') }}" method="GET" class="row g-3 align-items-center">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <input type="text" 
+                               name="search" 
+                               class="form-control" 
+                               placeholder="Cari berdasarkan Route, Customer ID, Driver ID, Fleet ID, PO Number, atau Status..."
+                               value="{{ request('search') }}"
+                               aria-label="Search">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    @if(request('search'))
+                    <div class="d-flex align-items-center">
+                        <span class="badge bg-info me-2">
+                            {{ $orders->total() }} hasil ditemukan
+                        </span>
+                        <a href="{{ route('histori.planner') }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    </div>
+                    @endif
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div class="card shadow-sm border-0">
+    <div class="card shadow-sm">
         <div class="card-body">
+            @if(request('search') && $orders->total() == 0)
+            <div class="alert alert-warning mb-4">
+                <i class="fas fa-exclamation-triangle"></i> 
+                Tidak ada data yang ditemukan untuk pencarian "<strong>{{ request('search') }}</strong>"
+            </div>
+            @endif
+
             <div class="table-responsive">
-                <table id="plannerHistoryTable" class="table table-bordered table-hover align-middle">
+                <table class="table table-bordered table-striped align-middle">
                     <thead class="table-primary text-center">
                         <tr>
-                            <th>Transport Sales</th>
-                            <th>Reference</th>
+                            <th>#</th>
+                            <th>Search Key</th>
+                            <th>CO Number</th>
+                            <th>Customer</th>
+                            <th>Route</th>
+                            <th>ETA</th>
+                            <th>ETD</th>
+                            <th>Area Type</th>
                             <th>Status</th>
-                            <th>Document Date</th>
-                            <th>Note</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse ($orders as $row)
-                            @php
-                                $transportSales = data_get($row, 'Value', '-');
-                                $reference = data_get($row, 'Reference', '-');
-                                $status = data_get($row, 'Status', '-');
-                                $documentDate = data_get($row, 'DocumentDate', '-');
-                                $note = data_get($row, 'Note', '-');
-                            @endphp
-                            <tr>
-                                <td>{{ $transportSales }}</td>
-                                <td>{{ $reference }}</td>
-                                <td>
-                                    @php
-                                        $badgeClass = 'secondary';
-                                        switch (strtoupper($status)) {
-                                            case 'FINISHED': $badgeClass = 'success'; break;
-                                            case 'SHIPMENT': $badgeClass = 'info'; break;
-                                            case 'LOAD': $badgeClass = 'warning'; break;
-                                            case 'UNLOAD': $badgeClass = 'primary'; break;
-                                            case 'CANCELLED': $badgeClass = 'danger'; break;
-                                        }
-                                    @endphp
-                                    <span class="badge bg-{{ $badgeClass }}">{{ $status }}</span>
-                                </td>
-                                <td>{{ $documentDate }}</td>
-                                <td>{{ $note }}</td>
-                            </tr>
+                        @forelse($orders as $i => $r)
+                        <tr>
+                            <td class="text-center">{{ $orders->firstItem() + $i }}</td>
+                            <td>
+                                @if(request('search') && stripos($r['Value'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['Value'] ?? '-', request('search')) !!}
+                                @else
+                                    {{ $r['Value'] ?? '-' }}
+                                @endif
+                            </td>
+                            <td>
+                                @if(request('search') && stripos($r['PONumber'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['PONumber'] ?? '-', request('search')) !!}
+                                @else
+                                    {{ $r['PONumber'] ?? '-' }}
+                                @endif
+                            </td>
+                            <td>
+                                @if(request('search') && stripos($r['Customer_ID'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['Customer_ID'] ?? '-', request('search')) !!}
+                                @else
+                                    {{ $r['Customer_ID'] ?? '-' }}
+                                @endif
+                            </td>
+                            <td>
+                                @if(request('search') && stripos($r['Route'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['Route'] ?? '-', request('search')) !!}
+                                @else
+                                    {{ $r['Route'] ?? '-' }}
+                                @endif
+                            </td>
+                            <td>{{ isset($r['ETA']) ? explode(' ', $r
+                            ['ETA'])[0] : '-' }}</td>
+                            <td>{{ isset($r['ETD']) ? explode(' ', $r['ETD'])[0] : '-' }}</td>
+                            <td>{{ $r['AreaType'] ?? '-' }}</td>
+                            <td>
+                                @if(request('search') && stripos($r['Status'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['Status'] ?? '-', request('search')) !!}
+                                @else
+                                    {{ $r['Status'] ?? '-' }}
+                                @endif
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ route('histori.planner.detail', ['id' => $r['XX_TransOrder_ID']]) }}" class="btn btn-sm btn-primary">
+                                    Detail
+                                </a>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">Tidak ada data histori untuk order ini.</td>
-                            </tr>
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">
+                                @if(request('search'))
+                                    Tidak ada data yang cocok dengan pencarian Anda.
+                                @else
+                                    Tidak ada data ditemukan.
+                                @endif
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
+
+            <!-- ✅ Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted">
+                    Menampilkan {{ $orders->firstItem() ?? 0 }} - {{ $orders->lastItem() ?? 0 }} dari {{ $orders->total() }} data
+                </div>
+                <div>
+                    {{ $orders->onEachSide(1)->links('vendor.pagination.bootstrap-4') }}
+                </div>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- DataTables -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        $('#plannerHistoryTable').DataTable({
-            pageLength: 10,
-            order: [[3, 'desc']], // urut berdasarkan tanggal selesai
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data per halaman",
-                zeroRecords: "Data tidak ditemukan",
-                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                infoEmpty: "Tidak ada data tersedia",
-                infoFiltered: "(disaring dari total _MAX_ data)",
-                paginate: {
-                    previous: "Sebelumnya",
-                    next: "Berikutnya"
-                }
-            }
-        });
-    });
-</script>
 @endsection
+
+<?php
+// Helper function untuk highlight text
+if (!function_exists('highlightText')) {
+    function highlightText($text, $search) {
+        if (empty($text) || empty($search)) return $text;
+        $highlighted = preg_replace("/($search)/i", '<mark class="bg-warning">$1</mark>', $text);
+        return $highlighted ?: $text;
+    }
+}
+?>

@@ -92,18 +92,36 @@ Route::middleware(['checkrole:1000051'])->group(function () {
     // Driver Create
     Route::get('/driver', [DriverController::class, 'index'])->name('driver.index');
     // Step 1 - Data Dasar Driver
-    Route::get('driver/create-step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
-    Route::post('driver/create-step-one', [DriverController::class, 'postCreateStepOne'])->name('driver.create.step.one.post');
-
-    // Step 2 - Informasi Kendaraan & Akun
-    Route::get('driver/create-step-two', [DriverController::class, 'createStepTwo'])->name('driver.create.step.two');
-    Route::post('driver/create-step-two', [DriverController::class, 'postCreateStepTwo'])->name('driver.create.step.two.post');
-
-    // Step 3 - Catatan & Status
-    Route::get('driver/create-step-three', [DriverController::class, 'createStepThree'])->name('driver.create.step.three');
-    Route::post('driver/create-step-three', [DriverController::class, 'postCreateStepThree'])->name('driver.create.step.three.post');
-    // Route::get('/driver/create', [DriverController::class, 'create'])->name('driver.create');
-
+    Route::get('/create/step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
+    Route::post('/create/step-one', [DriverController::class, 'createStepOnePost'])->name('driver.create.step.one.post');
+    
+    // Step 2
+    Route::get('/create/step-two', [DriverController::class, 'createStepTwo'])->name('driver.create.step.two');
+    Route::post('/create/step-two', [DriverController::class, 'createStepTwoPost'])->name('driver.create.step.two.post');
+    
+    // Step 3
+    Route::get('/create/step-three', [DriverController::class, 'createStepThree'])->name('driver.create.step.three');
+    Route::post('/create/step-three', [DriverController::class, 'createStepThreePost'])->name('driver.create.step.three.post');
+    
+    // Step 4
+    Route::get('/create/step-four', [DriverController::class, 'createStepFour'])->name('driver.create.step.four');
+    Route::post('/create/step-four', [DriverController::class, 'createStepFourPost'])->name('driver.create.step.four.post');
+    
+    // Step 5
+    Route::get('/create/step-five', [DriverController::class, 'createStepFive'])->name('driver.create.step.five');
+    Route::post('/create/step-five', [DriverController::class, 'createStepFivePost'])->name('driver.create.step.five.post');
+    
+    // Step 6
+    Route::get('/create/step-six', [DriverController::class, 'createStepSix'])->name('driver.create.step.six');
+    Route::post('/create/step-six', [DriverController::class, 'createStepSixPost'])->name('driver.create.step.six.post');
+    
+    // Step 7
+    Route::get('/create/step-seven', [DriverController::class, 'createStepSeven'])->name('driver.create.step.seven');
+    Route::post('/create/step-seven', [DriverController::class, 'createStepSevenPost'])->name('driver.create.step.seven.post');
+    
+    // Step 8
+    Route::get('/create/step-eight', [DriverController::class, 'createStepEight'])->name('driver.create.step.eight');
+    Route::post('/create/step-eight', [DriverController::class, 'createStepEightPost'])->name('driver.create.step.eight.post');
 
     // EDIT DRIVER (Step)
     // === EDIT DRIVER TANPA ID (DUMMY UNTUK TESTING) ===
@@ -123,8 +141,6 @@ Route::middleware(['checkrole:1000051'])->group(function () {
     Route::post('driver/edit-step-three', [DriverController::class, 'updateStepThree'])
         ->name('driver.edit.step.three.post');
 
-
-
     // Route::get('/driver/{id}/edit', [DriverController::class, 'edit'])->name('driver.edit');
     Route::get('/driver/{id}', [DriverController::class, 'detail'])->name('driver.detail');
 
@@ -134,4 +150,7 @@ Route::middleware(['checkrole:1000051'])->group(function () {
 
     // Transport Tracking
     Route::get('/histori/all', [HistoriController::class, 'historiPlanner'])->name('histori.planner');
-});
+    Route::get('/history/detail/{id}', [HistoriController::class, 'detailPlanner'])
+    ->whereNumber('id') // memastikan ID hanya angka
+    ->name('histori.planner.detail');
+}); 
