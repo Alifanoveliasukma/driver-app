@@ -107,14 +107,14 @@
             </div>
         </div>
 
-        <div class="row mb-4">
+        <!-- <div class="row mb-4">
             <div class="col-md-6">
                 <button type="button" class="btn btn-primary w-100">Add Transport Status</button>
             </div>
             <div class="col-md-6">
                 <button type="button" class="btn btn-success w-100">Release Driver Fleet</button>
             </div>
-        </div>
+        </div> -->
 
         <div class="row mb-3">
             <div class="col-md-6">
@@ -132,7 +132,7 @@
             <label class="form-check-label" for="send">Send</label>
         </div>
 
-        <button type="button" class="btn btn-secondary">Back</button>
+        <a href="{{ route('histori.planner.all') }}" class="btn btn-secondary">Back</a>
     </form>
 
     <hr class="my-5">
