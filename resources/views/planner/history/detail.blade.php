@@ -63,49 +63,45 @@
         </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Loading Date</label>
-                <input type="date" class="form-control" value="">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Unloading Date</label>
-                <input type="date" class="form-control" value="">
-            </div>
-        </div>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">Loading Date</label>
+        <input type="datetime-local" class="form-control"
+               value="{{ !empty($data['LoadDate']) ? \Carbon\Carbon::parse($data['LoadDate'])->format('Y-m-d\TH:i') : '' }}">
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Unloading Date</label>
+        <input type="datetime-local" class="form-control"
+               value="{{ !empty($data['UnloadDate']) ? \Carbon\Carbon::parse($data['UnloadDate'])->format('Y-m-d\TH:i') : '' }}">
+    </div>
+</div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Loading Date (Start)</label>
-                <input type="date" class="form-control" value="">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Unloading Date (Start)</label>
-                <input type="date" class="form-control" value="">
-            </div>
-        </div>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">Loading Date (Start)</label>
+        <input type="datetime-local" class="form-control"
+               value="{{ !empty($data['LoadDateStart']) ? \Carbon\Carbon::parse($data['LoadDateStart'])->format('Y-m-d\TH:i') : '' }}">
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Unloading Date (Start)</label>
+        <input type="datetime-local" class="form-control"
+               value="{{ !empty($data['UnloadDateStart']) ? \Carbon\Carbon::parse($data['UnloadDateStart'])->format('Y-m-d\TH:i') : '' }}">
+    </div>
+</div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Loading Date (Out)</label>
-                <input type="date" class="form-control" value="">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Unloading Date (Out)</label>
-                <input type="date" class="form-control" value="">
-            </div>
-        </div>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <label class="form-label">Loading Date (Out)</label>
+        <input type="datetime-local" class="form-control"
+               value="{{ !empty($data['OutLoadDate']) ? \Carbon\Carbon::parse($data['OutLoadDate'])->format('Y-m-d\TH:i') : '' }}">
+    </div>
+    <div class="col-md-6">
+        <label class="form-label">Unloading Date (Out)</label>
+        <input type="datetime-local" class="form-control"
+               value="{{ !empty($data['OutUnloadDate']) ? \Carbon\Carbon::parse($data['OutUnloadDate'])->format('Y-m-d\TH:i') : '' }}">
+    </div>
+</div>
 
-        <div class="row mb-3">
-            <div class="col-md-6">
-                <label class="form-label">Loading Standby</label>
-                <input type="text" class="form-control" value="">
-            </div>
-            <div class="col-md-6">
-                <label class="form-label">Unloading Standby</label>
-                <input type="text" class="form-control" value="">
-            </div>
-        </div>
 
         <!-- <div class="row mb-4">
             <div class="col-md-6">
@@ -132,7 +128,7 @@
             <label class="form-check-label" for="send">Send</label>
         </div>
 
-        <a href="{{ route('histori.planner.all') }}" class="btn btn-secondary">Back</a>
+        <a href="{{ route('histori.planner') }}" class="btn btn-secondary">Back</a>
     </form>
 
     <hr class="my-5">
@@ -156,70 +152,39 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Dummy data --}}
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>FINISHED</td>
-                            <td>Sep 30, 2025 6:33:01 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td><a href="https://ops-mzl.karyakoe.id/storage/foto-surat-jalan/UWos" target="_blank">View File</a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>UNLOAD</td>
-                            <td>Sep 30, 2025 6:32:52 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td><a href="https://ops-mzl.karyakoe.id/storage/mua1" target="_blank">View File</a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>WAIT FOR UNLOAD</td>
-                            <td>Sep 30, 2025 6:32:44 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>SHIPMENT</td>
-                            <td>Sep 30, 2025 6:32:41 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td><a href="https://ops-mzl.karyakoe.id/storage/supir" target="_blank">View File</a></td>
-                            <td><a href="https://ops-mzl.karyakoe.id/storage/dokumen" target="_blank">View File</a></td>
-                        </tr>
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>LOAD</td>
-                            <td>Sep 30, 2025 5:06:09 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>WAIT FOR LOAD</td>
-                            <td>Sep 30, 2025 5:06:07 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td>11866/MZL-TS/IX/2025</td>
-                            <td>AUD</td>
-                            <td>ON THE WAY LOAD</td>
-                            <td>Sep 30, 2025 5:06:04 PM WIB</td>
-                            <td>driver confirmation</td>
-                            <td></td>
-                            <td></td>
-                        </tr>
+                        @forelse ($trackingHistory as $item)
+                            <tr>
+                                <td>{{ $data['Value'] ?? '-' }}</td>
+                                <td>{{ $item['Reference'] ?? '-' }}</td>
+                                <td>{{ $item['Status'] ?? '-' }}</td>
+                                <td>
+                                    @if (!empty($item['DateDoc']))
+                                        {{ \Carbon\Carbon::parse($item['DateDoc'])->translatedFormat('M d, Y h:i:s A') }} WIB
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td>{{ $item['Note'] ?? '—' }}</td>
+                                <td class="text-center">
+                                    @if (!empty($item['DocumentDir']))
+                                        <a href="{{ $item['DocumentDir'] }}" target="_blank">View File</a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if (!empty($item['DocumentDir2']))
+                                        <a href="{{ $item['DocumentDir2'] }}" target="_blank">View File</a>
+                                    @else
+                                        -
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">Tidak ada data tracking untuk transport ini.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

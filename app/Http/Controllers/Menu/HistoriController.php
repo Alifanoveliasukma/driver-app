@@ -99,33 +99,40 @@ class HistoriController extends Controller
         return view('menu.histori.index', compact('orders'));
     }
 
+    protected function mapSoapResponse(array $rows): array
+    {
+        if (isset($rows['field'])) $rows = [$rows];
+
+        $mappedData = [];
+        foreach ($rows as $row) {
+            $fields = $row['field'] ?? [];
+            if (isset($fields['@attributes'])) $fields = [$fields];
+
+            $tmp = [];
+            foreach ($fields as $f) {
+                $attr = $f['@attributes'] ?? [];
+                if (isset($attr['column'], $attr['lval'])) {
+                    $tmp[$attr['column']] = $attr['lval'];
+                }
+            }
+            if (!empty($tmp)) $mappedData[] = $tmp;
+        }
+
+        return $mappedData;
+    }
+
     public function historiPlanner(Request $request)
     {
-        $cacheKey = 'transport_status_history';
+        $cacheKey = 'transport_status_history_finished'; 
         $cacheTime = 300; 
 
         $mappedStatuses = Cache::remember($cacheKey, $cacheTime, function () {
-            $response = $this->transportStatus->getAllTransportStatus();
+            // Asumsi: getAllTransportStatus() sudah memuat filter Status='FINISHED'
+            $response = $this->transportStatus->getAllTransportStatus(); 
             
             $rows = data_get($response, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
-            if (isset($rows['field'])) $rows = [$rows];
-
-            $mappedStatuses = [];
-            foreach ($rows as $row) {
-                $fields = $row['field'] ?? [];
-                if (isset($fields['@attributes'])) $fields = [$fields];
-
-                $tmp = [];
-                foreach ($fields as $f) {
-                    $attr = $f['@attributes'] ?? [];
-                    if (isset($attr['column'], $attr['lval'])) {
-                        $tmp[$attr['column']] = $attr['lval'];
-                    }
-                }
-                if (!empty($tmp)) $mappedStatuses[] = $tmp;
-            }
-
-            return $mappedStatuses;
+            
+            return $this->mapSoapResponse($rows);
         });
 
         $collection = collect($mappedStatuses)
@@ -135,14 +142,14 @@ class HistoriController extends Controller
         $search = $request->get('search');
         if ($search) {
             $collection = $collection->filter(function ($item) use ($search) {
-                
-                return str_contains(strtolower($item['Value'] ?? ''), strtolower($search)) || 
-                    str_contains(strtolower($item['Route'] ?? ''), strtolower($search)) ||
-                    str_contains(strtolower($item['Customer_ID'] ?? ''), strtolower($search)) ||
-                    str_contains(strtolower($item['XM_Driver_ID'] ?? ''), strtolower($search)) ||
-                    str_contains(strtolower($item['XM_Fleet_ID'] ?? ''), strtolower($search)) ||
-                    str_contains(strtolower($item['PONumber'] ?? ''), strtolower($search)) ||
-                    str_contains(strtolower($item['Status'] ?? ''), strtolower($search));
+                $search = strtolower($search);
+                return str_contains(strtolower($item['Value'] ?? ''), $search) || 
+                    str_contains(strtolower($item['Route'] ?? ''), $search) ||
+                    str_contains(strtolower($item['Customer_ID'] ?? ''), $search) ||
+                    str_contains(strtolower($item['XM_Driver_ID'] ?? ''), $search) ||
+                    str_contains(strtolower($item['XM_Fleet_ID'] ?? ''), $search) ||
+                    str_contains(strtolower($item['PONumber'] ?? ''), $search) ||
+                    str_contains(strtolower($item['Status'] ?? ''), $search);
             })->values();
         }
 
@@ -158,93 +165,49 @@ class HistoriController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // dd($orders);
         return view('planner.history.index', compact('orders', 'search'));
     }
 
     public function detailPlanner($id)
     {
-        $cacheKey = 'transport_status_history';
-        $cacheTime = 300; // 5 menit
+        // 1. Ambil Detail Transport (dari getAllTransportStatus)
+        $cacheKey = 'transport_status_history_finished';
+        $cacheTime = 300; 
 
-        // Ambil data cache (reuse dari historiPlanner)
+        // Mengambil data detail dari cache yang sama dengan historiPlanner
         $mappedStatuses = Cache::remember($cacheKey, $cacheTime, function () {
-            $response = $this->transportStatus->getAllTransportStatus();
-            
+            // Logika ini sama persis dengan yang ada di historiPlanner
+            $response = $this->transportStatus->getAllTransportStatus(); 
             $rows = data_get($response, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
-            if (isset($rows['field'])) $rows = [$rows];
-
-            $mappedStatuses = [];
-            foreach ($rows as $row) {
-                $fields = $row['field'] ?? [];
-                if (isset($fields['@attributes'])) $fields = [$fields];
-
-                $tmp = [];
-                foreach ($fields as $f) {
-                    $attr = $f['@attributes'] ?? [];
-                    if (isset($attr['column'], $attr['lval'])) {
-                        $tmp[$attr['column']] = $attr['lval'];
-                    }
-                }
-                if (!empty($tmp)) $mappedStatuses[] = $tmp;
-            }
-
-            return $mappedStatuses;
+            return $this->mapSoapResponse($rows);
         });
 
+        // Cari detail utama berdasarkan ID
         $data = collect($mappedStatuses)->firstWhere('XX_TransOrder_ID', $id);
 
         if (!$data) {
-            return redirect()->back()->with('error', 'Data tidak ditemukan.');
+            return redirect()->route('planner.history.index')->with('error', 'Detail Transport tidak ditemukan.');
+        }
+        
+        try {
+            $responseTracking = $this->transTrackingApi->getTransportTrackingByOrder($id);
+            
+            $trackingRows = data_get($responseTracking, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
+            
+            $trackingHistory = collect($this->mapSoapResponse($trackingRows))
+                // Urutkan berdasarkan tanggal (misalnya kolom 'DocumentDate' atau 'Created') terbaru
+                ->sortByDesc(fn($r) => $r['DocumentDate'] ?? $r['Created'] ?? '0000-01-01 00:00:00') 
+                ->values();
+                
+        } catch (\Exception $e) {
+            // Handle jika panggilan API Tracking gagal
+            $trackingHistory = collect([]); 
+            \Log::error("Gagal mengambil Tracking History untuk ID $id: " . $e->getMessage());
         }
 
-        // dd($data);
-        return view('planner.history.detail', compact('data'));
+        // dd($data, $trackingHistory);
+        // Kirim $data (Detail) dan $trackingHistory (Riwayat) ke view
+        return view('planner.history.detail', compact('data', 'trackingHistory'));
     }
-
-    // public function detailPlanner($id)
-    // {
-    //     \Log::info('Opening transport planner detail', ['XX_TransOrder_ID' => $id]);
-
-    //     $response = $this->transportStatus->getDetailByTransportStatusId($id);
-
-    //     $fields = data_get($response, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow.field', []);
-
-    //     if (isset($fields['@attributes'])) {
-    //         $fields = [$fields];
-    //     }
-
-    //     $data = [];
-    //     foreach ($fields as $field) {
-    //         $attr = $field['@attributes'] ?? [];
-    //         if (isset($attr['column'], $attr['lval'])) {
-    //             $data[$attr['column']] = $attr['lval'];
-    //         }
-    //     }
-
-    //     dd($data);
-    //     return view('planner.history.detail', compact('data'));
-    // }
-
-    //  public function detailPlanner($id)
-    // {
-    //     \Log::info('Transport Status ID Received:', ['id' => $id]);
-
-    //     if (!is_numeric($id)) {
-    //         \Log::warning('Invalid ID format for Transport Status', ['id' => $id]);
-    //         return redirect()->back()->with('error', 'Invalid ID format');
-    //     }
-
-    //     $response = $this->transTrackingApi->getDetailByTransportStatusId($id);
-
-    //     if (isset($response['error'])) {
-    //         \Log::error('SOAP Error Response:', $response);
-    //         return redirect()->back()->with('error', 'Gagal mengambil data dari server.');
-    //     }
-
-    //     $data = $response['data'] ?? $response;
-    //     // dd($data);
-    //     return view('planner.history.detail', compact('data'));
-    // }
 
 }
