@@ -9,7 +9,7 @@ class TransportStatusApi extends BaseApi
      */
     public function getAllTransportStatus()
 {
-    $filter = "IsActive='Y' AND IsVoid='N'";
+    $filter = "IsActive='Y' AND IsVoid='N' AND Status='FINISHED'";
 
     $request = '
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:adin="http://3e.pl/ADInterface">
@@ -52,5 +52,4 @@ class TransportStatusApi extends BaseApi
     
     return $response;
 }
-
 }
