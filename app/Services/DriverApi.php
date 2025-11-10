@@ -42,4 +42,64 @@ class DriverApi extends BaseApi
 
         return $this->sendRequest($request);
     }
+
+    public function createDriver(array $driverFields): string
+    {
+        if (empty($driverFields['Value']) || empty($driverFields['Name'])) {
+            throw new \Exception("Value and Name are required for Driver creation.");
+        }
+
+        $fields = array_merge([
+            'Value' => '', 
+            'Name' => '', 
+            'DriverStatus' => 'Stand by', 
+            'XM_Fleet_ID' => null, 
+            'Krani_ID' => null, 
+            'AccountNo' => null,
+            'Account' => null,
+            'Note' => null,
+        ], $driverFields);
+
+        $fieldsXml = '';
+        foreach ($fields as $column => $val) {
+            if (!empty($val) || (is_string($val) && strlen($val) > 0)) {
+                $fieldsXml .= '
+                        <adin:field column="' . htmlspecialchars($column) . '">
+                            <adin:val>' . htmlspecialchars($val) . '</adin:val>
+                        </adin:field>';
+            }
+        }
+
+        $adLoginRequestXml = $this->getAdLoginRequest();
+
+        $request = '
+         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+            xmlns:adin="http://3e.pl/ADInterface">
+            <soapenv:Header/>
+            <soapenv:Body>
+               <adin:createData>
+                     <adin:ModelCRUDRequest>
+                        <adin:ModelCRUD>
+                           <adin:serviceType>API-CreateDriver</adin:serviceType>
+                           <adin:TableName>XM_Driver</adin:TableName>
+                           <adin:RecordID>0</adin:RecordID>
+                           <adin:Action>Create</adin:Action>
+                           <adin:DataRow>'
+                           . $fieldsXml . '
+                           </adin:DataRow>
+                        </adin:ModelCRUD>
+                        <adin:ADLoginRequest>
+                           ' . $adLoginRequestXml . '
+                        </adin:ADLoginRequest>
+                     </adin:ModelCRUDRequest>
+               </adin:createData>
+            </soapenv:Body>
+         </soapenv:Envelope>';
+
+        $soapResponse = $this->sendRequest($request);
+
+        // PENTING: Mengekstrak RecordID (XM_Driver_ID) dari respons SOAP
+        return $this->extractRecordIDFromResponse($soapResponse);
+    }
+
 }
