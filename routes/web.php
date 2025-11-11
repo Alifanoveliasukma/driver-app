@@ -91,55 +91,64 @@ Route::middleware(['checkrole:1000051'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // Driver Create
     Route::get('/driver', [DriverController::class, 'index'])->name('driver.index');
+
+    Route::get('/create-user-driver', [DriverController::class, 'createForm'])->name('driver.create');
+
+    // Rute POST untuk memproses data formulir (membuat User, Role, dan Driver)
+    Route::post('/store-user-driver', [DriverController::class, 'store'])->name('driver.store');
+
+    // Rute untuk halaman sukses setelah proses berhasil
+    Route::get('/success-user-driver', [DriverController::class, 'successPage'])->name('driver.success');
+
     // Step 1 - Data Dasar Driver
-    Route::get('/create/step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
-    Route::post('/create/step-one', [DriverController::class, 'createStepOnePost'])->name('driver.create.step.one.post');
+    // Route::get('/create/step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
+    // Route::post('/create/step-one', [DriverController::class, 'createStepOnePost'])->name('driver.create.step.one.post');
     
     // Step 2
-    Route::get('/create/step-two', [DriverController::class, 'createStepTwo'])->name('driver.create.step.two');
-    Route::post('/create/step-two', [DriverController::class, 'createStepTwoPost'])->name('driver.create.step.two.post');
+    // Route::get('/create/step-two', [DriverController::class, 'createStepTwo'])->name('driver.create.step.two');
+    // Route::post('/create/step-two', [DriverController::class, 'createStepTwoPost'])->name('driver.create.step.two.post');
     
-    // Step 3
-    Route::get('/create/step-three', [DriverController::class, 'createStepThree'])->name('driver.create.step.three');
-    Route::post('/create/step-three', [DriverController::class, 'createStepThreePost'])->name('driver.create.step.three.post');
+    // // Step 3
+    // Route::get('/create/step-three', [DriverController::class, 'createStepThree'])->name('driver.create.step.three');
+    // Route::post('/create/step-three', [DriverController::class, 'createStepThreePost'])->name('driver.create.step.three.post');
     
-    // Step 4
-    Route::get('/create/step-four', [DriverController::class, 'createStepFour'])->name('driver.create.step.four');
-    Route::post('/create/step-four', [DriverController::class, 'createStepFourPost'])->name('driver.create.step.four.post');
+    // // Step 4
+    // Route::get('/create/step-four', [DriverController::class, 'createStepFour'])->name('driver.create.step.four');
+    // Route::post('/create/step-four', [DriverController::class, 'createStepFourPost'])->name('driver.create.step.four.post');
     
-    // Step 5
-    Route::get('/create/step-five', [DriverController::class, 'createStepFive'])->name('driver.create.step.five');
-    Route::post('/create/step-five', [DriverController::class, 'createStepFivePost'])->name('driver.create.step.five.post');
+    // // Step 5
+    // Route::get('/create/step-five', [DriverController::class, 'createStepFive'])->name('driver.create.step.five');
+    // Route::post('/create/step-five', [DriverController::class, 'createStepFivePost'])->name('driver.create.step.five.post');
     
-    // Step 6
-    Route::get('/create/step-six', [DriverController::class, 'createStepSix'])->name('driver.create.step.six');
-    Route::post('/create/step-six', [DriverController::class, 'createStepSixPost'])->name('driver.create.step.six.post');
+    // // Step 6
+    // Route::get('/create/step-six', [DriverController::class, 'createStepSix'])->name('driver.create.step.six');
+    // Route::post('/create/step-six', [DriverController::class, 'createStepSixPost'])->name('driver.create.step.six.post');
     
     // Step 7
-    Route::get('/create/step-seven', [DriverController::class, 'createStepSeven'])->name('driver.create.step.seven');
-    Route::post('/create/step-seven', [DriverController::class, 'createStepSevenPost'])->name('driver.create.step.seven.post');
+    // Route::get('/create/step-seven', [DriverController::class, 'createStepSeven'])->name('driver.create.step.seven');
+    // Route::post('/create/step-seven', [DriverController::class, 'createStepSevenPost'])->name('driver.create.step.seven.post');
     
-    // Step 8
-    Route::get('/create/step-eight', [DriverController::class, 'createStepEight'])->name('driver.create.step.eight');
-    Route::post('/create/step-eight', [DriverController::class, 'createStepEightPost'])->name('driver.create.step.eight.post');
+    // // Step 8
+    // Route::get('/create/step-eight', [DriverController::class, 'createStepEight'])->name('driver.create.step.eight');
+    // Route::post('/create/step-eight', [DriverController::class, 'createStepEightPost'])->name('driver.create.step.eight.post');
 
-    // EDIT DRIVER (Step)
-    // === EDIT DRIVER TANPA ID (DUMMY UNTUK TESTING) ===
+    // // EDIT DRIVER (Step)
+    // // === EDIT DRIVER TANPA ID (DUMMY UNTUK TESTING) ===
 
-    Route::get('driver/edit-step-one', [DriverController::class, 'editStepOne'])
-        ->name('driver.edit.step.one');
-    Route::post('driver/edit-step-one', [DriverController::class, 'updateStepOne'])
-        ->name('driver.edit.step.one.post');
+    // Route::get('driver/edit-step-one', [DriverController::class, 'editStepOne'])
+    //     ->name('driver.edit.step.one');
+    // Route::post('driver/edit-step-one', [DriverController::class, 'updateStepOne'])
+    //     ->name('driver.edit.step.one.post');
 
-    Route::get('driver/edit-step-two', [DriverController::class, 'editStepTwo'])
-        ->name('driver.edit.step.two');
-    Route::post('driver/edit-step-two', [DriverController::class, 'updateStepTwo'])
-        ->name('driver.edit.step.two.post');
+    // Route::get('driver/edit-step-two', [DriverController::class, 'editStepTwo'])
+    //     ->name('driver.edit.step.two');
+    // Route::post('driver/edit-step-two', [DriverController::class, 'updateStepTwo'])
+    //     ->name('driver.edit.step.two.post');
 
-    Route::get('driver/edit-step-three', [DriverController::class, 'editStepThree'])
-        ->name('driver.edit.step.three');
-    Route::post('driver/edit-step-three', [DriverController::class, 'updateStepThree'])
-        ->name('driver.edit.step.three.post');
+    // Route::get('driver/edit-step-three', [DriverController::class, 'editStepThree'])
+    //     ->name('driver.edit.step.three');
+    // Route::post('driver/edit-step-three', [DriverController::class, 'updateStepThree'])
+    //     ->name('driver.edit.step.three.post');
 
     // Route::get('/driver/{id}/edit', [DriverController::class, 'edit'])->name('driver.edit');
     Route::get('/driver/{id}', [DriverController::class, 'detail'])->name('driver.detail');
@@ -148,7 +157,7 @@ Route::middleware(['checkrole:1000051'])->group(function () {
     ->name('menu.profil.planner')
     ->middleware('checkrole:1000051');
 
-    // Transport Tracking
+
     Route::get('/histori/all', [HistoriController::class, 'historiPlanner'])->name('histori.planner');
     Route::get('/history/detail/{id}', [HistoriController::class, 'detailPlanner'])
     ->whereNumber('id') // memastikan ID hanya angka

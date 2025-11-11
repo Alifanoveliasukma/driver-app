@@ -3,12 +3,10 @@
 namespace App\Services;
 
 
-
 class DriverApi extends BaseApi
 {
     public function getDriver($bpartnerId)
     {
-
         $request = '
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:adin="http://3e.pl/ADInterface">
            <soapenv:Header/>
@@ -43,63 +41,55 @@ class DriverApi extends BaseApi
         return $this->sendRequest($request);
     }
 
-    public function createDriver(array $driverFields): string
+    public function createDriver($value, $name, $data) 
     {
-        if (empty($driverFields['Value']) || empty($driverFields['Name'])) {
-            throw new \Exception("Value and Name are required for Driver creation.");
-        }
-
-        $fields = array_merge([
-            'Value' => '', 
-            'Name' => '', 
-            'DriverStatus' => 'Stand by', 
-            'XM_Fleet_ID' => null, 
-            'Krani_ID' => null, 
-            'AccountNo' => null,
-            'Account' => null,
-            'Note' => null,
-        ], $driverFields);
-
-        $fieldsXml = '';
-        foreach ($fields as $column => $val) {
-            if (!empty($val) || (is_string($val) && strlen($val) > 0)) {
-                $fieldsXml .= '
-                        <adin:field column="' . htmlspecialchars($column) . '">
-                            <adin:val>' . htmlspecialchars($val) . '</adin:val>
-                        </adin:field>';
-            }
-        }
-
-        $adLoginRequestXml = $this->getAdLoginRequest();
+        $value = htmlspecialchars($value);
+        $name = htmlspecialchars($name);
+        $driver_status = htmlspecialchars($data['driver_status']);
+        $xm_fleet_id = htmlspecialchars($data['xm_fleet_id'] ?? '');
+        $krani_id = htmlspecialchars($data['krani_id'] ?? '');
+        $account_no = htmlspecialchars($data['account_no'] ?? '');
+        $account_name = htmlspecialchars($data['account_name'] ?? '');
+        $note = htmlspecialchars($data['note'] ?? '');
 
         $request = '
-         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
-            xmlns:adin="http://3e.pl/ADInterface">
-            <soapenv:Header/>
-            <soapenv:Body>
-               <adin:createData>
-                     <adin:ModelCRUDRequest>
-                        <adin:ModelCRUD>
-                           <adin:serviceType>API-CreateDriver</adin:serviceType>
-                           <adin:TableName>XM_Driver</adin:TableName>
-                           <adin:RecordID>0</adin:RecordID>
-                           <adin:Action>Create</adin:Action>
-                           <adin:DataRow>'
-                           . $fieldsXml . '
-                           </adin:DataRow>
-                        </adin:ModelCRUD>
-                        <adin:ADLoginRequest>
-                           ' . $adLoginRequestXml . '
-                        </adin:ADLoginRequest>
-                     </adin:ModelCRUDRequest>
-               </adin:createData>
-            </soapenv:Body>
-         </soapenv:Envelope>';
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:adin="http://3e.pl/ADInterface">
+        <soapenv:Header/>
+        <soapenv:Body>
+            <adin:createData>
+                <adin:ModelCRUDRequest>
+                    <adin:ModelCRUD>
+                        <adin:serviceType>API-CreateDriver</adin:serviceType>
+                        <adin:TableName>XM_Driver</adin:TableName>
+                        <adin:RecordID>0</adin:RecordID>
+                        <adin:Action>Create</adin:Action>
+                        <adin:DataRow>
+                            <adin:field column="Value"><adin:val>'.$value.'</adin:val></adin:field>
+                            <adin:field column="Name"><adin:val>'.$name.'</adin:val></adin:field>
+                            <adin:field column="DriverStatus"><adin:val>'.$driver_status.'</adin:val></adin:field>
+                            <adin:field column="XM_Fleet_ID"><adin:val>'.$xm_fleet_id.'</adin:val></adin:field>
+                            <adin:field column="Krani_ID"><adin:val>'.$krani_id.'</adin:val></adin:field>
+                            <adin:field column="AccountNo"><adin:val>'.$account_no.'</adin:val></adin:field>
+                            <adin:field column="Account"><adin:val>'.$account_name.'</adin:val></adin:field>
+                            <adin:field column="Note"><adin:val>'.$note.'</adin:val></adin:field>
+                        </adin:DataRow>
+                    </adin:ModelCRUD>
+                    <adin:ADLoginRequest>
+                        <adin:user>' . env('ERP_USER') . '</adin:user>
+                        <adin:pass>' . env('ERP_PASS') . '</adin:pass>
+                        <adin:lang>192</adin:lang>
+                        <adin:ClientID>' . env('ERP_CLIENT') . '</adin:ClientID>
+                        <adin:RoleID>' . env('ERP_ROLE') . '</adin:RoleID>
+                        <adin:OrgID>' . env('ERP_ORG') . '</adin:OrgID>
+                        <adin:WarehouseID>' . env('ERP_WH') . '</adin:WarehouseID>
+                    </adin:ADLoginRequest>
+                </adin:ModelCRUDRequest>
+            </adin:createData>
+        </soapenv:Body>
+        </soapenv:Envelope>';
 
-        $soapResponse = $this->sendRequest($request);
-
-        // PENTING: Mengekstrak RecordID (XM_Driver_ID) dari respons SOAP
-        return $this->extractRecordIDFromResponse($soapResponse);
+        return $this->sendRequest($request); // <--- DIPANGGIL DARI DALAM KELAS TURUNAN
     }
-
 }
+
+
