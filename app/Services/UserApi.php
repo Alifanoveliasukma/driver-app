@@ -92,5 +92,43 @@ class UserApi extends BaseApi
 
         return $this->sendRequest($request);
     }
+    public function addUserOrg($userId, $orgId)
+    {
+        $request = '
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:adin="http://3e.pl/ADInterface">
+        <soapenv:Header/>
+        <soapenv:Body>
+            <adin:createData>
+                <adin:ModelCRUDRequest>
+                    <adin:ModelCRUD>
+                    <adin:serviceType>API-AddOrgAccess</adin:serviceType>
+                    <adin:TableName>AD_User_OrgAccess</adin:TableName>
+                    <adin:RecordID>0</adin:RecordID>
+                    <adin:Action>Create</adin:Action>
+                    <adin:DataRow>
+                        <adin:field column="AD_User_ID">
+                            <adin:val>' . htmlspecialchars($userId) . '</adin:val>
+                        </adin:field>
+                        <adin:field column="AD_Org_ID">
+                            <adin:val>' . htmlspecialchars($orgId) . '</adin:val>
+                        </adin:field>
+                    </adin:DataRow>
+                    </adin:ModelCRUD>
+                    <adin:ADLoginRequest>
+                    <adin:user>' . env('ERP_USER') . '</adin:user>
+                    <adin:pass>' . env('ERP_PASS') . '</adin:pass>
+                    <adin:lang>192</adin:lang>
+                    <adin:ClientID>' . env('ERP_CLIENT') . '</adin:ClientID>
+                    <adin:RoleID>' . env('ERP_ROLE') . '</adin:RoleID>
+                    <adin:OrgID>' . env('ERP_ORG') . '</adin:OrgID>
+                    <adin:WarehouseID>' . env('ERP_WH') . '</adin:WarehouseID>
+                    </adin:ADLoginRequest>
+                </adin:ModelCRUDRequest>
+            </adin:createData>
+        </soapenv:Body>
+        </soapenv:Envelope>';
 
+        return $this->sendRequest($request);
+    }
+    
 }

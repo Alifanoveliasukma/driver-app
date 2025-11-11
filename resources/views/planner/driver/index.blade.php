@@ -11,7 +11,7 @@
         <h4 class="fw-bold text-primary mb-0">Data Driver</h4>
 
         <div class="ms-auto">
-            <a href="{{ route('driver.create.step.one') }}" class="btn btn-primary">
+            <a href="{{ route('driver.create') }}" class="btn btn-primary">
                 <i class="bi bi-plus-circle me-2"></i> Tambah Driver
             </a>
         </div>
@@ -51,10 +51,7 @@
                             <td>1234567890</td>
                             <td>BCA - a.n Ahmad Yusuf</td>
                             <td>Driver baru pindahan dari cabang Bekasi.</td>
-                            <td class="text-center">
-                                <a href="{{ route('driver.detail', 1) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
-                                <a href="{{ route('driver.edit.step.one', 1) }}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil"></i></a>
-                            </td>
+                            
                         </tr>
                         <tr>
                             <td>2</td>
@@ -68,10 +65,7 @@
                             <td>9876543210</td>
                             <td>BRI - a.n Rudi Hartono</td>
                             <td>Cut off sementara karena perawatan kendaraan.</td>
-                            <td class="text-center">
-                                <a href="{{ route('driver.detail', 2) }}" class="btn btn-sm btn-info text-white"><i class="bi bi-eye"></i></a>
-                                <a href="{{ route('driver.edit.step.one', 2) }}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil"></i></a>
-                            </td>
+                            
                         </tr>
                     </tbody>
                 </table>
