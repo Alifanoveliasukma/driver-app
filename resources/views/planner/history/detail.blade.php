@@ -20,22 +20,22 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Customer <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" value="{{ $data['Customer_ID'] ?? '-' }}" readonly>
+                <input type="text" class="form-control" value="{{ $data['Customer_Name'] ?? '-' }}" readonly>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Product</label>
-                <input type="text" class="form-control" value="{{ $data['M_Product_ID'] ?? '-' }}" readonly>
+                <input type="text" class="form-control" value="{{ $data['Product_Name'] ?? '-' }}" readonly>
             </div>
         </div>
 
         <div class="row mb-3">
             <div class="col-md-6">
                 <label class="form-label">Fleet <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" value="{{ $data['XM_Fleet_ID'] ?? '-' }}" readonly>
+                <input type="text" class="form-control" value="{{ $data['Fleet_Name'] ?? '-' }}" readonly>
             </div>
             <div class="col-md-6">
                 <label class="form-label">Driver <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" value="{{ $data['XM_Driver_ID'] ?? '-' }}" readonly>
+                <input type="text" class="form-control" value="{{ $data['Driver_Name'] ?? '-' }}" readonly>
             </div>
         </div>
 

@@ -1,7 +1,6 @@
 @extends('layouts.template-planner')
 
 
-
 @section('content')
 <div class="container-fluid mt-4">
     <h4 class="mb-4">Transport Status History</h4>
@@ -84,10 +83,10 @@
                                 @endif
                             </td>
                             <td>
-                                @if(request('search') && stripos($r['Customer_ID'] ?? '', request('search')) !== false)
-                                    {!! highlightText($r['Customer_ID'] ?? '-', request('search')) !!}
+                                @if(request('search') && stripos($r['Customer_Name'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['Customer_Name'] ?? '-', request('search')) !!}
                                 @else
-                                    {{ $r['Customer_ID'] ?? '-' }}
+                                    {{ $r['Customer_Name'] ?? '-' }}
                                 @endif
                             </td>
                             <td>
@@ -141,3 +140,4 @@
         </div>
     </div>
 </div>
+@endsection

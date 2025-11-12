@@ -6,7 +6,7 @@
 <div class="container py-3">
     <div class="card shadow-lg border-0 mb-4">
         <div class="card-header bg-primary text-white border-bottom-0">
-            <h4 class="mb-0 fw-bold">👤🚛 Pendaftaran User & Driver Baru</h4>
+            <h4 class="mb-0 fw-bold">👤 Pendaftaran User & Driver Baru</h4>
         </div>
         <div class="card-body p-4">
 
@@ -79,24 +79,8 @@
                                 @error('user_password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="is_full_bp_access" class="form-label fw-semibold">Akses Penuh BP? (IsFullBPAccess)</label>
-                                <select name="is_full_bp_access" id="is_full_bp_access" class="form-select @error('is_full_bp_access') is-invalid @enderror" required>
-                                    <option value="Y" {{ old('is_full_bp_access') == 'Y' ? 'selected' : '' }}>Ya (Y)</option>
-                                    <option value="N" {{ old('is_full_bp_access', 'N') == 'N' ? 'selected' : '' }}>Tidak (N)</option>
-                                </select>
-                                @error('is_full_bp_access')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
                         </div>
 
-                        <div class="col-md-6 mb-3">
-                            <label for="is_login_user" class="form-label fw-semibold">Bisa Login? (IsLoginUser)</label>
-                            <select name="is_login_user" id="is_login_user" class="form-select @error('is_login_user') is-invalid @enderror" required>
-                                <option value="Y" {{ old('is_login_user', 'Y') == 'Y' ? 'selected' : '' }}>Ya (Y)</option>
-                                <option value="N" {{ old('is_login_user') == 'N' ? 'selected' : '' }}>Tidak (N)</option>
-                            </select>
-                            @error('is_login_user')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                        </div>
                     </div>
                 </div>
                 {{-- END STEP 1 --}}
@@ -135,18 +119,28 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="xm_fleet_id" class="form-label fw-semibold">ID Fleet (XM_Fleet_ID)</label>
-                                <input type="number" name="xm_fleet_id" id="xm_fleet_id" class="form-control @error('xm_fleet_id') is-invalid @enderror" value="{{ old('xm_fleet_id') }}">
+                                <label for="xm_fleet_id" class="form-label fw-semibold">Nama Fleet</label>
+                                <select name="xm_fleet_id" id="xm_fleet_id" class="form-select select2 @error('xm_fleet_id') is-invalid @enderror">
+                                    <option value="">-- Pilih Fleet --</option>
+                                    @foreach($fleets as $fleet)
+                                        <option 
+                                            value="{{ $fleet->xm_fleet_id }}" 
+                                            {{ old('xm_fleet_id') == $fleet->xm_fleet_id ? 'selected' : '' }}
+                                        >
+                                            {{ $fleet->fleet_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('xm_fleet_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <!-- <div class="col-md-6 mb-3">
                                 <label for="krani_id" class="form-label fw-semibold">ID Krani (Krani_ID)</label>
                                 <input type="number" name="krani_id" id="krani_id" class="form-control @error('krani_id') is-invalid @enderror" value="{{ old('krani_id') }}">
                                 @error('krani_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                            </div>
+                            </div> -->
 
                             <div class="col-md-6 mb-3">
                                 <label for="account_no" class="form-label fw-semibold">No. Rekening (AccountNo)</label>
@@ -195,46 +189,41 @@
 </div>
 
 <script>
-    // Inisialisasi step saat ini (dimulai dari 1)
+    $(document).ready(function() {
+        $('#xm_fleet_id').select2({
+            theme: 'bootstrap-5',
+            placeholder: '-- Pilih Fleet --',
+            allowClear: true
+        });
+    });
+</script>
+
+<script>
     let currentStep = 1;
 
-    // Daftar field yang ada di Step 1. Digunakan untuk validasi sisi klien.
     const step1Fields = ['user_value', 'user_name', 'user_password'];
 
-    // Daftar field yang ada di Step 2. Digunakan untuk mendeteksi error validasi dari server.
     const step2Fields = [
         'driver_status', 'xm_fleet_id', 'krani_id', 'account_no', 
         'account_name', 'note', 'is_full_bp_access', 'is_login_user' 
     ];
 
-    /**
-     * Menampilkan langkah (step) yang diminta dan menyembunyikan yang lain.
-     * @param {number} n - Nomor langkah yang akan ditampilkan (1 atau 2).
-     */
     function showStep(n) {
-        // Sembunyikan semua konten langkah
         document.querySelectorAll('.step').forEach(step => {
             step.classList.add('d-none');
         });
 
-        // Tampilkan langkah yang diminta
         document.getElementById(`step${n}`).classList.remove('d-none');
         currentStep = n;
 
-        // Atur status tombol
         document.getElementById('prevBtn').classList.toggle('d-none', n === 1);
         document.getElementById('nextBtn').classList.toggle('d-none', n === 2);
         document.getElementById('submitBtn').classList.toggle('d-none', n === 1);
         document.getElementById('backToListBtn').classList.toggle('d-none', n === 2);
 
-        // Update Progress Indicator
         updateProgress(n);
     }
 
-    /**
-     * Mengatur progres bar (indicator).
-     * @param {number} n - Nomor langkah saat ini.
-     */
     function updateProgress(n) {
         const indicator1 = document.getElementById('step-indicator-1');
         const indicator2 = document.getElementById('step-indicator-2');
@@ -254,10 +243,6 @@
         }
     }
 
-    /**
-     * Validasi langkah saat ini sebelum melanjutkan.
-     * @returns {boolean} True jika valid, False jika tidak.
-     */
     function validateStep(step) {
         let isValid = true;
         let fieldsToCheck = [];
@@ -265,7 +250,6 @@
         if (step === 1) {
             fieldsToCheck = step1Fields;
         } 
-        // Anda bisa menambahkan validasi untuk Step 2 di sini sebelum submit jika perlu
 
         fieldsToCheck.forEach(fieldName => {
             const input = document.getElementById(fieldName);
@@ -284,13 +268,8 @@
         return isValid;
     }
 
-    /**
-     * Pindah ke langkah berikutnya atau sebelumnya.
-     * @param {number} n - 1 untuk maju, -1 untuk mundur.
-     */
     function nextStep(n) {
         if (n === 1 && currentStep === 1) {
-            // Cek validasi sebelum maju ke Step 2
             if (!validateStep(1)) {
                 return; 
             }
@@ -298,39 +277,29 @@
 
         let next = currentStep + n;
 
-        // Batasi langkah
         if (next > 2) next = 2;
         if (next < 1) next = 1;
 
         showStep(next);
     }
-
-    // Panggil fungsi ini saat halaman dimuat
     document.addEventListener('DOMContentLoaded', function() {
         const errorElement = document.getElementById('serverValidationError');
         
-        // Cek apakah ada error validasi dari Laravel
         if (errorElement) {
-            // Cek apakah ada field error yang termasuk dalam Step 2
             const isStep2Error = step2Fields.some(fieldName => {
-                // Laravel menambahkan kelas is-invalid jika ada error
                 return document.getElementById(fieldName)?.classList.contains('is-invalid');
             });
 
             if (isStep2Error) {
-                // Jika error ada di Step 2, tampilkan Step 2
                 showStep(2);
             } else {
-                // Default: Tampilkan Step 1
                 showStep(1);
             }
         } else {
-            // Jika tidak ada error, tampilkan Step 1
             showStep(1);
         }
     });
 
-    // Panggil fungsi untuk menampilkan Step 1 saat pertama kali dimuat (jika tidak ada error)
-    // showStep(currentStep); // Sudah dipanggil di DOMContentLoaded
+
 </script>
 @endsection

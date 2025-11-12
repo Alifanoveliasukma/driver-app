@@ -80,7 +80,8 @@ class HistoriController extends Controller
                 return isset($r['Status']) && $r['Status'] === 'FINISHED'; // hanya histori
             })
             ->sortByDesc(function ($r) {
-                return $r['ETA'] ?? '0000-01-01 00:00:00'; // histori urut dari ETA terbaru
+                return $r['ETA'] ?? '0000-01-01 00:00:00'; 
+
             })
             ->values()
             ->map(function ($r) use ($customers, $routes) {
@@ -127,13 +128,35 @@ class HistoriController extends Controller
         $cacheTime = 300; 
 
         $mappedStatuses = Cache::remember($cacheKey, $cacheTime, function () {
-            // Asumsi: getAllTransportStatus() sudah memuat filter Status='FINISHED'
             $response = $this->transportStatus->getAllTransportStatus(); 
             
             $rows = data_get($response, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
             
             return $this->mapSoapResponse($rows);
         });
+
+        $customerIds = collect($mappedStatuses)->pluck('Customer_ID')->filter()->unique()->all();
+        $fleetIds    = collect($mappedStatuses)->pluck('XM_Fleet_ID')->filter()->unique()->all();
+
+        $customerNames = DB::table('mzl.c_bpartner')
+            ->whereIn('c_bpartner_id', $customerIds)
+            ->pluck('name', 'c_bpartner_id')
+            ->all();
+
+        $fleetNames = DB::table('mzl.xm_fleet')
+            ->whereIn('xm_fleet_id', $fleetIds)
+            ->pluck('name', 'xm_fleet_id')
+            ->all();
+
+        $mappedStatuses = collect($mappedStatuses)->map(function ($item) use ($customerNames, $fleetNames) {
+
+            $item['Customer_Name'] = $customerNames[$item['Customer_ID']] ?? null;
+            
+
+            $item['Fleet_Name'] = $fleetNames[$item['XM_Fleet_ID']] ?? null;
+
+            return $item;
+        })->all();
 
         $collection = collect($mappedStatuses)
             ->sortByDesc(fn($r) => $r['ETA'] ?? '0000-01-01 00:00:00')
@@ -170,21 +193,53 @@ class HistoriController extends Controller
 
     public function detailPlanner($id)
     {
-        // 1. Ambil Detail Transport (dari getAllTransportStatus)
         $cacheKey = 'transport_status_history_finished';
         $cacheTime = 300; 
 
-        // Mengambil data detail dari cache yang sama dengan historiPlanner
         $mappedStatuses = Cache::remember($cacheKey, $cacheTime, function () {
-            // Logika ini sama persis dengan yang ada di historiPlanner
+
             $response = $this->transportStatus->getAllTransportStatus(); 
             $rows = data_get($response, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
             return $this->mapSoapResponse($rows);
         });
 
-        // Cari detail utama berdasarkan ID
         $data = collect($mappedStatuses)->firstWhere('XX_TransOrder_ID', $id);
+        
+        if ($data) {
+            
+            $fleetId   = $data['XM_Fleet_ID'] ?? null;
+            $driverId  = $data['XM_Driver_ID'] ?? null;
+            $productId = $data['M_Product_ID'] ?? null; 
+            $customerId  = $data['Customer_ID'] ?? null;
 
+            if ($customerId) {
+                $customerName = DB::table('mzl.c_bpartner')
+                    ->where('c_bpartner_id', $customerId) 
+                    ->value('name');
+                $data['Customer_Name'] = $customerName;
+            }
+
+            if ($fleetId) {
+                $fleetName = DB::table('mzl.xm_fleet')
+                    ->where('xm_fleet_id', $fleetId)
+                    ->value('name');
+                $data['Fleet_Name'] = $fleetName;
+            }
+            
+            if ($driverId) {
+                $driverName = DB::table('mzl.xm_driver')
+                    ->where('xm_driver_id', $driverId)
+                    ->value('name');
+                $data['Driver_Name'] = $driverName;
+            }
+
+            if ($productId) {
+                $productName = DB::table('mzl.m_product')
+                    ->where('m_product_id', $productId)
+                    ->value('name');
+                $data['Product_Name'] = $productName;
+            }
+        }
         if (!$data) {
             return redirect()->route('planner.history.index')->with('error', 'Detail Transport tidak ditemukan.');
         }
@@ -195,12 +250,10 @@ class HistoriController extends Controller
             $trackingRows = data_get($responseTracking, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
             
             $trackingHistory = collect($this->mapSoapResponse($trackingRows))
-                // Urutkan berdasarkan tanggal (misalnya kolom 'DocumentDate' atau 'Created') terbaru
                 ->sortByDesc(fn($r) => $r['DocumentDate'] ?? $r['Created'] ?? '0000-01-01 00:00:00') 
                 ->values();
                 
         } catch (\Exception $e) {
-            // Handle jika panggilan API Tracking gagal
             $trackingHistory = collect([]); 
             \Log::error("Gagal mengambil Tracking History untuk ID $id: " . $e->getMessage());
         }

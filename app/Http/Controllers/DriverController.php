@@ -45,6 +45,7 @@ class DriverController extends Controller
                         'd.driverstatus',
                         'd.xm_fleet_id',
                         'd.accountno',
+                        'd.accountname',
                         'bp.c_bpartner_id',
                         'bp.value as bp_value',
                         'bp.name as bp_name',
@@ -55,7 +56,7 @@ class DriverController extends Controller
                     ->where('d.isactive', 'Y')
                     ->get();
             });
-
+            // dd($allDriverData);
             $collection = $allDriverData;
 
             if ($search) {
@@ -90,7 +91,13 @@ class DriverController extends Controller
 
     public function createForm()
     {
-        return view('planner.driver.create');
+        $fleets = DB::table('mzl.xm_fleet')
+            ->select('xm_fleet_id', 'name as fleet_name')
+            ->where('isactive', 'Y')
+            ->orderBy('fleet_name', 'asc')
+            ->get();
+
+        return view('planner.driver.create', compact('fleets'));
     }
 
     public function store(Request $request)
@@ -100,19 +107,19 @@ class DriverController extends Controller
             'user_value' => 'required|string|max:255',
             'user_name' => 'required|string|max:255',
             'user_password' => 'required|string|min:6',
-            'is_full_bp_access' => 'required|in:Y,N',
-            'is_login_user' => 'required|in:Y,N',
 
             'driver_status' => 'required|string|max:25',
             'xm_fleet_id' => 'nullable|integer',
-            'krani_id' => 'nullable|integer',
+            // 'krani_id' => 'nullable|integer',
             'account_no' => 'nullable|string|max:50',
             'account_name' => 'nullable|string|max:255',
             'note' => 'nullable|string',
         ]);
 
-        $user_data = $request->only(['user_value', 'user_name', 'user_password', 'is_full_bp_access', 'is_login_user']);
-        $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'krani_id', 'account_no', 'account_name', 'note']);
+        $user_data = $request->only(['user_value', 'user_name', 'user_password']);
+        $user_data['is_full_bp_access'] = 'Y';
+        $user_data['is_login_user'] = 'Y';
+        $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'note']);
 
         $debug_data = []; 
         $userId = null; 
