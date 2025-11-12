@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\UserApi;
 use App\Services\DriverApi;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -54,9 +55,32 @@ class DriverController extends Controller
         $userId = null; // Inisialisasi userId
 
         try {
+
+             // --- 1. Buat Driver Baru (Menangani Array Response) ---
+            $driverResponse = $this->driverApi->createDriver(
+                $user_data['user_value'], 
+                $user_data['user_name'], 
+                $driver_data
+            );
+
+            // Cek Keberhasilan & Ekstraksi RecordID Driver
+            $driverRecordId = $driverResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']['@attributes']['RecordID'] ?? 'NOT_FOUND';
+
+            if (!is_array($driverResponse) || $driverRecordId === 'NOT_FOUND') {
+                throw new \Exception('Gagal membuat data driver atau RecordID tidak ditemukan. Respons: ' . print_r($driverResponse, true));
+            }
+              $debug_data['OUTPUT_API_CALLS']['CREATE_DRIVER'] = [
+                'DRIVER_DATA' => $driver_data,
+                'RESPONSE_RAW' => $driverResponse,
+                'CONTAINS_ERROR' => false,
+                'RECORD_ID_MATCH' => $driverRecordId
+            ];
+
+            $user_data['c_bpartner_id'] = DB::table('mzl.xm_driver')->select('c_bpartner_id')
+                ->where('xm_driver_id', $driverRecordId)
+                ->value('c_bpartner_id');
             
             $userResponse = $this->userApi->createUser($user_data);
-    
             $recordIdPath = $userResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']['@attributes']['RecordID'] ?? 'NOT_FOUND';
             
             if (!is_array($userResponse) || $recordIdPath === 'NOT_FOUND') {
@@ -109,26 +133,7 @@ class DriverController extends Controller
                 throw new \Exception('Gagal menambahkan role driver ke user. Respons API: ' . print_r($roleResponse, true));
             }
 
-            // --- 3. Buat Driver Baru (Menangani Array Response) ---
-            $driverResponse = $this->driverApi->createDriver(
-                $user_data['user_value'], 
-                $user_data['user_name'], 
-                $driver_data
-            );
-
-            // Cek Keberhasilan & Ekstraksi RecordID Driver
-            $driverRecordId = $driverResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']['@attributes']['RecordID'] ?? 'NOT_FOUND';
-
-            if (!is_array($driverResponse) || $driverRecordId === 'NOT_FOUND') {
-                throw new \Exception('Gagal membuat data driver atau RecordID tidak ditemukan. Respons: ' . print_r($driverResponse, true));
-            }
-            
-            $debug_data['OUTPUT_API_CALLS']['CREATE_DRIVER'] = [
-                'DRIVER_DATA' => $driver_data,
-                'RESPONSE_RAW' => $driverResponse,
-                'CONTAINS_ERROR' => false,
-                'RECORD_ID_MATCH' => $driverRecordId
-            ];
+           
 
             // Output debug data (jika diperlukan)
             dd($debug_data);
