@@ -1,106 +1,117 @@
-@extends('layouts.template-planner')
+@extends('layouts.template-planner') {{-- Pastikan nama layout Anda benar --}}
 
-@section('title', 'Data Driver')
+@section('title', 'Data Semua Driver')
 
 @section('content')
 <div class="container py-3">
-    <div class="d-flex align-items-center mb-4">
-        <button class="btn btn-outline-primary me-3" onclick="window.history.back()" aria-label="Kembali">
-            <i class="bi bi-chevron-left"></i>
-        </button>
-        <h4 class="fw-bold text-primary mb-0">Data Driver</h4>
+    <h4 class="fw-bold text-primary mb-4">🚛 Daftar Semua Driver</h4>
 
-        <div class="ms-auto">
-            <a href="{{ route('driver.create') }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i> Tambah Driver
-            </a>
+    {{-- Pesan Sukses (digunakan saat clear cache) --}}
+    @if(session('success_message'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success_message') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+    @endif
+
+    @isset($error)
+        <div class="alert alert-danger" role="alert">
+            <i class="bi bi-x-octagon-fill me-2"></i> **Error:** {{ $error }}
+        </div>
+    @endisset
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        {{-- Pencarian menggunakan Form, dikirim ke Controller --}}
+        <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2">
+            <label for="searchInput" class="form-label mb-0 fw-semibold">Cari Driver:</label>
+            <input type="text" class="form-control w-auto shadow-sm" id="searchInput" name="search" 
+                   placeholder="Ketik NIP, Nama, atau Status..." 
+                   value="{{ $search ?? '' }}">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Cari</button>
+            @if(isset($search))
+                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">Reset</a>
+            @endif
+        </form>
+
+        {{-- Tombol Debugging Clear Cache --}}
+        <a href="{{ url()->current() }}?clear_cache=true" class="btn btn-sm btn-outline-danger" title="Hapus cache driver dan muat ulang data">
+            <i class="bi bi-arrow-clockwise me-1"></i> Clear Cache
+        </a>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="driverTable" class="table table-bordered table-hover align-middle">
-                    <thead class="table-primary text-center">
-                        <tr>
-                            <th>No</th>
-                            <th>Search Key</th>
-                            <th>Status Driver</th>
-                            <th>Nama Driver</th>
-                            <th>Business Partner</th>
-                            <th>Fleet ID</th>
-                            <th>Active</th>
-                            <th>Krani ID</th>
-                            <th>Account No</th>
-                            <th>Account</th>
-                            <th>Catatan</th>
-                            <th width="120px">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{-- Contoh data dummy --}}
-                        <tr>
-                            <td>1</td>
-                            <td>DRV001</td>
-                            <td><span class="badge bg-success">Aktif</span></td>
-                            <td>Ahmad Yusuf</td>
-                            <td>BP-1002</td>
-                            <td>FLT-009</td>
-                            <td><span class="badge bg-success">Yes</span></td>
-                            <td>KRN-008</td>
-                            <td>1234567890</td>
-                            <td>BCA - a.n Ahmad Yusuf</td>
-                            <td>Driver baru pindahan dari cabang Bekasi.</td>
-                            
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>DRV002</td>
-                            <td><span class="badge bg-danger">Nonaktif</span></td>
-                            <td>Rudi Hartono</td>
-                            <td>BP-1003</td>
-                            <td>FLT-015</td>
-                            <td><span class="badge bg-secondary">No</span></td>
-                            <td>KRN-010</td>
-                            <td>9876543210</td>
-                            <td>BRI - a.n Rudi Hartono</td>
-                            <td>Cut off sementara karena perawatan kendaraan.</td>
-                            
-                        </tr>
-                    </tbody>
-                </table>
+
+    @if($driverData->isEmpty() && !isset($error) && !isset($search))
+        {{-- Tampil jika tidak ada data sama sekali --}}
+        <div class="alert alert-info" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i> Tidak ada data Driver yang ditemukan.
+        </div>
+    @elseif($driverData->isEmpty() && isset($search))
+        {{-- Tampil jika tidak ada data setelah difilter --}}
+        <div class="alert alert-warning" role="alert">
+            <i class="bi bi-search me-2"></i> Tidak ditemukan data yang cocok dengan kata kunci **"{{ $search }}"**.
+        </div>
+    @else
+        <div class="card shadow-lg border-0">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-4" id="driverTable">
+                        <thead>
+                            <tr class="table-primary">
+                                <th>#</th>
+                                <th>NIP</th>
+                                <th>Nama Lengkap</th>
+                                <th>Status</th>
+                                <th>ID Fleet</th>
+                                <th>ID BP</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            @foreach($driverData as $driver)
+                                <tr>
+                                    {{-- Menghitung nomor urut dengan memperhitungkan halaman saat ini --}}
+                                    <td>{{ $loop->iteration + ($driverData->currentPage() - 1) * $driverData->perPage() }}</td>
+                                    <td>{{ $driver->nip }}</td>
+                                    <td>{{ $driver->nama_lengkap }}</td>
+                                    <td>
+                                        <span class="badge 
+                                            @if($driver->driverstatus == 'Stand By') bg-success 
+                                            @elseif($driver->driverstatus == 'Out') bg-warning 
+                                            @else bg-secondary 
+                                            @endif">
+                                            {{ $driver->driverstatus }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $driver->xm_fleet_id ?? '-' }}</td>
+                                    <td>{{ $driver->c_bpartner_id ?? '-' }}</td>
+                                    
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" title="Lihat Detail">
+                                            <i class="bi bi-eye"></i> Detail
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ✅ Pagination Sesuai Contoh User -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted">
+                        Menampilkan **{{ $driverData->firstItem() ?? 0 }}** - **{{ $driverData->lastItem() ?? 0 }}** dari **{{ $driverData->total() }}** data
+                    </div>
+                    <div>
+                        {{-- Menggunakan vendor.pagination.bootstrap-4 dan onEachSide(1) --}}
+                        {{ $driverData->onEachSide(1)->appends(['search' => $search])->links('vendor.pagination.bootstrap-4') }}
+                    </div>
+                </div>
+                <p class="text-muted small mt-2 mb-0">
+                    <i class="bi bi-info-circle-fill me-1"></i> **Catatan:** Jika ada Driver baru yang sudah ditambahkan di database tetapi belum muncul, silakan klik tombol **Clear Cache** di atas untuk memuat ulang data terbaru.
+                </p>
+
             </div>
         </div>
-    </div>
+    @endif
 </div>
-
-<!-- DataTables JS & CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        $('#driverTable').DataTable({
-            order: [[0, 'asc']],
-            pageLength: 10,
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data per halaman",
-                zeroRecords: "Data tidak ditemukan",
-                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                infoEmpty: "Tidak ada data tersedia",
-                infoFiltered: "(disaring dari total _MAX_ data)",
-                paginate: {
-                    previous: "Sebelumnya",
-                    next: "Berikutnya"
-                }
-            },
-            columnDefs: [
-                { targets: [0, 6, 7, 8, 9, 10, 11], className: 'text-center' }
-            ]
-        });
-    });
-</script>
 @endsection
