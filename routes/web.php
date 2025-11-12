@@ -100,6 +100,14 @@ Route::middleware(['checkrole:1000051'])->group(function () {
     // Rute untuk halaman sukses setelah proses berhasil
     Route::get('/success-user-driver', [DriverController::class, 'successPage'])->name('driver.success');
 
+    Route::get('/clear-cache', function() {
+        Cache::forget('all_active_drivers'); // Hapus hanya cache driver
+        // Atau hapus semua cache:
+        // Artisan::call('cache:clear');
+
+        return "Cache driver telah dihapus. Silakan refresh halaman utama.";
+    });
+
     // Step 1 - Data Dasar Driver
     // Route::get('/create/step-one', [DriverController::class, 'createStepOne'])->name('driver.create.step.one');
     // Route::post('/create/step-one', [DriverController::class, 'createStepOnePost'])->name('driver.create.step.one.post');

@@ -26,12 +26,17 @@ class DriverController extends Controller
     {
         $perPage = 10;
         $cacheKey = 'all_active_drivers';
-        $cacheTime = 60 * 60; // 60 menit
+        $cacheTime = 60 * 60; 
+        $search = $request->get('search');
+
+        if ($request->has('clear_cache') && $request->get('clear_cache') === 'true') {
+            Cache::forget($cacheKey);
+        }
 
         try {
-            // 1. Ambil Data dari Database atau Cache (semua data)
+
             $allDriverData = Cache::remember($cacheKey, $cacheTime, function () {
-                // Query hanya akan dieksekusi jika data tidak ada di cache
+
                 return DB::table('mzl.xm_driver as d')
                     ->select(
                         'd.xm_driver_id as id',
@@ -39,85 +44,49 @@ class DriverController extends Controller
                         'd.name as nama_lengkap',
                         'd.driverstatus',
                         'd.xm_fleet_id',
+                        'd.accountno',
                         'bp.c_bpartner_id',
-                        'bp.value as bp_value'
+                        'bp.value as bp_value',
+                        'bp.name as bp_name',
+                        'f.name as fleet_name' 
                     )
                     ->leftJoin('mzl.c_bpartner as bp', 'bp.c_bpartner_id', '=', 'd.c_bpartner_id')
+                    ->leftJoin('mzl.xm_fleet as f', 'f.xm_fleet_id', '=', 'd.xm_fleet_id') 
                     ->where('d.isactive', 'Y')
-                    ->get(); // Mengambil data sebagai Collection
+                    ->get();
             });
 
             $collection = $allDriverData;
-            $search = $request->get('search');
 
-            // 2. Terapkan Filter Pencarian (jika ada) pada Collection
             if ($search) {
                 $search = strtolower($search);
                 $collection = $collection->filter(function ($item) use ($search) {
-                    // Cari kecocokan di NIP, Nama Lengkap, atau Status
                     return str_contains(strtolower($item->nip ?? ''), $search) || 
-                           str_contains(strtolower($item->nama_lengkap ?? ''), $search) ||
-                           str_contains(strtolower($item->driverstatus ?? ''), $search);
-                })->values(); // Reset kunci setelah filtering
+                        str_contains(strtolower($item->nama_lengkap ?? ''), $search) ||
+                        str_contains(strtolower($item->driverstatus ?? ''), $search);
+                })->values(); 
             }
 
-            // 3. Pagination Manual pada Collection
             $currentPage = LengthAwarePaginator::resolveCurrentPage();
-            
-            // Hitung data yang akan ditampilkan di halaman ini
             $pagedData = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
-            // Buat instance LengthAwarePaginator
             $driverData = new LengthAwarePaginator(
                 $pagedData,
-                $collection->count(), // Total item setelah filter
+                $collection->count(),
                 $perPage,
                 $currentPage,
-                // Pastikan path dan query string (termasuk 'search') diteruskan
                 ['path' => $request->url(), 'query' => $request->query()] 
             );
 
-            // 4. Kirim data ke view
             return view('planner.driver.index', compact('driverData', 'search'));
 
         } catch (\Exception $e) {
-            // Jika ada masalah koneksi atau query DB
             return view('planner.driver.index', [
                 'driverData' => new LengthAwarePaginator(collect([]), 0, $perPage, 1),
                 'error' => 'Gagal memuat data Driver dari Database: ' . $e->getMessage()
             ]);
         }
     }
-
-    // public function index()
-    // {
-    //     try {
-    //         $driverData = DB::table('mzl.xm_driver as d')
-    //             ->select(
-    //                 'd.xm_driver_id as id',
-    //                 'd.value as nip',
-    //                 'd.name as nama_lengkap',
-    //                 'd.driverstatus',
-    //                 'd.xm_fleet_id',
-    //                 'bp.c_bpartner_id',
-    //                 'bp.value as bp_value'
-    //             )
-    //             ->leftJoin('mzl.c_bpartner as bp', 'bp.c_bpartner_id', '=', 'd.c_bpartner_id')
-    //             ->where('d.isactive', 'Y')
-    //             ->get();
-            
-    //         // dd($driverData);
-    //         // Kirim data ke view
-    //         return view('planner.driver.index', compact('driverData'));
-
-    //     } catch (\Exception $e) {
-    //         // Jika ada masalah koneksi atau query DB
-    //         return view('planner.driver.index', [
-    //             'driverData' => collect(), // Kirim koleksi kosong
-    //             'error' => 'Gagal memuat data Driver dari Database: ' . $e->getMessage()
-    //         ]);
-    //     }
-    // }
 
     public function createForm()
     {
@@ -145,19 +114,16 @@ class DriverController extends Controller
         $user_data = $request->only(['user_value', 'user_name', 'user_password', 'is_full_bp_access', 'is_login_user']);
         $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'krani_id', 'account_no', 'account_name', 'note']);
 
-        $debug_data = []; // Inisialisasi variabel debug
-        $userId = null; // Inisialisasi userId
+        $debug_data = []; 
+        $userId = null; 
 
         try {
-
-             // --- 1. Buat Driver Baru (Menangani Array Response) ---
             $driverResponse = $this->driverApi->createDriver(
                 $user_data['user_value'], 
                 $user_data['user_name'], 
                 $driver_data
             );
 
-            // Cek Keberhasilan & Ekstraksi RecordID Driver
             $driverRecordId = $driverResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']['@attributes']['RecordID'] ?? 'NOT_FOUND';
 
             if (!is_array($driverResponse) || $driverRecordId === 'NOT_FOUND') {
@@ -226,16 +192,10 @@ class DriverController extends Controller
             if (!$isRoleSuccess) {
                 throw new \Exception('Gagal menambahkan role driver ke user. Respons API: ' . print_r($roleResponse, true));
             }
-
-           
-
-            // Output debug data (jika diperlukan)
-            dd($debug_data);
             
-            return redirect()->route('driver.success')->with('success', '✅ User dan Driver berhasil dibuat!');
+            return redirect()->route('driver.index')->with('success', '✅ User dan Driver berhasil dibuat!');
 
         } catch (\Exception $e) {
-            // Jika ada error di salah satu langkah, log error dan kembalikan ke halaman sebelumnya
             \Log::error('Error create driver: ' . $e->getMessage(), ['debug_data' => $debug_data ?? []]);
             return back()->with('error', $e->getMessage())->withInput();
         }

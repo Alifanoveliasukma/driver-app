@@ -33,10 +33,15 @@
             @endif
         </form>
 
-        {{-- Tombol Debugging Clear Cache --}}
-        <a href="{{ url()->current() }}?clear_cache=true" class="btn btn-sm btn-outline-danger" title="Hapus cache driver dan muat ulang data">
-            <i class="bi bi-arrow-clockwise me-1"></i> Clear Cache
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('driver.create') }}" class="btn btn-success fw-semibold shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Tambah Driver
+            </a>
+            
+            <a href="{{ url()->current() }}?clear_cache=true" class="btn btn-sm btn-outline-danger" title="Hapus cache driver dan muat ulang data">
+                <i class="bi bi-arrow-clockwise me-1"></i> Clear Cache
+            </a>
+        </div>
     </div>
 
 
@@ -58,18 +63,18 @@
                         <thead>
                             <tr class="table-primary">
                                 <th>#</th>
-                                <th>NIP</th>
+                                <th>ID</th>
                                 <th>Nama Lengkap</th>
                                 <th>Status</th>
-                                <th>ID Fleet</th>
-                                <th>ID BP</th>
-                                <th>Aksi</th>
+                                <th>Fleet</th>
+                                <th>No Account</th>
+                                <th>BPartner</th>
+                                <!-- <th>Aksi</th> -->
                             </tr>
                         </thead>
                         <tbody id="tableBody">
                             @foreach($driverData as $driver)
                                 <tr>
-                                    {{-- Menghitung nomor urut dengan memperhitungkan halaman saat ini --}}
                                     <td>{{ $loop->iteration + ($driverData->currentPage() - 1) * $driverData->perPage() }}</td>
                                     <td>{{ $driver->nip }}</td>
                                     <td>{{ $driver->nama_lengkap }}</td>
@@ -82,14 +87,15 @@
                                             {{ $driver->driverstatus }}
                                         </span>
                                     </td>
-                                    <td>{{ $driver->xm_fleet_id ?? '-' }}</td>
-                                    <td>{{ $driver->c_bpartner_id ?? '-' }}</td>
-                                    
+                                    <td>{{ $driver->fleet_name ?? '-' }}</td>
+                                    <td>{{ $driver->accountno ?? '-' }}</td>
+                                    <td>{{ $driver->bp_name ?? '-' }}</td>
+<!--                                     
                                     <td>
                                         <button class="btn btn-sm btn-outline-info" title="Lihat Detail">
                                             <i class="bi bi-eye"></i> Detail
                                         </button>
-                                    </td>
+                                    </td> -->
                                 </tr>
                             @endforeach
                         </tbody>
