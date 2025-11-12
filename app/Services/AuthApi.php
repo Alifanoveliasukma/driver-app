@@ -45,7 +45,7 @@ class AuthApi extends BaseApi
             ->select('ur.ad_role_id as id', 'r.name')
             ->leftJoin('mzl.ad_role as r', 'r.ad_role_id', '=', 'ur.ad_role_id')
             ->where('ur.ad_user_id', $userId)
-            ->whereIn('r.name', ['OPS MRO', 'INVOICE ADMIN', 'Driver', 'PLANNER ADMIN'])
+            ->whereIn('r.name', [ 'INVOICE ADMIN', 'Driver', 'PLANNER ADMIN'])
             ->get();
     }
 
