@@ -56,7 +56,7 @@ class DriverController extends Controller
                     ->where('d.isactive', 'Y')
                     ->get();
             });
-            dd($allDriverData);
+            // dd($allDriverData);
             $collection = $allDriverData;
 
             if ($search) {
@@ -200,7 +200,7 @@ class DriverController extends Controller
                 throw new \Exception('Gagal menambahkan role driver ke user. Respons API: ' . print_r($roleResponse, true));
             }
             
-            dd($debug_data);
+            // dd($debug_data);
             return redirect()->route('driver.index')->with('success', '✅ User dan Driver berhasil dibuat!');
 
         } catch (\Exception $e) {
