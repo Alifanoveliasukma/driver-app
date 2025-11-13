@@ -58,7 +58,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="bg-white p-4 rounded">
+            <form method="POST" action="{{ route('login.process') }}" class="bg-white p-4 rounded">
                 @csrf
                 <div class="d-flex justify-content-between align-items-center mb-4 px-1">
                     <div class="text-center">

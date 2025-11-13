@@ -50,15 +50,14 @@
           {{ is_array($errors->first()) ? json_encode($errors->first()) : $errors->first() }}
         </div>
       @endif
-
-      <form action="{{ route('login', ['step' => 'roleorg']) }}" method="POST" class="bg-white p-4 rounded" id="form-roleorg">
+      <form action="{{ route('auth.process') }}" method="POST" class="bg-white p-4 rounded" id="form-roleorg">
         @csrf
 
         <div class="mb-3">
           <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
           <select id="role" name="role" class="form-control select2 @error('role') is-invalid @enderror" data-invalid="@error('role') true @enderror">
             <option value=""></option>
-            @foreach(($roles ?? []) as $role)
+            @foreach((session("roles") ?? []) as $role)
               <option value="{{ $role->id }}" {{ old('role')==$role->id ? 'selected' : '' }}>
                 {{ $role->name }}
               </option>
@@ -71,7 +70,7 @@
           <label for="org" class="form-label">Cabang <span class="text-danger">*</span></label>
           <select id="org" name="org" class="form-control select2 @error('org') is-invalid @enderror" data-invalid="@error('org') true @enderror">
             <option value=""></option>
-            @foreach(($orgs ?? []) as $org)
+            @foreach((session("orgs") ?? []) as $org)
               <option value="{{ $org->id }}" {{ old('org')==$org->id ? 'selected' : '' }}>
                 {{ $org->name }}
               </option>
