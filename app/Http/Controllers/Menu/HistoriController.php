@@ -25,6 +25,26 @@ class HistoriController extends Controller
         $this->middleware('checklogin');
     }
 
+    private function normalizeValue($value)
+    {
+        if (is_array($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
+        if (is_object($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE);
+        }
+
+        if ($value === null) return '';
+
+        $value = (string)$value;
+
+        $value = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $value);
+
+        return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
+    }
+
+
     public function histori()
     {
         $c_bpartner_id = session('c_bpartner_id');
@@ -168,15 +188,25 @@ class HistoriController extends Controller
             ->sortByDesc(fn($r) => $r['ETA'] ?? '0000-01-01 00:00:00')
             ->values();
 
+        $collection = $collection->map(function ($item) {
+            foreach ($item as $key => $val) {
+                $item[$key] = $this->normalizeValue($val);
+            }
+            return $item;
+        });
+
         $search = $request->get('search');
         if ($search) {
-            $collection = $collection->filter(function ($item) use ($search) {
-                $search = strtolower((string)$search);
 
-                return str_contains(strtolower((string)($item['Value'] ?? '')), $search) ||
-                    str_contains(strtolower((string)($item['Customer_Name'] ?? '')), $search) ||
-                    str_contains(strtolower((string)($item['Fleet_Name'] ?? '')), $search) ||
-                    str_contains(strtolower((string)($item['PONumber'] ?? '')), $search);
+            $search = strtolower($this->normalizeValue($search));
+
+            $collection = $collection->filter(function ($item) use ($search) {
+
+                return str_contains(strtolower($item['Value'] ?? ''), $search) ||
+                    str_contains(strtolower($item['Customer_Name'] ?? ''), $search) ||
+                    str_contains(strtolower($item['Fleet_Name'] ?? ''), $search) ||
+                    str_contains(strtolower($item['PONumber'] ?? ''), $search);
+
             })->values();
         }
 
