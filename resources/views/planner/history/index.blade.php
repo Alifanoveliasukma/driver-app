@@ -12,11 +12,11 @@
                 <div class="col-md-8">
                     <div class="input-group">
                         <input type="text" 
-                               name="search" 
-                               class="form-control" 
-                               placeholder="Cari berdasarkan Route, Customer ID, Driver ID, Fleet ID, PO Number, atau Status..."
-                               value="{{ request('search') }}"
-                               aria-label="Search">
+                                name="search" 
+                                class="form-control" 
+                                placeholder="Cari berdasarkan Search Key, Customer Name, Fleet Name, atau PO Number..." 
+                                value="{{ request('search') }}"
+                                aria-label="Search">
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-search"></i> Search
                         </button>
@@ -59,6 +59,7 @@
                             <th>ETA</th>
                             <th>ETD</th>
                             <th>Area Type</th>
+                            <th>Fleet</th>
                             <th>Status</th>
                             <th>Action</th>
 
@@ -100,6 +101,13 @@
                             ['ETA'])[0] : '-' }}</td>
                             <td>{{ isset($r['ETD']) ? explode(' ', $r['ETD'])[0] : '-' }}</td>
                             <td>{{ $r['AreaType'] ?? '-' }}</td>
+                            <td>
+                                @if(request('search') && stripos($r['Fleet_Name'] ?? '', request('search')) !== false)
+                                    {!! highlightText($r['Fleet_Name'] ?? '-', request('search')) !!}
+                                @else
+                                    {{ $r['Fleet_Name'] ?? '-' }}
+                                @endif
+                            </td>
                             <td>
                                 @if(request('search') && stripos($r['Status'] ?? '', request('search')) !== false)
                                     {!! highlightText($r['Status'] ?? '-', request('search')) !!}

@@ -124,14 +124,14 @@ class HistoriController extends Controller
 
     public function historiPlanner(Request $request)
     {
-        $cacheKey = 'transport_status_history_finished'; 
-        $cacheTime = 300; 
+        $cacheKey = 'transport_status_history_finished';
+        $cacheTime = 300;
 
         $mappedStatuses = Cache::remember($cacheKey, $cacheTime, function () {
-            $response = $this->transportStatus->getAllTransportStatus(); 
-            
+            $response = $this->transportStatus->getAllTransportStatus();
+
             $rows = data_get($response, 'soap:Body.ns1:queryDataResponse.WindowTabData.DataSet.DataRow', []);
-            
+
             return $this->mapSoapResponse($rows);
         });
 
@@ -149,11 +149,17 @@ class HistoriController extends Controller
             ->all();
 
         $mappedStatuses = collect($mappedStatuses)->map(function ($item) use ($customerNames, $fleetNames) {
+            $customerID = $item['Customer_ID'] ?? null;
+            $fleetID = $item['XM_Fleet_ID'] ?? null;
 
-            $item['Customer_Name'] = $customerNames[$item['Customer_ID']] ?? null;
-            
+            // ✅ Perbaikan keamanan Error 500 & Pemetaan Nama
+            $item['Customer_Name'] = (isset($customerNames[$customerID]) && $customerID)
+                ? $customerNames[$customerID]
+                : null;
 
-            $item['Fleet_Name'] = $fleetNames[$item['XM_Fleet_ID']] ?? null;
+            $item['Fleet_Name'] = (isset($fleetNames[$fleetID]) && $fleetID)
+                ? $fleetNames[$fleetID]
+                : null;
 
             return $item;
         })->all();
@@ -166,13 +172,11 @@ class HistoriController extends Controller
         if ($search) {
             $collection = $collection->filter(function ($item) use ($search) {
                 $search = strtolower($search);
-                return str_contains(strtolower($item['Value'] ?? ''), $search) || 
-                    str_contains(strtolower($item['Route'] ?? ''), $search) ||
-                    str_contains(strtolower($item['Customer_ID'] ?? ''), $search) ||
-                    str_contains(strtolower($item['XM_Driver_ID'] ?? ''), $search) ||
-                    str_contains(strtolower($item['XM_Fleet_ID'] ?? ''), $search) ||
-                    str_contains(strtolower($item['PONumber'] ?? ''), $search) ||
-                    str_contains(strtolower($item['Status'] ?? ''), $search);
+                
+                return str_contains(strtolower($item['Value'] ?? ''), $search) ||
+                    str_contains(strtolower($item['Customer_Name'] ?? ''), $search) || // Customer Name
+                    str_contains(strtolower($item['Fleet_Name'] ?? ''), $search) ||     // Fleet Name
+                    str_contains(strtolower($item['PONumber'] ?? ''), $search);
             })->values();
         }
 

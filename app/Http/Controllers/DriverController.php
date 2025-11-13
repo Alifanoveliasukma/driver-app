@@ -56,7 +56,7 @@ class DriverController extends Controller
                     ->where('d.isactive', 'Y')
                     ->get();
             });
-            // dd($allDriverData);
+            dd($allDriverData);
             $collection = $allDriverData;
 
             if ($search) {
@@ -119,7 +119,7 @@ class DriverController extends Controller
         $user_data = $request->only(['user_value', 'user_name', 'user_password']);
         $user_data['is_full_bp_access'] = 'Y';
         $user_data['is_login_user'] = 'Y';
-        $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'note']);
+        $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'note', 'account_name', 'account_no']);
 
         $debug_data = []; 
         $userId = null; 
@@ -200,6 +200,7 @@ class DriverController extends Controller
                 throw new \Exception('Gagal menambahkan role driver ke user. Respons API: ' . print_r($roleResponse, true));
             }
             
+            dd($debug_data);
             return redirect()->route('driver.index')->with('success', '✅ User dan Driver berhasil dibuat!');
 
         } catch (\Exception $e) {
