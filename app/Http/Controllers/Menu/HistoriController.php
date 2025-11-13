@@ -171,12 +171,12 @@ class HistoriController extends Controller
         $search = $request->get('search');
         if ($search) {
             $collection = $collection->filter(function ($item) use ($search) {
-                $search = strtolower($search);
-                
-                return str_contains(strtolower($item['Value'] ?? ''), $search) ||
-                    str_contains(strtolower($item['Customer_Name'] ?? ''), $search) || // Customer Name
-                    str_contains(strtolower($item['Fleet_Name'] ?? ''), $search) ||     // Fleet Name
-                    str_contains(strtolower($item['PONumber'] ?? ''), $search);
+                $search = strtolower((string)$search);
+
+                return str_contains(strtolower((string)($item['Value'] ?? '')), $search) ||
+                    str_contains(strtolower((string)($item['Customer_Name'] ?? '')), $search) ||
+                    str_contains(strtolower((string)($item['Fleet_Name'] ?? '')), $search) ||
+                    str_contains(strtolower((string)($item['PONumber'] ?? '')), $search);
             })->values();
         }
 
