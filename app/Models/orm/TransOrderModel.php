@@ -3,21 +3,66 @@
 namespace App\Models\orm;
 
 use DB;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TransOrderModel extends Model
 {
     use HasFactory;
-    protected $table='mzl.xx_transorder';
+    protected $table = 'mzl.xx_transorder';
     protected $hidden = [
-        
+
     ];
-    public function getTransportSales(Builder $query){
-        return $query->where([["IsActive",'=','Y'],["IsVoid",'=','N']]);
+
+    public function fleet(): HasOne
+    {
+        return $this->hasOne(FleetModel::class, "xm_fleet_id", "xm_fleet_id");
     }
-    public function getTransOrderWithCustomerAddress($transOrderId)
+    public function bPartner(): BelongsTo
+    {
+        return $this->belongsTo(BPartnerModel::class, 'customer_id', 'c_bpartner_id');
+    }
+
+    public static function getTransportSalesPaginated($perPage = 10,$search = null)
+    {
+        $transportSales= self::with([
+            'fleet:xm_fleet_id,value,name',
+
+            'bPartner:c_bpartner_id,name'
+        ])->where([
+                    ['isactive', '=', 'Y'],
+                    ['isvoid', '=', 'N']
+                ])->select(
+                "xx_transorder_id",
+                'ponumber',
+                'status',
+                'route',
+                'eta',
+                'etd',
+                'xm_fleet_id',
+                'customer_id',
+                'areatype',
+                'value'
+            )->orderBy('created', 'desc');
+
+            if ($search) {
+                $transportSales = $transportSales->where([
+                    ['ponumber','LIKE','%'.$search.'%'],
+                    ['status','LIKE','%'.$search.'%'],
+                    ['value','LIKE','%'.$search.'%'],
+                    ['areatype','LIKE','%'.$search.'%'],
+                ],'or')->orWhereHas('fleet', function ($query) use ($search) {
+                    $query->where('name', 'LIKE', '%' . $search . '%');
+                })->orWhereHas('bPartner', function ($query) use ($search) {
+                    $query->where('name', 'LIKE', '%' . $search . '%');
+                });
+            }
+            return $transportSales->paginate($perPage);
+    }
+
+    public static function getTransOrderWithCustomerAddress($transOrderId)
     {
         return DB::table('mzl.xx_transorder as t')
             ->select(
