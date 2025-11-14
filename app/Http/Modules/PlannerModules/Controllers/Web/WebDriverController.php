@@ -23,12 +23,11 @@ class WebDriverController extends Controller
     public function index(Request $request)
     {
         $perPage = 10;
-        $search = $request->get('search');
         $cacheData = [
             'cacheTime' => 60 * 60,
             'cacheKey' => 'all_active_drivers',
         ];
-        $res = DriverService::getDriver($request, $cacheData, $perPage, $search);
+        $res = DriverService::getDriver($request, $cacheData, $perPage);
         if (!$res['success']) {
             return view('planner.driver.index', [
                 'driverData' => $res['data'],
@@ -53,7 +52,7 @@ class WebDriverController extends Controller
         if (!$res['success']) {
             return back()->with('error', $res['message'])->withInput();
         }
-        return redirect()->route('driver.index')->with('success', '✅ User dan Driver berhasil dibuat!');
+        return redirect()->route('driver.index')->with('success', $res['message']);
     }
 
 }

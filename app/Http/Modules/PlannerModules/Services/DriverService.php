@@ -12,12 +12,13 @@ use Illuminate\Support\Facades\Cache;
 class DriverService
 {
     // Tambahkan metode layanan terkait driver di sini
-    public static function getDriver(Request $request, $cacheData, $perPage, $search)
+    public static function getDriver(Request $request, $cacheData, $perPage)
     {
+        $search = $request->get('search');
         if ($request->has('clear_cache') && $request->get('clear_cache') === 'true') {
             Cache::forget($cacheData['cacheKey']);
         }
-
+        
         try {
             $allDriverData = Cache::remember($cacheData['cacheKey'], $cacheData['cacheTime'], function () {
                 return DriverModel::getAllDriverName();
@@ -97,7 +98,7 @@ class DriverService
                 'RECORD_ID_MATCH' => $driverRecordId
             ];
 
-            $user_data['c_bpartner_id'] = DriverModel::getBPartnerIdByDriverId($driverRecordId);
+            $user_data['c_bpartner_id'] = (int) DriverModel::getBPartnerIdByDriverId($driverRecordId);
             
             $userResponse = $userApi->createUser($user_data);
             $recordIdPath = $userResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']['@attributes']['RecordID'] ?? 'NOT_FOUND';
@@ -159,8 +160,11 @@ class DriverService
                     'message'=> 'Gagal menambahkan role driver ke user. Respons API: ' . print_r($roleResponse, true)
                 ];
             }
-            
-            return redirect()->route('driver.index')->with('success', '✅ User dan Driver berhasil dibuat!');
+
+            return [
+                'success' => true,
+                'message' => '✅ User dan Driver berhasil dibuat!'
+            ];
 
         } catch (\Exception $e) {
             \Log::error('Error create driver: ' . $e->getMessage(), ['debug_data' => $debug_data ?? []]);

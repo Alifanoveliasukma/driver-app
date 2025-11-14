@@ -40,8 +40,7 @@ class WebAuthServices
         $password = session('password');
         $roleid = (int) $request->input('role');
         $orgid = (int) $request->input('org');
-        $whid = WarehouseModel::getWarehouseIdByOrgId($orgid);
-
+        $whid = WarehouseModel::getWarehouseIdByOrgId($orgid)->m_warehouse_id;
         $user = $api->authUser($username, $password, $roleid, $orgid, $whid);
         if (isset($user['Error'])) {
             return [
