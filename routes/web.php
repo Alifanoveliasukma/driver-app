@@ -2,18 +2,16 @@
 
 use App\Http\Modules\AuthModules\Controllers\Web\WebAuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
-Route::get('/login',[WebAuthController::class,'showLogin'])->name('login')->middleware('redirectIfLoggedIn');
-Route::post('/login',[WebAuthController::class,'processLogin'])->name('login.process')->middleware('redirectIfLoggedIn');
-Route::get('/login/role',[WebAuthController::class,'showAuth'])->name('auth')->middleware('redirectIfLoggedIn');
-Route::post('/login/role',[WebAuthController::class,'processAuth'])->name('auth.process')->middleware('redirectIfLoggedIn');
-Route::get('/', function () {
-    return redirect()->route('login');
-});
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::fallback(function () {
-    return response()->view('errors.404', [], 404);
+Route::fallback(fn() => response()->view('errors.404', [], 404));
+Route::get('/', fn() => redirect()->route('login'));
+Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
+
+Route::middleware('redirectIfLoggedIn')->group(function () {
+    Route::get('/login', [WebAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [WebAuthController::class, 'processLogin'])->name('login.process');
+    Route::get('/login/role', [WebAuthController::class, 'showAuth'])->name('auth');
+    Route::post('/login/role', [WebAuthController::class, 'processAuth'])->name('auth.process');
 });
 
 require __DIR__ . '/WebRouteModule/driver.php';

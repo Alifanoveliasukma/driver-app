@@ -35,7 +35,19 @@ class WebAuthController extends Controller
 
     public function processAuth(AuthValidator $request,AuthApi $api)
     {
-        return WebAuthServices::authProcess($request,$api);
+        $res = WebAuthServices::authProcess($request,$api);
+        if(!$res['success']){
+            return redirect()->route('login')->with('message',$res['message']);
+        }
+        if ((int) $res['data']['roleid'] === 1000049) {
+            // Driver
+            return redirect()->route('menu.list-order');
+        } elseif ((int) $res['data']['roleid'] === 1000051) {
+            // Planner Admin
+            return redirect()->route('dashboard');
+        }
+
+        return redirect()->route('login')->with('error', 'Role tidak dikenali');
     }
 
   

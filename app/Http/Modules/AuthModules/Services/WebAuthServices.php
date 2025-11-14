@@ -4,18 +4,16 @@ namespace App\Http\Modules\AuthModules\Services;
 
 use App\Http\Modules\AuthModules\Validator\AuthValidator;
 use App\Http\Modules\AuthModules\Validator\LoginValidator;
+use App\Models\orm\UserModel;
+use App\Models\orm\WarehouseModel;
 use App\Models\xml\AuthApi;
-use DB;
 
 class WebAuthServices
 {
 
     public static function loginProcess(LoginValidator $request, AuthApi $api)
     {
-        $user = DB::table('mzl.ad_user')
-            ->select('ad_user_id as id')
-            ->where('value', $request->input('username'))
-            ->first();
+        $user = UserModel::findUserIdByUsername($request->input('username'));
 
         if (!$user) {
             session()->flash(
@@ -42,14 +40,15 @@ class WebAuthServices
         $password = session('password');
         $roleid = (int) $request->input('role');
         $orgid = (int) $request->input('org');
-        $whid = DB::table('mzl.m_warehouse')
-            ->where(['isactive' => 'Y', 'ad_org_id' => $orgid])
-            ->value('m_warehouse_id');
+        $whid = WarehouseModel::getWarehouseIdByOrgId($orgid);
 
         $user = $api->authUser($username, $password, $roleid, $orgid, $whid);
         if (isset($user['Error'])) {
-            session()->flash('message', is_array($user['Error']) ? json_encode($user['Error']) : $user['Error']);
-            return redirect()->route('login');
+            return [
+                'success' => false,
+                'message'=> is_array($user['Error']) ? json_encode($user['Error']) : $user['Error']
+            ];
+            
         }
 
 
@@ -58,11 +57,15 @@ class WebAuthServices
         if (!$hasDataSet) {
             $info = $user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['Log']['Info'] ?? null;
             if ($info && isset($info['@attributes']['msgtext'])) {
-                session()->flash('message', $info['@attributes']['msgtext']);
+                $message= $info['@attributes']['msgtext'];
             } else {
-                session()->flash('message', 'Error logging in - no roles or user/pwd invalid.');
+                $message= 'Error logging in - no roles or user/pwd invalid.';
             }
-            return redirect()->route('login');
+            return [
+                'success' => false,
+                'message'=> $message
+            ];
+            
         }
 
         $dataset = $user['DataSet']
@@ -71,16 +74,21 @@ class WebAuthServices
             ?? ($user['soap:Body']['ns1:queryDataResponse']['WindowTabData']['Success'] ?? null));
         $successOk = in_array(strtolower((string) $success), ['true', 'y', '1'], true) || $success === true;
         if (!$successOk) {
-            session()->flash('message', 'Login gagal: Success=false.');
-            return redirect()->route('login');
+            return [
+                'success' => false,
+                'message'=> 'Login gagal: Success=false.' 
+            ];
+            
         }
 
         $dataRow = $dataset['DataRow'] ?? null;
         if (isset($dataRow['field'])) {
             $fields = $dataRow['field'];
         } else {
-            session()->flash('message', 'Login gagal: DataRow tidak ditemukan.');
-            return redirect()->route('login');
+            return [
+                'success' => false,
+                'message'=> 'Login gagal: DataRow tidak ditemukan.'
+            ];
         }
 
         if (isset($fields['@attributes'])) {
@@ -94,7 +102,7 @@ class WebAuthServices
 
 
         session()->forget(['username', 'password', 'roleid', 'orgid', 'c_bpartner_id','roles','orgs']);
-        session([
+        $sessonObj=[
             'user_id' => $user_id,
             'name' => $name,
             'username' => $value,
@@ -102,17 +110,14 @@ class WebAuthServices
             'roleid' => (int) $roleid,
             'orgid' => (int) $orgid,
             'is_login' => true,
-        ]);
+        ];
+        session($sessonObj);
 
-        if ((int) $roleid === 1000049) {
-            // Driver
-            return redirect()->route('menu.list-order');
-        } elseif ((int) $roleid === 1000051) {
-            // Planner Admin
-            return redirect()->route('dashboard');
-        }
-
-        return redirect()->route('login')->with('error', 'Role tidak dikenali');
+        return [
+            'success' => true,
+            'message'=> 'Login berhasil.',
+            'data'=> $sessonObj
+        ];
     }
     public static function LogOutService()
     {
