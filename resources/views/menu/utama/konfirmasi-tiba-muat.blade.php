@@ -10,15 +10,15 @@
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>
-                <span class="value">{{ $mappedDetail['Value'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->value ?? '-' }}</span>
             </div>
             <div class="row-item">
                 <span class="label">Pelanggan</span>
-                <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->customer_name ?? '-' }}</span>
             </div>
             <div class="row-item">
                 <span class="label">Status</span>
-                <span class="value">{{ $mappedDetail['Status'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->status ?? '-' }}</span>
             </div>
         </div>
     </div>
@@ -32,7 +32,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengambilan</div>
-                    <div style="font-weight: bold;">{{ $mappedDetail['pickup_address'] ?? '-' }}</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail->pickup_address ?? '-' }}</div>
                     {{-- <div style="font-weight: bold;">Jl Veteran</div> --}}
                 </div>
                 <div class="text-center">
@@ -45,7 +45,7 @@
         </div>
 
         @php
-            $pickup = \Carbon\Carbon::parse($mappedDetail['LoadDateStart'] ?? $mappedDetail['LoadDate']);
+            $pickup = \Carbon\Carbon::parse($mappedDetail->loaddatestart ?? $mappedDetail->loaddate);
             $pickup_date = $pickup->format('d M Y');
             $pickup_time = $pickup->format('H:i');
         @endphp
@@ -146,8 +146,8 @@
             const container = document.querySelector('.slide-track');
 
             const postUrl = @json(route('utama.konfirmasi-tiba-muat.submit'));
-            const nextUrl = @json(route('utama.konfirmasi-selesai-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+            const nextUrl = @json(route('utama.konfirmasi-selesai-muat', ['orderId' => $mappedDetail->xx_transorder_id ?? '']));
+            const orderId = @json($mappedDetail->xx_transorder_id ?? '');
 
             const left = parseInt(btn.style.left || '0', 10);
             const threshold = container.clientWidth - btn.clientWidth - 5;

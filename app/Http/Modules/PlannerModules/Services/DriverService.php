@@ -8,6 +8,7 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class DriverService
 {
@@ -18,7 +19,7 @@ class DriverService
         if ($request->has('clear_cache') && $request->get('clear_cache') === 'true') {
             Cache::forget($cacheData['cacheKey']);
         }
-        
+
         try {
             $allDriverData = Cache::remember($cacheData['cacheKey'], $cacheData['cacheTime'], function () {
                 return DriverModel::getAllDriverName();
@@ -76,13 +77,13 @@ class DriverService
         $user_data['is_login_user'] = 'Y';
         $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'note', 'account_name', 'account_no']);
 
-        $debug_data = []; 
-        $userId = null; 
+        $debug_data = [];
+        $userId = null;
 
         try {
             $driverResponse = $driverApi->createDriver(
-                $user_data['user_value'], 
-                $user_data['user_name'], 
+                $user_data['user_value'],
+                $user_data['user_name'],
                 $driver_data
             );
 
@@ -99,18 +100,18 @@ class DriverService
             ];
 
             $user_data['c_bpartner_id'] = (int) DriverModel::getBPartnerIdByDriverId($driverRecordId);
-            
+
             $userResponse = $userApi->createUser($user_data);
             $recordIdPath = $userResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']['@attributes']['RecordID'] ?? 'NOT_FOUND';
-            
+
             if (!is_array($userResponse) || $recordIdPath === 'NOT_FOUND') {
                 return [
                     'success' => false,
                     'message'=> 'Gagal membuat user di sistem ERP atau RecordID tidak ditemukan. Respons: ' . print_r($userResponse, true)
                 ];
             }
-            
-            $userId = $recordIdPath; 
+
+            $userId = $recordIdPath;
 
             $debug_data['OUTPUT_API_CALLS']['CREATE_USER'] = [
                 'REQUEST_DATA' => $user_data,
@@ -118,13 +119,13 @@ class DriverService
                 'CONTAINS_ERROR' => false,
                 'RECORD_ID_MATCH' => $userId
             ];
-            
-            $roleId = 1000049; 
+
+            $roleId = 1000049;
             $roleResponse = $userApi->addUserRole($userId, $roleId);
 
-            $isRoleSuccess = isset($roleResponse['soap:Body']['ns1:addDataResponse']['StandardResponse']) || 
-                            isset($roleResponse['soap:Body']['ns1:updateDataResponse']['StandardResponse']) || 
-                            isset($roleResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']); 
+            $isRoleSuccess = isset($roleResponse['soap:Body']['ns1:addDataResponse']['StandardResponse']) ||
+                            isset($roleResponse['soap:Body']['ns1:updateDataResponse']['StandardResponse']) ||
+                            isset($roleResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']);
 
             $debug_data['OUTPUT_API_CALLS']['ADD_USER_ROLE'] = [
                 'USER_ID' => $userId,
@@ -140,12 +141,12 @@ class DriverService
                 ];
             }
 
-            $orgId = 1000005; 
+            $orgId = 1000005;
             $roleResponse = $userApi->addUserOrg($userId, $orgId);
 
-            $isRoleSuccess = isset($roleResponse['soap:Body']['ns1:addDataResponse']['StandardResponse']) || 
-                            isset($roleResponse['soap:Body']['ns1:updateDataResponse']['StandardResponse']) || 
-                            isset($roleResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']); 
+            $isRoleSuccess = isset($roleResponse['soap:Body']['ns1:addDataResponse']['StandardResponse']) ||
+                            isset($roleResponse['soap:Body']['ns1:updateDataResponse']['StandardResponse']) ||
+                            isset($roleResponse['soap:Body']['ns1:createDataResponse']['StandardResponse']);
 
             $debug_data['OUTPUT_API_CALLS']['ADD_USER_ORG'] = [
                 'USER_ID' => $userId,
@@ -167,7 +168,7 @@ class DriverService
             ];
 
         } catch (\Exception $e) {
-            \Log::error('Error create driver: ' . $e->getMessage(), ['debug_data' => $debug_data ?? []]);
+            Log::error('Error create driver: ' . $e->getMessage(), ['debug_data' => $debug_data ?? []]);
             return [
                 'success' => false,
                 'message' => 'Gagal membuat User dan Driver: ' . $e->getMessage()

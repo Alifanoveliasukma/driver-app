@@ -11,15 +11,15 @@
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>
-                <span class="value">{{ $mappedDetail['Value'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->value ?? '-' }}</span>
             </div>
             <div class="row-item">
                 <span class="label">Pelanggan</span>
-                <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->customer_name ?? '-' }}</span>
             </div>
             <div class="row-item">
                 <span class="label">Status</span>
-                <span class="value">{{ $mappedDetail['Status'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->status ?? '-' }}</span>
             </div>
         </div>
     </div>
@@ -31,7 +31,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Alamat Pengiriman</div>
-                    <div style="font-weight: bold;">{{ $mappedDetail['delivery_address'] ?? '-' }}</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail->delivery_address ?? '-' }}</div>
                 </div>
                 <div class="text-center">
 
@@ -63,7 +63,7 @@
                                                                                                                                                         <label for="total_tonase">Tonase</label>
                                                                                                                                                         <div class="unit-input">
                                                                                                                                                             <input type="number" style="text-align: right" id="total_tonase" name="total_tonase"
-                                                                                                                                                                value="{{ $mappedDetail['Tonnage'] }}" disabled>
+                                                                                                                                                                value="{{ $mappedDetail->tonnage }}" disabled>
                                                                                                                                                             <span class="unit">Tonase</span>
                                                                                                                                                         </div>
                                                                                                                                                     </div>
@@ -72,7 +72,7 @@
                                                                                                                                                         <label for="biaya_tonase">Biaya Tonase</label>
                                                                                                                                                         <div class="unit-input">
                                                                                                                                                             <input type="number" style="text-align: right" id="biaya_tonase" name="TonnageCost"
-                                                                                                                                                                value="{{ $mappedDetail['TonnageCost'] }}" disabled>
+                                                                                                                                                                value="{{ $mappedDetail->tonnageCost }}" disabled>
                                                                                                                                                         </div>
                                                                                                                                                     </div>
 
@@ -80,7 +80,7 @@
                                                                                                                                                         <label for="total_kubikasi">Penjualan Tonase</label>
                                                                                                                                                         <div class="unit-input">
                                                                                                                                                             <input type="number" style="text-align: right" id="penjualan_tonase" name="TonnageSales"
-                                                                                                                                                                value="{{ $mappedDetail['TonnageSales'] }}" disabled>
+                                                                                                                                                                value="{{ $mappedDetail->tonnageSales }}" disabled>
                                                                                                                                                         </div>
                                                                                                                                                     </div> -->
         </div>
@@ -337,7 +337,7 @@
                 const threshold = container.clientWidth - btn.clientWidth - 5;
                 const postUrl = @json(route('utama.konfirmasi-keluar-bongkar.submit'));
                 const nextUrl = @json(route('menu.list-order'));
-                const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
+                const orderId = @json($mappedDetail->xx_transorder_id ?? '');
 
                 if (left >= threshold) {
                     if (!fotoSuratJalan) {

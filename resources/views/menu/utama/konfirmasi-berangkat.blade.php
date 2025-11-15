@@ -22,15 +22,15 @@
         <div class="floating-box">
             <div class="row-item">
                 <span class="label">Surat Jalan</span>
-                <span class="value">{{ $mappedDetail['Value'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->value ?? '-' }}</span>
             </div>
             <div class="row-item">
                 <span class="label">Pelanggan</span>
-                <span class="value">{{ $mappedDetail['Customer_Name'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->customer_name ?? '-' }}</span>
             </div>
             <div class="row-item">
                 <span class="label">Status</span>
-                <span class="value">{{ $mappedDetail['Status'] ?? '-' }}</span>
+                <span class="value">{{ $mappedDetail->status ?? '-' }}</span>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="text-muted mb-1" style="font-size: 14px;">Rute</div>
-                    <div style="font-weight: bold;">{{ $mappedDetail['route'] ?? '-' }}</div>
+                    <div style="font-weight: bold;">{{ $mappedDetail->route ?? '-' }}</div>
                 </div>
                 <div class="text-center">
 
@@ -141,9 +141,9 @@
             const container = document.querySelector('.slide-track');
 
             const postUrl = @json(route('utama.konfirmasi-berangkat'));
-            const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-            const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
-            const status = @json($mappedDetail['Status'] ?? '');
+            const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail->xx_transorder_id ?? '']));
+            const orderId = @json($mappedDetail->xx_transorder_id ?? '');
+            const status = @json($mappedDetail->status ?? '');
             const kmTake = document.getElementById('kmTake').value || 0;
 
             const left = parseInt(btn.style.left || '0', 10);
@@ -258,9 +258,9 @@
         //     const container = document.querySelector(".slide-track");
 
         //     const postUrl = @json(route('utama.konfirmasi-berangkat'));
-        //     const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail['XX_TransOrder_ID'] ?? '']));
-        //     const orderId = @json($mappedDetail['XX_TransOrder_ID'] ?? '');
-        //     const status = @json($mappedDetail['Status'] ?? '');
+        //     const nextUrl = @json(route('utama.konfirmasi-tiba-muat', ['orderId' => $mappedDetail->xx_transorder_id ?? '']));
+        //     const orderId = @json($mappedDetail->xx_transorder_id ?? '');
+        //     const status = @json($mappedDetail->status ?? '');
 
 
         //     const kmTake = document.getElementById("kmTake").value || 0;

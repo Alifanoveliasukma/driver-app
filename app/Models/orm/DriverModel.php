@@ -2,8 +2,8 @@
 
 namespace App\Models\orm;
 
-use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class DriverModel extends Model
@@ -39,5 +39,12 @@ class DriverModel extends Model
         return self::select('c_bpartner_id')
                 ->where('xm_driver_id', $driverId)
                 ->value('c_bpartner_id');
+    }
+
+    public static function getDriverIdByBPartnerId($bPartnerId)
+    {
+        return self::select('xm_driver_id')
+                ->where('c_bpartner_id', $bPartnerId)
+                ->value('xm_driver_id');
     }
 }

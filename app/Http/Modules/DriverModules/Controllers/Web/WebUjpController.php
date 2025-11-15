@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Menu;
+namespace App\Http\Modules\DriverModules\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
-class UjpController extends Controller
+class WebUjpController extends Controller
 {
+
     public function ujp()
     {
         return view('menu.ujp.index');

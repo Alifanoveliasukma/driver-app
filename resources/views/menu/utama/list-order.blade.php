@@ -15,13 +15,13 @@
             @break($i === 40)
 
             @php
-                $noSp = data_get($o, 'Value', '-');
-                $etaRaw = data_get($o, 'ETA');
-                $etdRaw = data_get($o, 'ETD');
-                $customerName = data_get($o, 'Customer_Name');
-                $route = data_get($o, 'route');
-                $orderId = data_get($o, 'XX_TransOrder_ID');
-                $status = data_get($o, 'Status');
+                $noSp = $o->value ?? '-';
+                $etaRaw = $o->eta ?? null;
+                $etdRaw = $o->etd ?? null;
+                $customerName = $o->customer_name ?? null;
+                $route = $o->route ?? null;
+                $orderId = $o->xx_transorder_id ?? null;
+                $status = $o->status ?? null;
 
                 $etaClean = $etaRaw ? str_replace('.0', '', $etaRaw) : null;
                 $etdClean = $etdRaw ? str_replace('.0', '', $etdRaw) : null;
@@ -93,7 +93,7 @@
                 @if ($orderId)
                     <div class="text-end">
                         <a class="btn btn-primary btn-sm"
-                            href="{{ route('menu.detail-order', ['orderId' => $o['XX_TransOrder_ID']]) }}">
+                            href="{{ route('menu.detail-order', ['orderId' => $o->xx_transorder_id]) }}">
                             Pilih
                         </a>
                     </div>

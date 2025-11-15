@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\Menu\HistoriController;
-use App\Http\Controllers\Menu\ProfilController;
 use App\Http\Modules\PlannerModules\Controllers\Web\WebDashboardController;
 use App\Http\Modules\PlannerModules\Controllers\Web\WebDriverController;
 use App\Http\Modules\PlannerModules\Controllers\Web\WebProfileController;
 use App\Http\Modules\PlannerModules\Controllers\Web\WebTransTrackingController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 // ROLE PLANNER
@@ -27,13 +25,12 @@ Route::middleware(['checkrole:1000051'])->group(function () {
         Cache::forget('all_active_drivers');
         return "Cache driver telah dihapus. Silakan refresh halaman utama.";
     });
-    // Route::get('/driver/{id}', [DriverController::class, 'detail'])->name('driver.detail');
 
     Route::get('/profile/planner', [WebProfileController::class, 'index'])
         ->name('menu.profil.planner');
 
     Route::get('/histori/all', [WebTransTrackingController::class, 'index'])->name('histori.planner');
-    Route::get('/history/detail/{id}', [HistoriController::class, 'detailPlanner'])
+    Route::get('/history/detail/{id}', [WebTransTrackingController::class, 'detail'])
         ->whereNumber('id') // memastikan ID hanya angka
         ->name('histori.planner.detail');
 });

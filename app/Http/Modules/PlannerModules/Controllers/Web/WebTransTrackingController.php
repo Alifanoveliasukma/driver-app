@@ -4,17 +4,46 @@ namespace App\Http\Modules\PlannerModules\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Modules\PlannerModules\Services\TransTrackingService;
+use App\Services\TransportStatusApi;
+use App\Services\TransTrackingApi;
 use Illuminate\Http\Request;
 
+class WebTransTrackingController extends Controller
+{
+    protected $transportStatus, $transTrackingApi;
 
-class WebTransTrackingController extends Controller{
+    public function __construct(TransportStatusApi $transportStatus, TransTrackingApi $transTrackingApi)
+    {
+        $this->transportStatus = $transportStatus;
+        $this->transTrackingApi = $transTrackingApi;
+    }
+
+    /**
+     * Show history index page for planner
+     */
     public function index(Request $request)
     {
         $res = TransTrackingService::getAllTransTracking($request);
-        if($res['success']){
+        if ($res['success']) {
             $data = $res['data'];
             return view('planner.history.index', compact('data'));
         }
+    }
+
+    /**
+     * Show detail page for planner
+     */
+    public function detail($id)
+    {
+        $data = TransTrackingService::getTransportStatusDetail($id, $this->transportStatus);
+
+        if (!$data) {
+            return redirect()->route('histori.planner')->with('error', 'Detail Transport tidak ditemukan.');
+        }
+
+        $trackingHistory = TransTrackingService::getTrackingHistory($id, $this->transTrackingApi);
+
+        return view('planner.history.detail', compact('data', 'trackingHistory'));
     }
 
     // public function detailPlanner($id)
