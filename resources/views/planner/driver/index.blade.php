@@ -4,9 +4,8 @@
 
 @section('content')
 <div class="container py-3">
-    <h4 class="fw-bold text-primary mb-4">🚛 Daftar Semua Driver</h4>
+    <h4 class="fw-bold text-primary mb-4">Daftar Semua Driver</h4>
 
-    {{-- Pesan Sukses (digunakan saat clear cache) --}}
     @if(session('success_message'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i> {{ session('success_message') }}
@@ -20,27 +19,31 @@
         </div>
     @endisset
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        {{-- Pencarian menggunakan Form, dikirim ke Controller --}}
-        <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2">
-            <label for="searchInput" class="form-label mb-0 fw-semibold">Cari Driver:</label>
-            <input type="text" class="form-control w-auto shadow-sm" id="searchInput" name="search" 
-                   placeholder="Ketik NIP, Nama, atau Status..." 
-                   value="{{ $search ?? '' }}">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Cari</button>
-            @if(isset($search))
-                <a href="{{ url()->current() }}" class="btn btn-outline-secondary">Reset</a>
-            @endif
-        </form>
+    <div class="row g-2 mb-4">
+        <div class="col-12">
+            <form action="{{ url()->current() }}" method="GET" class="d-flex align-items-center gap-2">
+                <label for="searchInput" class="form-label mb-0 fw-semibold d-none d-sm-block">Cari Driver:</label> 
+                <input type="text" class="form-control w-auto flex-grow-1 shadow-sm" id="searchInput" name="search" 
+                    placeholder="Ketik NIP, Nama, atau Status..." 
+                    value="{{ $search ?? '' }}">
+                
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
+                @if(isset($search))
+                    <a href="{{ url()->current() }}" class="btn btn-outline-secondary d-none d-sm-block">Reset</a>
+                @endif
+            </form>
+        </div>
 
-        <div class="d-flex gap-2">
-            <a href="{{ route('driver.create') }}" class="btn btn-success fw-semibold shadow-sm">
-                <i class="bi bi-plus-lg me-1"></i> Tambah Driver
-            </a>
-            
-            <a href="{{ url()->current() }}?clear_cache=true" class="btn btn-sm btn-outline-danger" title="Hapus cache driver dan muat ulang data">
-                <i class="bi bi-arrow-clockwise me-1"></i> Clear Cache
-            </a>
+        <div class="col-12">
+            <div class="d-flex gap-2 w-100">
+                <a href="{{ route('driver.create') }}" class="btn btn-success fw-semibold shadow-sm flex-fill">
+                    <i class="bi bi-plus-lg me-1"></i> Tambah Driver
+                </a>
+                
+                <a href="{{ url()->current() }}?clear_cache=true" class="btn btn-sm btn-outline-danger flex-fill" title="Hapus cache driver dan muat ulang data">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Clear Cache
+                </a>
+            </div>
         </div>
     </div>
 
@@ -102,14 +105,14 @@
                     </table>
                 </div>
 
-                <!-- ✅ Pagination Sesuai Contoh User -->
-                <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap">
                     <div class="text-muted">
                         Menampilkan **{{ $driverData->firstItem() ?? 0 }}** - **{{ $driverData->lastItem() ?? 0 }}** dari **{{ $driverData->total() }}** data
                     </div>
-                    <div>
-                        {{-- Menggunakan vendor.pagination.bootstrap-4 dan onEachSide(1) --}}
-                        {{ $driverData->onEachSide(1)->appends(['search' => $search])->links('vendor.pagination.bootstrap-4') }}
+                    <div class="order-2 w-100 overflow-auto"> 
+                        <div class="d-flex justify-content-center"> {{-- Menggunakan vendor.pagination.bootstrap-4 dan onEachSide(1) --}}
+                            {{ $driverData->onEachSide(1)->appends(['search' => $search])->links('vendor.pagination.bootstrap-4') }}
+                        </div>
                     </div>
                 </div>
                 <p class="text-muted small mt-2 mb-0">

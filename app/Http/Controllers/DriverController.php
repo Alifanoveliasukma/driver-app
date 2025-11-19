@@ -45,7 +45,6 @@ class DriverController extends Controller
                         'd.driverstatus',
                         'd.xm_fleet_id',
                         'd.accountno',
-                        'd.accountname',
                         'bp.c_bpartner_id',
                         'bp.value as bp_value',
                         'bp.name as bp_name',
@@ -56,7 +55,6 @@ class DriverController extends Controller
                     ->where('d.isactive', 'Y')
                     ->get();
             });
-            // dd($allDriverData);
             $collection = $allDriverData;
 
             if ($search) {
@@ -112,14 +110,13 @@ class DriverController extends Controller
             'xm_fleet_id' => 'nullable|integer',
             // 'krani_id' => 'nullable|integer',
             'account_no' => 'nullable|string|max:50',
-            'account_name' => 'nullable|string|max:255',
             'note' => 'nullable|string',
         ]);
 
         $user_data = $request->only(['user_value', 'user_name', 'user_password']);
         $user_data['is_full_bp_access'] = 'Y';
         $user_data['is_login_user'] = 'Y';
-        $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'note', 'account_name', 'account_no']);
+        $driver_data = $request->only(['driver_status', 'xm_fleet_id', 'note', 'account_no']);
 
         $debug_data = []; 
         $userId = null; 

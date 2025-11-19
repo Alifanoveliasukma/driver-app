@@ -6,11 +6,10 @@
 <div class="container py-3">
     <div class="card shadow-lg border-0 mb-4">
         <div class="card-header bg-primary text-white border-bottom-0">
-            <h4 class="mb-0 fw-bold">👤 Pendaftaran User & Driver Baru</h4>
+            <h4 class="mb-0 fw-bold">Pendaftaran User & Driver Baru</h4>
         </div>
         <div class="card-body p-4">
 
-            {{-- ALERT MESSAGES --}}
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
@@ -143,16 +142,10 @@
                             </div> -->
 
                             <div class="col-md-6 mb-3">
-                                <label for="account_no" class="form-label fw-semibold">No. Rekening (AccountNo)</label>
+                                <label for="account_no" class="form-label fw-semibold">No. Akun</label>
                                 <input type="text" name="account_no" id="account_no" class="form-control @error('account_no') is-invalid @enderror" value="{{ old('account_no') }}">
                                 @error('account_no')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="account_name" class="form-label fw-semibold">Nama Akun/Bank (Account)</label>
-                            <input type="text" name="account_name" id="account_name" class="form-control @error('account_name') is-invalid @enderror" value="{{ old('account_name') }}">
-                            @error('account_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
                         <div class="mb-3">
@@ -164,9 +157,8 @@
                 </div>
                 {{-- END STEP 2 --}}
 
-
-                {{-- NAVIGATION BUTTONS --}}
-                <div class="d-flex justify-content-between mt-4">
+                <div class="d-flex justify-content-between mt-4 mb-5">
+                    {{-- NAVIGATION BUTTONS --}}
                     <a href="{{ route('driver.index') }}" class="btn btn-outline-secondary" id="backToListBtn">
                         <i class="bi bi-arrow-left me-1"></i> Kembali ke Daftar Driver
                     </a>

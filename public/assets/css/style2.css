@@ -1,0 +1,56 @@
+#wrapper {
+    overflow-x: hidden; 
+}
+
+#sidebar-wrapper {
+    width: 250px; 
+    position: fixed;
+    height: 100%;
+    z-index: 1000; 
+    transition: all 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
+#page-content-wrapper {
+    margin-left: 250px; 
+    padding-top: 15px;
+    min-width: 0; 
+}
+@media (max-width: 991.98px) {
+    #sidebar-wrapper {
+        margin-left: -250px; 
+        position: fixed; 
+    }
+
+    #page-content-wrapper {
+        margin-left: 0; 
+        width: 100%; 
+    }
+    
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0; 
+    }
+    
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: 250px; 
+    }
+}
+
+
+#driverTable, 
+#driverTable th, 
+#driverTable td {
+    border: none !important; 
+}
+
+#driverTable tbody tr {
+    border-bottom: 1px solid #e9ecef; 
+}
+
+#driverTable tbody tr:last-child {
+    border-bottom: none !important;
+}
+
+#driverTable thead tr {
+    border-bottom: 2px solid #dee2e6; 
+}
