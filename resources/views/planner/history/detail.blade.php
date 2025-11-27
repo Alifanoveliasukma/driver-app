@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h4 class="mb-4">Transport Detail (Dummy)</h4>
+    <h4 class="mb-4">Transport Detail</h4>
 
     <form>
         <div class="row mb-3">
